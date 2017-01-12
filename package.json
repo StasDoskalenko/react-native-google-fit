@@ -28,6 +28,10 @@
   "bugs": {
     "url": "https://github.com/StasDoskalenko/react-native-google-fit/issues"
   },
+  "dependencies": {
+    "react-native": ">= 0.34.0",
+    "moment": ">= 2.1.0"
+  },
   "peerDependencies": {
     "react-native": ">= 0.34.0",
     "moment": ">= 2.1.0"
