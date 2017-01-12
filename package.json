@@ -1,0 +1,35 @@
+
+{
+  "name": "react-native-google-fit",
+  "version": "0.0.1",
+  "description": "A React Native bridge module for interacting with Google Fit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "google-fit",
+    "Google",
+    "health",
+    "fit",
+    "google fit",
+    "android",
+    "fitness",
+    "native",
+    "ReactNative"
+  ],
+  "author": "Stanislav Doskalenko",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/https://github.com/StasDoskalenko/react-native-google-fit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/https://github.com/StasDoskalenko/react-native-google-fit/issues"
+  },
+  "peerDependencies": {
+    "react-native": ">= 0.34.0",
+    "moment": ">= 2.1.0"
+  }
+}
