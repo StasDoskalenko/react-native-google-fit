@@ -81,7 +81,7 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
  
  ```
  
- # PLANS / TODO
+ ### PLANS / TODO
  
  * support of all Google Fit activity types
  * code refactoring
