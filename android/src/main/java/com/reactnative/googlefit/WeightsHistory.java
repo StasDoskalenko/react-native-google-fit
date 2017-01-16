@@ -41,19 +41,19 @@ public class WeightsHistory {
 
     private static final String TAG = "Weights History";
 
-    public StepHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
+    public WeightsHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
     }
 
-    public void displayLastWeeksData(long startTime, long endTime) {
+    public Object displayLastWeeksData(long startTime, long endTime) {
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
 
         //Check how many steps were walked and recorded in the last 7 days
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_WEIGHT_SUMMARY)
+                .aggregate(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
                 .bucketByTime(1, TimeUnit.DAYS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();

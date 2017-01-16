@@ -27,15 +27,13 @@ class RNGoogleFit {
     }
 
     getWeightSamples(startDate,endDate,callback) {
-        googleFit.getWeeklySteps(   startDate.toDate().getTime(),
-                                    startDate.endDate().getTime(),
+        googleFit.getWeightSamples( startDate,
+                                    endDate,
                                     (msg) => {
-                                        console.log('error');
-                                        console.log(msg);
+                                        callback(msg,false);
                                     },
                                     (res) => {
-                                        console.log('success');
-                                        console.log(res);
+                                        callback(false,res);
                                     });
     }
 

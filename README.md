@@ -3,7 +3,15 @@
 
 A React Native bridge module for interacting with Google Fit
 
-##First release, feel free to contribute
+Changelog:
+
+```
+
+0.0.8 - Weights Samples support
+
+0.0.1 - 0.0.7 Initial builds
+
+```
 
 ## Getting started
 
@@ -70,8 +78,18 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
     }
  
  ```
- 
- 4. Other methods:
+
+ 4. Retrieve Weights
+
+ ```
+
+ GoogleFit.getWeightSamples(moment().startOf('month').unix(), moment().unix(), (err,res) => {
+                    console.log(res);
+     });
+
+ ```
+
+ 5. Other methods:
  
  ``` 
  GoogleFit.observeSteps(callback); //On Step Changed Event

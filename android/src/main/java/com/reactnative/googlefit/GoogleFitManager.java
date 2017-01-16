@@ -123,13 +123,13 @@ public class GoogleFitManager implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "Failed AuthorizationMgr:" + connectionResult);
+        Log.i(TAG, "Failed Authorization Mgr:" + connectionResult);
         if (!authInProgress) {
             try {
                 authInProgress = true;
                 connectionResult.startResolutionForResult(this.activity, REQUEST_OAUTH);
             } catch (IntentSender.SendIntentException e) {
-
+                Log.i(TAG, "Failed again: " + e);
             }
         } else {
             Log.i(TAG, "authInProgress");
@@ -137,14 +137,14 @@ public class GoogleFitManager implements
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if ((mGoogleApiClient != null) && (mGoogleApiClient.isConnected())) {
-            mGoogleApiClient.disconnect();
-        }
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//
+//        if ((mGoogleApiClient != null) && (mGoogleApiClient.isConnected())) {
+//            mGoogleApiClient.disconnect();
+//        }
+//    }
 
 
     protected void stop() {
@@ -179,8 +179,9 @@ public class GoogleFitManager implements
                     mApiClient.connect();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Log.e(TAG, "RESULT_CANCELED ale co tam");
-                mApiClient.connect();
+                Log.e(TAG, "RESULT_CANCELED");
+                this.authorize();
+                //mApiClient.connect();
             }
         } else {
             Log.e(TAG, "requestCode NOT request_oauth");
