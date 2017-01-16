@@ -1,3 +1,4 @@
+'use strict'
 
 import {
         NativeModules,
@@ -23,6 +24,19 @@ class RNGoogleFit {
 
     getWeeklySteps(startDate) {
         googleFit.getWeeklySteps(startDate.toDate().getTime(), moment().toDate().getTime());
+    }
+
+    getWeightSamples(startDate,endDate,callback) {
+        googleFit.getWeeklySteps(   startDate.toDate().getTime(),
+                                    startDate.endDate().getTime(),
+                                    (msg) => {
+                                        console.log('error');
+                                        console.log(msg);
+                                    },
+                                    (res) => {
+                                        console.log('success');
+                                        console.log(res);
+                                    });
     }
 
     observeSteps(callback) {
@@ -55,3 +69,5 @@ class RNGoogleFit {
 }
 
 export default new RNGoogleFit();
+
+//module.exports = RNGoogleFit;

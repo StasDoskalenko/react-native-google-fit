@@ -63,6 +63,20 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
         googleFitManager.getStepHistory().displayLastWeeksData((long)startDate, (long)endDate);
     }
 
+    @ReactMethod
+    public void getWeightSamples(double startDate,
+                                 double endDate,
+                                 Callback errorCallback,
+                                 Callback successCallback) {
+
+        try {
+            successCallback.invoke(googleFitManager.getWeightsHistory().displayLastWeeksData((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+
 
 
 

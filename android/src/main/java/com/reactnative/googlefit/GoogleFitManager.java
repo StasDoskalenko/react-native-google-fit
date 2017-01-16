@@ -46,6 +46,7 @@ public class GoogleFitManager implements
 
 
     private StepHistory stepHistory;
+    private WeightsHistory weightsHistory;
     private StepCounter stepCounter;
     private StepSensor stepSensor;
 
@@ -63,6 +64,7 @@ public class GoogleFitManager implements
 
         this.stepCounter = new StepCounter(mReactContext, this, activity);
         this.stepHistory = new StepHistory(mReactContext, this);
+        this.weightsHistory = new WeightsHistory(mReactContext, this);
 
 //        this.stepSensor = new StepSensor(mReactContext, activity);
 
@@ -79,6 +81,10 @@ public class GoogleFitManager implements
 
     public StepHistory getStepHistory() {
         return stepHistory;
+    }
+
+    public WeightsHistory getWeightsHistory() {
+        return weightsHistory;
     }
 
 
