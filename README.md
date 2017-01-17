@@ -6,10 +6,13 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.0.9   - Weights Save Support
+        - Refactor methods to be compatible with react-native-apple-healthkit module
+        - Remove 'moment.js' dependency
 
-0.0.8 - Weights Samples support
+0.0.8   - Weights Samples support
 
-0.0.1 - 0.0.7 Initial builds
+0.0.1   - 0.0.7 Initial builds
 
 ```
 
@@ -48,14 +51,14 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
 2. Authorize:
 
 ```      
-        await GoogleFit.authorizeFit();
+        GoogleFit.authorizeFit();
         GoogleFit.onAuthorize((result) => {
              //console.log(result);
              dispatch('AUTH SUCCESS');
         });
  ```
  
- 3. Retrieve Steps For Period 
+3. Retrieve Steps For Period
  
  GoogleFit.getSteps(dayStart, dayEnd);
  
@@ -65,8 +68,8 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
     
     let retrieveDailySteps = () => {
         return async (dispatch) => {
-            var todayStart = TimeUtil.getStartOfToday();
-            var dayEnd = TimeUtil.getEndOfToday();
+            let todayStart = "2017-01-01T00:00:17.971Z"; //ISO Time String
+            let dayEnd = "2017-01-01T23:59:17.971Z"; //ISO Time String
             await GoogleFit.getSteps(todayStart, dayEnd);
             await GoogleFit.observeHistory((results) => {
                 if (results.length > 0) {
@@ -79,17 +82,40 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
  
  ```
 
- 4. Retrieve Weights
+4. Retrieve Weights
 
  ```
 
- GoogleFit.getWeightSamples(moment().startOf('month').unix(), moment().unix(), (err,res) => {
-                    console.log(res);
-     });
+ let opt =   {
+                unit: 'pound',										// required; default 'kg'
+                startDate: "2017-01-01T00:00:17.971Z",		        // required
+                endDate: (new Date()).toISOString(),				// required
+                ascending: false									// optional; default false
+             };
+ GoogleFit.getWeightSamples(opt, (err,res) => {
+        console.log(res);
+ });
 
  ```
 
- 5. Other methods:
+
+5. Save Weights
+
+ ```
+
+    let opt =   {
+                    value: 200,
+                    date: (new Date().toISOString()),
+                    unit: "pound"
+                };
+    GoogleFit.saveWeight(opt, (err, res)=> {
+         if (err) throw 'Cant save data to the Google Fit';
+    });
+
+ ```
+
+
+6. Other methods:
  
  ``` 
  GoogleFit.observeSteps(callback); //On Step Changed Event
@@ -99,7 +125,7 @@ then, in MainApplication.java, you need to pass MainActivity.activity to the mod
  
  ```
  
- ### PLANS / TODO
+### PLANS / TODO
  
  * support of all Google Fit activity types
  * code refactoring

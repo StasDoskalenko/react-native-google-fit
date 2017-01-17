@@ -54,7 +54,7 @@ public class GoogleFitManager implements
 
     public GoogleFitManager(ReactContext reactContext, Activity activity) {
 
-        Log.i(TAG, "Initializing GoogleFitManager" + authInProgress);
+        //Log.i(TAG, "Initializing GoogleFitManager" + authInProgress);
         this.mReactContext = reactContext;
         this.activity = activity;
 
@@ -90,7 +90,7 @@ public class GoogleFitManager implements
 
     public void authorize() {
 
-        Log.i(TAG, "Authorizing");
+        //Log.i(TAG, "Authorizing");
         mApiClient = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
                 .addApi(Fitness.SENSORS_API)
                 .addApi(Fitness.HISTORY_API)
@@ -106,7 +106,7 @@ public class GoogleFitManager implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i(TAG, "Connected");
+        //Log.i(TAG, "Connected");
 
         //stepCounter.findFitnessDataSources();
         WritableMap map = Arguments.createMap();
@@ -118,12 +118,15 @@ public class GoogleFitManager implements
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i("AuthorizationMgr", "Connection Suspended");
+        //Log.i("AuthorizationMgr", "Connection Suspended");
+        if ((mApiClient != null) && (mApiClient.isConnected())) {
+            mApiClient.disconnect();
+        }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "Failed Authorization Mgr:" + connectionResult);
+        //Log.i(TAG, "Failed Authorization Mgr:" + connectionResult);
         if (!authInProgress) {
             try {
                 authInProgress = true;
@@ -131,20 +134,12 @@ public class GoogleFitManager implements
             } catch (IntentSender.SendIntentException e) {
                 Log.i(TAG, "Failed again: " + e);
             }
-        } else {
-            Log.i(TAG, "authInProgress");
-        }
+        }// else {
+        //Log.i(TAG, "authInProgress");
+        //}
 
     }
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//
-//        if ((mGoogleApiClient != null) && (mGoogleApiClient.isConnected())) {
-//            mGoogleApiClient.disconnect();
-//        }
-//    }
 
 
     protected void stop() {
@@ -171,7 +166,7 @@ public class GoogleFitManager implements
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult" + requestCode);
+        //Log.i(TAG, "onActivityResult" + requestCode);
         if (requestCode == REQUEST_OAUTH) {
             authInProgress = false;
             if (resultCode == Activity.RESULT_OK) {
@@ -179,13 +174,13 @@ public class GoogleFitManager implements
                     mApiClient.connect();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Log.e(TAG, "RESULT_CANCELED");
+                //Log.e(TAG, "RESULT_CANCELED");
                 this.authorize();
                 //mApiClient.connect();
             }
-        } else {
-            Log.e(TAG, "requestCode NOT request_oauth");
-        }
+        } //else {
+        //Log.e(TAG, "requestCode NOT request_oauth");
+        //}
 
     }
 
