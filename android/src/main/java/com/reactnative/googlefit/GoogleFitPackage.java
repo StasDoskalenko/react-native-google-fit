@@ -23,19 +23,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GoogleFitPackage implements ReactPackage{
-
-    private Activity activity;
-
-    public GoogleFitPackage(Activity activity) {
-        this.activity = activity;
-    }
+public class GoogleFitPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new GoogleFitModule(reactContext, activity));
+        modules.add(new GoogleFitModule(reactContext));
 
         return modules;
     }

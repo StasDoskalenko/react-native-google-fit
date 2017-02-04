@@ -20,13 +20,9 @@ Changelog:
 
 `$ npm install react-native-google-fit --save`
 
-### Mostly automatic installation
+### Automatic installation
 
 `$ react-native link react-native-google-fit`
-
-then, in MainApplication.java, you need to pass MainActivity.activity to the module:
-
-`new GoogleFitPackage(MainActivity.activity),`
 
 ### Manual installation
 
