@@ -26,14 +26,12 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
 
     private static final String REACT_MODULE = "RNGoogleFit";
     private ReactContext mReactContext;
-    private GoogleFitManager googleFitManager;
-    private Activity activity;
+    private GoogleFitManager googleFitManager = null;
 
-    public GoogleFitModule(ReactApplicationContext reactContext, Activity activity) {
+    public GoogleFitModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
         this.mReactContext = reactContext;
-        this.activity = activity;
     }
 
 
@@ -44,6 +42,8 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void authorize() {
+        final Activity activity = getCurrentActivity();
+
         if(googleFitManager == null) {
             googleFitManager = new GoogleFitManager(mReactContext, activity);
         }
@@ -90,10 +90,4 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
             errorCallback.invoke(e.getMessage());
         }
     }
-
-
-
-
-
-
 }
