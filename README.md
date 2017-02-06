@@ -6,6 +6,11 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.1.0-beta
+        - getting activity within module itself
+        - fixed package name dependency
+        - provided more detailed documentation
+
 0.0.9   - Weights Save Support
         - Refactor methods to be compatible with react-native-apple-healthkit module
         - Remove 'moment.js' dependency
@@ -16,19 +21,33 @@ Changelog:
 
 ```
 
-## Getting started
+### Getting started
 
 `$ npm install react-native-google-fit --save`
 
-### Automatic installation
+### Enable Google Fitness API for your application
+
+In order for your app to communicate properly with the Google Fitness API you need to enable Google Fit API in your Google API Console.
+Also you need to generate new client ID for your app and provide both debug and release SHA keys.
+Another step is to configure the consent screen, etc.
+
+More detailed info available at
+https://developers.google.com/fit/android/get-api-key
+
+### Mostly Automatic installation
 
 `$ react-native link react-native-google-fit`
+
+then pass your package name to the module in MainApplication.java (google fit requires package name to save data)
+
+
+`new GoogleFitPackage(BuildConfig.APPLICATION_ID)`
 
 ### Manual installation
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import com.reactnative.googlefit.GoogleFitPackage;` to the imports at the top of the file
-  - Add `new GoogleFitPackage(MainActivity.activity),` to the list returned by the `getPackages()` method
+  - Add `new GoogleFitPackage(BuildConfig.APPLICATION_ID),` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```
   	 include ':react-native-google-fit'

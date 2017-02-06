@@ -21,6 +21,12 @@ import java.util.*;
 
 public class GoogleFitPackage implements ReactPackage {
 
+    public static String PACKAGE_NAME;
+
+    public GoogleFitPackage(String PACKAGE_NAME) {
+        this.PACKAGE_NAME = PACKAGE_NAME;
+    }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();

@@ -153,7 +153,7 @@ public class WeightsHistory {
     private DataSet createDataForRequest(DataType dataType, int dataSourceType, Double value,
                                          long startTime, long endTime, TimeUnit timeUnit) {
         DataSource dataSource = new DataSource.Builder()
-                .setAppPackageName("com.newtopia")
+                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
                 .setDataType(dataType)
                 .setType(dataSourceType)
                 .build();
