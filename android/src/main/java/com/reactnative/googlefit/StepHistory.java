@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -48,6 +49,46 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
+    public ReadableArray aggregateDataByDate(long startTime, long endTime) {
+
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        //Check how many steps were walked and recorded in specified days
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+
+        WritableArray map = Arguments.createArray();
+
+        //Used for aggregated data
+        if (dataReadResult.getBuckets().size() > 0) {
+            Log.i(TAG, "Number of buckets: " + dataReadResult.getBuckets().size());
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    processDataSet(dataSet, map);
+                }
+            }
+        }
+        //Used for non-aggregated data
+        else if (dataReadResult.getDataSets().size() > 0) {
+            Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                processDataSet(dataSet, map);
+            }
+        }
+
+        return map;
+    }
+
+    //Will be deprecated in future releases
     public void displayLastWeeksData(long startTime, long endTime) {
 /*        Calendar cal = Calendar.getInstance();
         Date now = new Date();
@@ -57,8 +98,8 @@ public class StepHistory {
         long startTime = cal.getTimeInMillis();*/
 
         DateFormat dateFormat = DateFormat.getDateInstance();
-        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
-        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+        //Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        //Log.i(TAG, "Range End: " + dateFormat.format(endTime));
 
         //Check how many steps were walked and recorded in the last 7 days
         DataReadRequest readRequest = new DataReadRequest.Builder()
@@ -119,10 +160,8 @@ public class StepHistory {
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("steps", dp.getValue(field).asInt());
-
                 map.pushMap(stepMap);
             }
-
         }
     }
 

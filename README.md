@@ -7,6 +7,10 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.1.1-beta
+        - getDailyStepCountSamples method compatible with Apple Healthkit module
+        - started to implement JSDoc documentation
+
 0.1.0
         - getting activity within module itself
         - fixed package name dependency

@@ -15,15 +15,57 @@ class RNGoogleFit {
         googleFit.authorize();
     }
 
-    getSteps(dayStart,dayEnd) { //TODO: refactor method as in react-native-apple-healthkit
+    //Will be deprecated in future releases
+    getSteps(dayStart,dayEnd) {
         googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd));
     }
 
-    getWeeklySteps(startDate) { //TODO: refactor method as in react-native-apple-healthkit
+    //Will be deprecated in future releases
+    getWeeklySteps(startDate) {
         googleFit.getWeeklySteps(Date.parse(startDate), Date.now());
     }
 
-    getWeightSamples(options,callback) {
+
+    /**
+     * Get the total steps per day over a specified date range.
+     * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @callback callback The function will be called with an array of elements.
+     */
+
+    getDailyStepCountSamples(options, callback) {
+        let startDate = Date.parse(options.startDate);
+        let endDate = Date.parse(options.endDate);
+        console.log('Start Date', startDate);
+        console.log('End Date', endDate);
+        googleFit.getDailyStepCountSamples( startDate,
+            endDate,
+            (msg) => {
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.value) {
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any steps data for this period", false);
+                }
+            });
+    }
+
+    /**
+     * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
+     * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
+     *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @callback callback The function will be called with an array of elements.
+     */
+
+    getWeightSamples(options, callback) {
         let startDate = Date.parse(options.startDate);
         let endDate = Date.parse(options.endDate);
         googleFit.getWeightSamples( startDate,
@@ -45,7 +87,7 @@ class RNGoogleFit {
                     });
                     callback(false, res.filter(day => day != undefined));
                 } else {
-                    callback("There is no any fit data for this period", false);
+                    callback("There is no any weight data for this period", false);
                 }
             });
     }

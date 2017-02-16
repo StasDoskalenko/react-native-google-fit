@@ -67,6 +67,19 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getDailyStepCountSamples(double startDate,
+                                 double endDate,
+                                 Callback errorCallback,
+                                 Callback successCallback) {
+
+        try {
+            successCallback.invoke(googleFitManager.getStepHistory().aggregateDataByDate((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
     public void getWeightSamples(double startDate,
                                  double endDate,
                                  Callback errorCallback,
