@@ -35,8 +35,6 @@ class RNGoogleFit {
     getDailyStepCountSamples(options, callback) {
         let startDate = Date.parse(options.startDate);
         let endDate = Date.parse(options.endDate);
-        console.log('Start Date', startDate);
-        console.log('End Date', endDate);
         googleFit.getDailyStepCountSamples( startDate,
             endDate,
             (msg) => {
