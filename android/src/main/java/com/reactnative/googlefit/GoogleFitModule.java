@@ -103,4 +103,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
             errorCallback.invoke(e.getMessage());
         }
     }
+
+    @ReactMethod
+    public void deleteWeight(ReadableMap weightSample, Callback errorCallback, Callback successCallback) {
+        try {
+            successCallback.invoke(googleFitManager.getWeightsHistory().deleteWeight(weightSample));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
 }

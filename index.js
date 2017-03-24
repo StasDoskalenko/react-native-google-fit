@@ -105,6 +105,21 @@ class RNGoogleFit {
             });
     }
 
+    deleteWeight(options, callback) {
+        if (options.unit == 'pound') {
+            options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
+        }
+        options.date = Date.parse(options.date);
+        googleFit.deleteWeight( options,
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+
+            });
+    }
+
     observeSteps(callback) {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',
