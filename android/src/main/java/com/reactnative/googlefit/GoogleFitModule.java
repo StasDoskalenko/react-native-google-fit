@@ -143,12 +143,10 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
     }
 
     private boolean isEnabledCheck() {
-
-        if (googleFitManager != null) {
-            return googleFitManager.isAuthorize();
-        } else {
-            return false;
+        if (googleFitManager == null) {
+            googleFitManager = new GoogleFitManager(mReactContext, getCurrentActivity());
         }
+        return googleFitManager.isAuthorize();
     }
 
 }
