@@ -123,12 +123,30 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void isEnabled(Callback errorCallback, Callback successCallback) { // true if permission granted
+        try {
+            successCallback.invoke(isEnabledCheck());
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
     private boolean isAvailableCheck() {
         PackageManager pm = mReactContext.getPackageManager();
         try {
             pm.getPackageInfo(GOOGLE_FIT_APP_URI, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    private boolean isEnabledCheck() {
+
+        if (googleFitManager != null) {
+            return googleFitManager.isAuthorize();
+        } else {
             return false;
         }
     }

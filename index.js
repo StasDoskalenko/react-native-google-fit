@@ -130,6 +130,16 @@ class RNGoogleFit {
             });
     }
 
+    isEnabled(callback) { // true if permission granted
+        googleFit.isEnabled(
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+            });
+    }
+
     observeSteps(callback) {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',
