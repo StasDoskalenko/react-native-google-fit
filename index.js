@@ -120,6 +120,16 @@ class RNGoogleFit {
             });
     }
 
+    isAvailable(callback) { // true if GoogleFit installed
+        googleFit.isAvailable(
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+            });
+    }
+
     observeSteps(callback) {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',
