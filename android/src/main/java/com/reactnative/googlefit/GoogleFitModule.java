@@ -124,8 +124,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
     }
 
     private boolean isAvailableCheck() {
-        Log.w("myLog", "isAvailable");
-
         PackageManager pm = mReactContext.getPackageManager();
         try {
             pm.getPackageInfo(GOOGLE_FIT_APP_URI, PackageManager.GET_ACTIVITIES);
