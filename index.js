@@ -105,6 +105,41 @@ class RNGoogleFit {
             });
     }
 
+    deleteWeight(options, callback) {
+        if (options.unit == 'pound') {
+            options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
+        }
+        options.date = Date.parse(options.date);
+        googleFit.deleteWeight( options,
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+
+            });
+    }
+
+    isAvailable(callback) { // true if GoogleFit installed
+        googleFit.isAvailable(
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+            });
+    }
+
+    isEnabled(callback) { // true if permission granted
+        googleFit.isEnabled(
+            (msg) => {
+                callback(msg,false);
+            },
+            (res) => {
+                callback(false,res);
+            });
+    }
+
     observeSteps(callback) {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',

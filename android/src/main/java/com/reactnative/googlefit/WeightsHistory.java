@@ -18,6 +18,8 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -25,6 +27,7 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 
@@ -104,6 +107,51 @@ public class WeightsHistory {
         return true;
     }
 
+    public boolean deleteWeight(ReadableMap weightSample) {
+
+        DateFormat dateFormat = DateFormat.getDateInstance();
+
+        long endTime = (long) weightSample.getDouble("endTime");
+        long startTime = (long) weightSample.getDouble("startTime");
+
+        new DeleteDataTask(startTime, endTime).execute();
+
+        return true;
+    }
+
+    //Async fit data delete
+    private class DeleteDataTask extends AsyncTask<Void, Void, Void> {
+
+        long startTime;
+        long endTime;
+
+        DeleteDataTask(long startTime, long endTime) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            DataDeleteRequest request = new DataDeleteRequest.Builder()
+                    .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+                    .addDataType(DataType.TYPE_WEIGHT)
+                    .build();
+
+            com.google.android.gms.common.api.Status insertStatus =
+                    Fitness.HistoryApi.deleteData(googleFitManager.getGoogleApiClient(), request)
+                            .await(1, TimeUnit.MINUTES);
+
+            if (insertStatus.isSuccess()) {
+                Log.w("myLog", "+Successfully deleted data.");
+            } else {
+                Log.w("myLog", "+Failed to delete data.");
+            }
+
+            return null;
+        }
+    }
+
 
     //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
@@ -181,9 +229,9 @@ public class WeightsHistory {
 
             int i = 0;
 
-            for(Field field : dp.getDataType().getFields()) {
+            for (Field field : dp.getDataType().getFields()) {
                 i++;
-                if (i>1) continue; //Get only average instance
+                if (i > 1) continue; //Get only average instance
 
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));

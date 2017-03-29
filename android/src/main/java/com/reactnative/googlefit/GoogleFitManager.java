@@ -124,6 +124,14 @@ public class GoogleFitManager implements
         }
     }
 
+    public boolean isAuthorize() {
+        if (mApiClient != null && mApiClient.isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         //Log.i(TAG, "Failed Authorization Mgr:" + connectionResult);
