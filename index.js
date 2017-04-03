@@ -43,7 +43,7 @@ class RNGoogleFit {
             (res) => {
                 if (res.length>0) {
                     res = res.map((el) => {
-                        if (el.value) {
+                        if (el.steps) {
                             el.startDate = new Date(el.startDate).toISOString();
                             el.endDate = new Date(el.endDate).toISOString();
                             return el;
