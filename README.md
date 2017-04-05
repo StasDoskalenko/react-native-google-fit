@@ -7,6 +7,10 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.2.0   - getDailyDistanceSamples();
+        - isAvailable();
+        - isEnabled();
+        - deleteWeight(); 
 0.1.1-beta
         - getDailyStepCountSamples method compatible with Apple Healthkit module
         - started to implement JSDoc documentation
@@ -112,6 +116,7 @@ then pass your package name to the module in MainApplication.java (google fit re
                 endDate: (new Date()).toISOString(),				// required
                 ascending: false									// optional; default false
              };
+             
  GoogleFit.getWeightSamples(opt, (err,res) => {
         console.log(res);
  });
@@ -138,10 +143,17 @@ then pass your package name to the module in MainApplication.java (google fit re
 6. Other methods:
  
  ``` 
- GoogleFit.observeSteps(callback); //On Step Changed Event
+ observeSteps(callback); //On Step Changed Event
  
- GoogleFit.unsucscribeListeners(); //Put into componentWillUnmount() method to prevent leaks
+ unsucscribeListeners(); //Put into componentWillUnmount() method to prevent leaks
  
+ getDailyDistanceSamples(options, callback); - method to get daily distance
+ 
+ isAvailable(callback); - Checks is GoogleFit available for current account / installed on device
+ 
+ isEnabled(callback); - Checks is permissions granted
+ 
+ deleteWeight(options, callback); - method to delete weights by options (same as in save weights)
  
  ```
  
