@@ -44,7 +44,7 @@ public class GoogleFitManager implements
     private boolean authInProgress = false;
     private Activity activity;
 
-
+    private DistanceHistory distanceHistory;
     private StepHistory stepHistory;
     private WeightsHistory weightsHistory;
     private StepCounter stepCounter;
@@ -65,6 +65,7 @@ public class GoogleFitManager implements
         this.stepCounter = new StepCounter(mReactContext, this, activity);
         this.stepHistory = new StepHistory(mReactContext, this);
         this.weightsHistory = new WeightsHistory(mReactContext, this);
+        this.distanceHistory = new DistanceHistory(mReactContext, this);
 
 //        this.stepSensor = new StepSensor(mReactContext, activity);
 
@@ -87,6 +88,9 @@ public class GoogleFitManager implements
         return weightsHistory;
     }
 
+    public DistanceHistory getDistanceHistory() {
+        return distanceHistory;
+    }
 
     public void authorize() {
 
@@ -96,6 +100,7 @@ public class GoogleFitManager implements
                 .addApi(Fitness.HISTORY_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
+                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
