@@ -19,6 +19,9 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
+
 import com.facebook.react.uimanager.IllegalViewOperationException;
 
 
@@ -42,14 +45,21 @@ public class GoogleFitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void authorize() {
+    public void authorize(Callback error, Callback success) {
         final Activity activity = getCurrentActivity();
 
-        if(googleFitManager == null) {
+        if (googleFitManager == null) {
             googleFitManager = new GoogleFitManager(mReactContext, activity);
         }
 
-        googleFitManager.authorize();
+        if (googleFitManager.isAuthorize()) {
+            WritableMap map = Arguments.createMap();
+            map.putBoolean("authorized", true);
+            success.invoke(map);
+            return;
+        }
+
+        googleFitManager.authorize(error, success);
     }
 
     @ReactMethod
