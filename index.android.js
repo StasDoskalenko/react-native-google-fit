@@ -45,10 +45,13 @@ class RNGoogleFit {
             },
             (res) => {
                 if (res.length>0) {
-                    callback(false, [{
-                        source: "googlefit",
-                        steps: this.buildDailySteps(res)
-                    }]);
+                    callback(false, res.map(function(dev) {
+                        var obj = {};
+                        obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
+                        obj.steps = this.buildDailySteps(dev.steps);
+                        return obj;
+                        }, this)
+                    );
                 } else {
                     callback("There is no any steps data for this period", false);
                 }
