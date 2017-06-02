@@ -11,8 +11,11 @@ class RNGoogleFit {
     constructor() {
     }
 
-    authorizeFit() {
-        googleFit.authorize();
+    authorize(callback) {
+        googleFit.authorize(
+          msg => callback(msg, false),
+          res => callback(false, res)
+        );
     }
 
     //Will be deprecated in future releases
@@ -33,8 +36,8 @@ class RNGoogleFit {
      */
 
     getDailyStepCountSamples(options, callback) {
-        let startDate = Date.parse(options.startDate);
-        let endDate = Date.parse(options.endDate);
+        let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
+        let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
         googleFit.getDailyStepCountSamples( startDate,
             endDate,
             (msg) => {
@@ -42,18 +45,44 @@ class RNGoogleFit {
             },
             (res) => {
                 if (res.length>0) {
-                    res = res.map((el) => {
-                        if (el.steps || el.value) {
-                            el.startDate = new Date(el.startDate).toISOString();
-                            el.endDate = new Date(el.endDate).toISOString();
-                            return el;
-                        }
-                    });
-                    callback(false, res.filter(day => day != undefined));
+                    callback(false, res.map(function(dev) {
+                        var obj = {};
+                        obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
+                        obj.steps = this.buildDailySteps(dev.steps);
+                        return obj;
+                        }, this)
+                    );
                 } else {
                     callback("There is no any steps data for this period", false);
                 }
             });
+    }
+
+    buildDailySteps(steps)
+    {
+        let results = {};
+        for(var step of steps) {
+            if (step == undefined) continue;
+
+            var date = new Date(step.startDate);
+
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth()+1)).slice(-2);
+            var year = date.getFullYear();
+            var dateFormatted = year + "-" + month + "-" + day;
+
+            if (!(dateFormatted in results)) {
+                results[dateFormatted] = 0;
+            }
+
+            results[dateFormatted] += step.steps;
+        }
+
+        let results2 = [];
+        for(var index in results) {
+            results2.push({date: index, value: results[index]});
+        }
+        return results2;
     }
 
     /**

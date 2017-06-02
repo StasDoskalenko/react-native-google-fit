@@ -2,7 +2,7 @@
   "name": "react-native-google-fit",
   "version": "0.2.0",
   "description": "A React Native bridge module for interacting with Google Fit",
-  "main": "index.js",
+  "main": "index.android.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
