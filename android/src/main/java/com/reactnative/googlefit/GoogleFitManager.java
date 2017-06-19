@@ -11,8 +11,10 @@
 package com.reactnative.googlefit;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,7 +27,9 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
@@ -38,7 +42,7 @@ public class GoogleFitManager implements
 
     private ReactContext mReactContext;
     private GoogleApiClient mApiClient;
-    private static final int REQUEST_OAUTH = 1;
+    private static final int REQUEST_OAUTH = 1001;
     private static final String AUTH_PENDING = "auth_state_pending";
     private boolean mAuthInProgress = false;
     private Activity mActivity;
@@ -87,6 +91,13 @@ public class GoogleFitManager implements
         return distanceHistory;
     }
 
+    public void resetAuthInProgress()
+    {
+        if (!isAuthorize()) {
+            mAuthInProgress = false;
+        }
+    }
+
     public void authorize(@Nullable final Callback errorCallback, @Nullable final Callback successCallback) {
 
         //Log.i(TAG, "Authorizing");
@@ -125,16 +136,22 @@ public class GoogleFitManager implements
                         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                             Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                             if (mAuthInProgress) {
+                                Log.i(TAG, "Authorization - Already attempting to resolve an error.");
                                 //if (errorCallback != null) {
                                 //    errorCallback.invoke("Failed Authorization Mgr");
                                 //}
-                            } else {
+                            } else if (connectionResult.hasResolution()) {
                                 try {
                                     mAuthInProgress = true;
                                     connectionResult.startResolutionForResult(mActivity, REQUEST_OAUTH);
                                 } catch (IntentSender.SendIntentException e) {
                                     Log.i(TAG, "Authorization - Failed again: " + e);
+                                    mApiClient.connect();
                                 }
+                            } else {
+                                Log.i(TAG, "Show dialog using GoogleApiAvailability.getErrorDialog()");
+                                showErrorDialog(connectionResult.getErrorCode());
+                                mAuthInProgress = true;
                             }
                         }
                     }
@@ -176,27 +193,45 @@ public class GoogleFitManager implements
 
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult: " + requestCode);
         if (requestCode == REQUEST_OAUTH) {
-
             mAuthInProgress = false;
             if (resultCode == Activity.RESULT_OK) {
+                // Make sure the app is not already connected or attempting to connect
                 if (!mApiClient.isConnecting() && !mApiClient.isConnected()) {
                     mApiClient.connect();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                //Log.e(TAG, "RESULT_CANCELED");
-                //this.authorize(null, null);
-                //mApiClient.connect();
+                Log.e(TAG, "Authorization - Cancel");
             }
-        } //else {
-        //Log.e(TAG, "requestCode NOT request_oauth");
-        //}
-
+        }
     }
 
     @Override
     public void onNewIntent(Intent intent) {
+    }
 
+    /* Creates a dialog for an error message */
+    private void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment() {
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                // Get the error code and retrieve the appropriate dialog
+                int errorCode = this.getArguments().getInt(AUTH_PENDING);
+                return GoogleApiAvailability.getInstance().getErrorDialog(
+                        this.getActivity(), errorCode, REQUEST_OAUTH);
+            }
+
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                mAuthInProgress = false;
+            }
+        };
+
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(AUTH_PENDING, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(mActivity.getFragmentManager(), "errordialog");
     }
 }
