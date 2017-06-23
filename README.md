@@ -7,6 +7,14 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+
+0.3.0-beta (@firodj thanks for this PR!)
+        - steps adapter to avoid errors;
+        - authorize: allow cancel;
+        - authorize: using callback instead event;
+        - strict dataSource;
+        - xiaomi support; 
+
 0.2.0   - getDailyDistanceSamples();
         - isAvailable();
         - isEnabled();
