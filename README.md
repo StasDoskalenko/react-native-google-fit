@@ -8,6 +8,9 @@ Changelog:
 
 ```
 
+0.3.1-beta 
+        - better cancel/deny support
+        
 0.3.0-beta (@firodj thanks for this PR!)
         - steps adapter to avoid errors;
         - authorize: allow cancel;
