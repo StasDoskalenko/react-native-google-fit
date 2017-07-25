@@ -86,7 +86,7 @@ then pass your package name to the module in MainApplication.java (google fit re
 2. Authorize:
 
 ```      
-        GoogleFit.authorizeFit();
+        GoogleFit.authorize();
         GoogleFit.onAuthorize((result) => {
              //console.log(result);
              dispatch('AUTH SUCCESS');
