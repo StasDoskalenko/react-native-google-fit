@@ -8,6 +8,9 @@ Changelog:
 
 ```
 
+0.3.2 
+        - React Native 0.46 Support
+        
 0.3.1-beta 
         - better cancel/deny support
         
