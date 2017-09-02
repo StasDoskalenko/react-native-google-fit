@@ -50,6 +50,7 @@ public class GoogleFitManager implements
     private DistanceHistory distanceHistory;
     private StepHistory stepHistory;
     private WeightsHistory weightsHistory;
+    private CalorieHistory calorieHistory;
     private StepCounter mStepCounter;
     private StepSensor stepSensor;
 
@@ -67,8 +68,9 @@ public class GoogleFitManager implements
         this.stepHistory = new StepHistory(mReactContext, this);
         this.weightsHistory = new WeightsHistory(mReactContext, this);
         this.distanceHistory = new DistanceHistory(mReactContext, this);
-
-//        this.stepSensor = new StepSensor(mReactContext, activity);
+        this.calorieHistory = new CalorieHistory(mReactContext, this);
+        
+        //        this.stepSensor = new StepSensor(mReactContext, activity);
     }
 
     public GoogleApiClient getGoogleApiClient() {
@@ -97,7 +99,9 @@ public class GoogleFitManager implements
             mAuthInProgress = false;
         }
     }
-
+    
+    public CalorieHistory getCalorieHistory() { return calorieHistory; }
+    
     public void authorize(@Nullable final Callback errorCallback, @Nullable final Callback successCallback) {
 
         //Log.i(TAG, "Authorizing");
