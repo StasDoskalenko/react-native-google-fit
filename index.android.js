@@ -115,6 +115,39 @@ class RNGoogleFit {
             });
     }
 
+
+
+    /**
+     * Get the total calories per day over a specified date range.
+     * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @callback callback The function will be called with an array of elements.
+     */
+
+    getDailyCalorieSamples(options, callback) {
+        let startDate = Date.parse(options.startDate);
+        let endDate = Date.parse(options.endDate);
+        googleFit.getDailyCalorieSamples( startDate,
+            endDate,
+            (msg) => {
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.calorie) {
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any calorie data for this period", false);
+                }
+            });
+    }
+
+
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
