@@ -7,7 +7,7 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
-0.3.3   - Burned Calories History (getDailyCalorieSamples)
+0.3.4   - Burned Calories History (getDailyCalorieSamples)
 
 0.3.2 
         - React Native 0.46 Support
