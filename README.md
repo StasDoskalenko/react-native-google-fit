@@ -7,6 +7,7 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.3.3   - Burned Calories History (getDailyCalorieSamples)
 
 0.3.2 
         - React Native 0.46 Support
@@ -162,6 +163,8 @@ then pass your package name to the module in MainApplication.java (google fit re
  observeSteps(callback); //On Step Changed Event
  
  unsucscribeListeners(); //Put into componentWillUnmount() method to prevent leaks
+
+ getDailyCalorieSamples(options, callback); - method to get calories per day
  
  getDailyDistanceSamples(options, callback); - method to get daily distance
  
