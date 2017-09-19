@@ -12,6 +12,7 @@ package com.reactnative.googlefit;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;

@@ -7,6 +7,9 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.3.5   - Fix Error: Fragments should be static
+        - Updated readme
+
 0.3.4   - Burned Calories History (getDailyCalorieSamples)
 
 0.3.2 
@@ -101,27 +104,32 @@ then pass your package name to the module in MainApplication.java (google fit re
  
 3. Retrieve Steps For Period
  
- GoogleFit.getSteps(dayStart, dayEnd);
+    **GoogleFit.getDailyStepCountSamples** 
  
- REDUX example
+ ```javascript
+    const options = {
+                startDate: "2017-01-01T00:00:17.971Z",  // required ISO8601Timestamp
+                endDate: (new Date()).toISOString()     // required ISO8601Timestamp
+            };
+
+    GoogleFit.getDailyStepCountSamples(options, (err, res) => {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Daily steps >>>", res);
+            })
  
  ```
     
-    let retrieveDailySteps = () => {
-        return async (dispatch) => {
-            let todayStart = "2017-01-01T00:00:17.971Z"; //ISO Time String
-            let dayEnd = "2017-01-01T23:59:17.971Z"; //ISO Time String
-            await GoogleFit.getSteps(todayStart, dayEnd);
-            await GoogleFit.observeHistory((results) => {
-                if (results.length > 0) {
-                    console.log(results[0].steps);
-                    dispatch('SUCCESSFULLY GOT DAILY STEPS!');
-                } 
-            });
-        }
-    }
- 
- ```
+   **Response:**
+    
+ ```javascript
+[ 
+    {source: "com.google.android.gms:estimated_steps", steps: []},
+    {source: "com.google.android.gms:merge_step_deltas", steps: []},
+    {source: "com.xiaomi.hm.health", steps: []}
+]
+```
 
 4. Retrieve Weights
 

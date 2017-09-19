@@ -44,7 +44,7 @@ public class GoogleFitManager implements
     private GoogleApiClient mApiClient;
     private static final int REQUEST_OAUTH = 1001;
     private static final String AUTH_PENDING = "auth_state_pending";
-    private boolean mAuthInProgress = false;
+    private static boolean mAuthInProgress = false;
     private Activity mActivity;
 
     private DistanceHistory distanceHistory;
@@ -69,7 +69,6 @@ public class GoogleFitManager implements
         this.weightsHistory = new WeightsHistory(mReactContext, this);
         this.distanceHistory = new DistanceHistory(mReactContext, this);
         this.calorieHistory = new CalorieHistory(mReactContext, this);
-        
         //        this.stepSensor = new StepSensor(mReactContext, activity);
     }
 
@@ -99,9 +98,9 @@ public class GoogleFitManager implements
             mAuthInProgress = false;
         }
     }
-    
+
     public CalorieHistory getCalorieHistory() { return calorieHistory; }
-    
+
     public void authorize(@Nullable final Callback errorCallback, @Nullable final Callback successCallback) {
 
         //Log.i(TAG, "Authorizing");
@@ -214,24 +213,25 @@ public class GoogleFitManager implements
     public void onNewIntent(Intent intent) {
     }
 
+    public static class GoogleFitCustomErrorDialig extends ErrorDialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(AUTH_PENDING);
+            return GoogleApiAvailability.getInstance().getErrorDialog(
+                    this.getActivity(), errorCode, REQUEST_OAUTH);
+        }
+
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            mAuthInProgress = false;
+        }
+    }
+
     /* Creates a dialog for an error message */
     private void showErrorDialog(int errorCode) {
         // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment() {
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                // Get the error code and retrieve the appropriate dialog
-                int errorCode = this.getArguments().getInt(AUTH_PENDING);
-                return GoogleApiAvailability.getInstance().getErrorDialog(
-                        this.getActivity(), errorCode, REQUEST_OAUTH);
-            }
-
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                mAuthInProgress = false;
-            }
-        };
-
+        GoogleFitCustomErrorDialig dialogFragment = new GoogleFitCustomErrorDialig();
         // Pass the error that should be displayed
         Bundle args = new Bundle();
         args.putInt(AUTH_PENDING, errorCode);
