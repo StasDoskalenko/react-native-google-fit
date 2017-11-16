@@ -18,6 +18,10 @@ class RNGoogleFit {
     );
     }
 
+    startRecording() {
+        googleFit.startFitnessRecording();
+    }
+
     //Will be deprecated in future releases
     getSteps(dayStart,dayEnd) {
         googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd));

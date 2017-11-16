@@ -88,6 +88,11 @@ LifecycleEventListener {
     }
     
     @ReactMethod
+    public void startFitnessRecording() {
+        mGoogleFitManager.getRecordingApi().subscribe();
+    }
+
+    @ReactMethod
     public void observeSteps() {
         mGoogleFitManager.getStepCounter().findFitnessDataSources();
     }
