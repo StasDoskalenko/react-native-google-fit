@@ -36,7 +36,6 @@ LifecycleEventListener {
     
     public GoogleFitModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        
         this.mReactContext = reactContext;
     }
     

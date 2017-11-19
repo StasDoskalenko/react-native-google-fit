@@ -11,7 +11,7 @@
 
 package com.reactnative.googlefit;
 
-import com.rfs.GoogleFitManager;
+import com.reactnative.googlefit.GoogleFitManager;
 
 import com.facebook.react.bridge.ReactContext;
 import android.util.Log;
@@ -23,6 +23,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.data.DataType;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
@@ -40,65 +41,57 @@ public class RecordingApi {
 
     private static final String TAG = "RecordingApi";
 
-    public FitnessRecord (ReactContext reactContext, GoogleFitManager googleFitManager) {
+    public RecordingApi (ReactContext reactContext, GoogleFitManager googleFitManager) {
 
         this.reactContext = reactContext;
         this.googleFitManager = googleFitManager;
 
     }
 
-    // This function could take an array as parameters and subscribe to each fitness data type provided
-    public ReadableArray subscribe () {
-
-        final WritableArray result = Arguments.createArray();
+    public void subscribe () {
 
         Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), DataType.TYPE_STEP_COUNT_CUMULATIVE)
             .setResultCallback(new ResultCallback <Status> () {
 
                 @Override
                 public void onResult(Status status) {
+
+                    WritableMap map = Arguments.createMap();
+
                     if (status.isSuccess()) {
-                            if (status.getStatusCode()
-                                    == FitnessStatusCodes.SUCCESS_ALREADY_SUBSCRIBED) {
-                                Log.i(TAG, "Existing subscription for activity detected.");
-                                sendEvent(reactContext, "RecordingSuccess", null);
-                            } else {
-                                Log.i(TAG, "Successfully subscribed!");
-                                sendEvent(reactContext, "RecordingSuccess", null);
-                            }
-                        } else {
-                            Log.i(TAG, "There was a problem subscribing.");
-                            sendEvent(reactContext, "RecordingError", null);
-                        }
+                        map.putBoolean("recording", true);
+                        Log.i(TAG, "RecordingAPI - Connected");
+                        sendEvent(reactContext, "STEP_RECORDING", map);
+
+                    } else {
+                        map.putBoolean("recording", false);
+                        Log.i(TAG, "RecordingAPI - Error connecting");
+                        sendEvent(reactContext, "STEP_RECORDING", map);
+                    }
                 }
             });
-        Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), DataType.TYPE_DISTANCE_DELTA)
+            Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), DataType.TYPE_DISTANCE_DELTA)
             .setResultCallback(new ResultCallback <Status> () {
 
                 @Override
                 public void onResult(Status status) {
 
+                    WritableMap map = Arguments.createMap();
+
                     if (status.isSuccess()) {
-                            if (status.getStatusCode()
-                                    == FitnessStatusCodes.SUCCESS_ALREADY_SUBSCRIBED) {
-                                Log.i(TAG, "Existing subscription for activity detected.");
-                                sendEvent(reactContext, "DistanceRecordingSuccess", null);
-                            } else {
-                                Log.i(TAG, "Successfully subscribed!");
-                                sendEvent(reactContext, "DistanceRecordingSuccess", null);
-                            }
-                        } else {
-                            Log.i(TAG, "There was a problem subscribing.");
-                            sendEvent(reactContext, "DistanceRecordFail", null);
-                        }
+                        map.putBoolean("recording", true);
+                        Log.i(TAG, "RecordingAPI - Connected");
+                        sendEvent(reactContext, "DISTANCE_RECORDING", map);
+
+                    } else {
+                        map.putBoolean("recording", false);
+                        Log.i(TAG, "RecordingAPI - Error connecting");
+                        sendEvent(reactContext, "DISTANCE_RECORDING", map);
+                    }
                 }
             });
-
-        // Could be a void function instead of returning this string - success/error messages 
-        // are emitted as events 
-        result.pushString("Success :)");
-        return result;
     }
+
 
     private void sendEvent(ReactContext reactContext,
         String eventName, @Nullable WritableMap params) {

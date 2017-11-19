@@ -17,7 +17,12 @@ class RNGoogleFit {
             res => callback(false, res)
     );
     }
-
+    /**
+     * Start recording fitness data (steps, distance)
+     * This function relies on sending events to signal the RecordingAPI status
+     * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
+     * and check for {recording: true} as the event data
+     */
     startRecording() {
         googleFit.startFitnessRecording();
     }
@@ -95,8 +100,8 @@ class RNGoogleFit {
      */
 
     getDailyDistanceSamples(options, callback) {
-        let startDate = Date.parse(options.startDate);
-        let endDate = Date.parse(options.endDate);
+        let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
+        let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
         googleFit.getDailyDistanceSamples( startDate,
             endDate,
             (msg) => {

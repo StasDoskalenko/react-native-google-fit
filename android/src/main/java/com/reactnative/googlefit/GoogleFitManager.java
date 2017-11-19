@@ -109,10 +109,10 @@ public class GoogleFitManager implements
 
     public void authorize(@Nullable final Callback errorCallback, @Nullable final Callback successCallback) {
 
-        //Log.i(TAG, "Authorizing");
         mApiClient = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
                 .addApi(Fitness.SENSORS_API)
                 .addApi(Fitness.HISTORY_API)
+                .addApi(Fitness.RECORDING_API)
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
                 .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
@@ -143,12 +143,14 @@ public class GoogleFitManager implements
                     new GoogleApiClient.OnConnectionFailedListener() {
                         @Override
                         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+                            // if (errorCallback != null) {
+                            //    errorCallback.invoke("Failed Authorization Mgr");
+                            // }
+
                             Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                             if (mAuthInProgress) {
                                 Log.i(TAG, "Authorization - Already attempting to resolve an error.");
-                                //if (errorCallback != null) {
-                                //    errorCallback.invoke("Failed Authorization Mgr");
-                                //}
                             } else if (connectionResult.hasResolution()) {
                                 try {
                                     mAuthInProgress = true;
