@@ -36,7 +36,6 @@ LifecycleEventListener {
     
     public GoogleFitModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        
         this.mReactContext = reactContext;
     }
     
@@ -87,6 +86,11 @@ LifecycleEventListener {
         mGoogleFitManager.authorize(error, success);
     }
     
+    @ReactMethod
+    public void startFitnessRecording() {
+        mGoogleFitManager.getRecordingApi().subscribe();
+    }
+
     @ReactMethod
     public void observeSteps() {
         mGoogleFitManager.getStepCounter().findFitnessDataSources();
