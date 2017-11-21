@@ -80,12 +80,12 @@ public class RecordingApi {
 
                     if (status.isSuccess()) {
                         map.putBoolean("recording", true);
-                        Log.i(TAG, "RecordingAPI - Connected");
+                        // Log.i(TAG, "RecordingAPI - Connected");
                         sendEvent(reactContext, "DISTANCE_RECORDING", map);
 
                     } else {
                         map.putBoolean("recording", false);
-                        Log.i(TAG, "RecordingAPI - Error connecting");
+                        // Log.i(TAG, "RecordingAPI - Error connecting");
                         sendEvent(reactContext, "DISTANCE_RECORDING", map);
                     }
                 }

@@ -76,13 +76,11 @@ LifecycleEventListener {
         }
         
         if (mGoogleFitManager.isAuthorize()) {
-            Log.i("RNGITESHBRO", "Authorization - already authorized");
             WritableMap map = Arguments.createMap();
             map.putBoolean("authorized", true);
             success.invoke(map);
             return;
         }
-        Log.i("RNGITESHBRO", "Authorization - starting");
         mGoogleFitManager.authorize(error, success);
     }
     

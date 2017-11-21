@@ -23,8 +23,18 @@ class RNGoogleFit {
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording() {
+    startRecording(callback) {
         googleFit.startFitnessRecording();
+
+            DeviceEventEmitter.addListener(
+                'STEP_RECORDING',
+                (steps) => callback(steps));
+
+            DeviceEventEmitter.addListener(
+                'DISTANCE_RECORDING',
+                (distance) => callback(distance));
+
+            // TODO: add mote activity listeners
     }
 
     //Will be deprecated in future releases
@@ -244,8 +254,7 @@ class RNGoogleFit {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',
             (steps) => callback(steps)
-    );
-
+        );
         googleFit.observeSteps();
     }
 

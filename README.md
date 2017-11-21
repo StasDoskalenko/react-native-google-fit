@@ -7,6 +7,12 @@ A React Native bridge module for interacting with Google Fit
 Changelog:
 
 ```
+0.4.0-beta
+        - Recording API implemetation (@reboss thanks for PR)
+        - Just use startRecording(callback) function which listens 
+        to STEPS and DISTANCE (for now) activities from Google Fitness
+        API (no need to install Google fit app)
+
 0.3.5   - Fix Error: Fragments should be static
         - Updated readme
 
@@ -100,6 +106,11 @@ then pass your package name to the module in MainApplication.java (google fit re
              }
              dispatch('AUTH SUCCESS');
         });
+        
+        GoogleFit.startRecording((callback) => {
+            // Process data from Google Fit Recording API (no google fit app needed)
+        });
+        
  ```
  
 3. Retrieve Steps For Period
