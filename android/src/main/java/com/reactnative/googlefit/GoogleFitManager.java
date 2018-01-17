@@ -100,14 +100,15 @@ public class GoogleFitManager implements
 
     public void resetAuthInProgress()
     {
-        if (!isAuthorize()) {
+        if (!isAuthorized()) {
             mAuthInProgress = false;
         }
     }
 
     public CalorieHistory getCalorieHistory() { return calorieHistory; }
 
-    public void authorize(@Nullable final Callback errorCallback, @Nullable final Callback successCallback) {
+    public void authorize() {
+        final ReactContext mReactContext = this.mReactContext;
 
         mApiClient = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
                 .addApi(Fitness.SENSORS_API)
@@ -121,13 +122,7 @@ public class GoogleFitManager implements
                         @Override
                         public void onConnected(@Nullable Bundle bundle) {
                             Log.i(TAG, "Authorization - Connected");
-
-                            //sendEvent(this.mReactContext, "AuthorizeEvent", map);
-                            if (successCallback != null) {
-                                WritableMap map = Arguments.createMap();
-                                map.putBoolean("authorized", true);
-                                successCallback.invoke(map);
-                            }
+                            sendEvent(mReactContext, "GoogleFitAuthorizeSuccess", null);
                         }
 
                         @Override
@@ -143,10 +138,9 @@ public class GoogleFitManager implements
                     new GoogleApiClient.OnConnectionFailedListener() {
                         @Override
                         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-                            // if (errorCallback != null) {
-                            //    errorCallback.invoke("Failed Authorization Mgr");
-                            // }
+                            WritableMap map = Arguments.createMap();
+                            map.putString("message", "" + connectionResult);
+                            sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
 
                             Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                             if (mAuthInProgress) {
@@ -172,7 +166,7 @@ public class GoogleFitManager implements
         mApiClient.connect();
     }
 
-    public boolean isAuthorize() {
+    public boolean isAuthorized() {
         if (mApiClient != null && mApiClient.isConnected()) {
             return true;
         } else {
