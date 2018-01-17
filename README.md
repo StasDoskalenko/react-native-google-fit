@@ -99,14 +99,18 @@ then pass your package name to the module in MainApplication.java (google fit re
 2. Authorize:
 
 ```      
-        GoogleFit.authorize((err, result) => {
-             if(err) {
-                 dispatch('AUTH ERROR');
-                 return;
-             }
+        GoogleFit.onAuthorize(() => {
              dispatch('AUTH SUCCESS');
         });
-        
+
+        GoogleFit.onAuthorizeFailure(() => {
+             dispatch('AUTH ERROR');
+        });
+
+        GoogleFit.authorize();
+
+        ...
+        // Call when authorized
         GoogleFit.startRecording((callback) => {
             // Process data from Google Fit Recording API (no google fit app needed)
         });
