@@ -68,20 +68,17 @@ LifecycleEventListener {
     }
     
     @ReactMethod
-    public void authorize(Callback error, Callback success) {
+    public void authorize() {
         final Activity activity = getCurrentActivity();
         
         if (mGoogleFitManager == null) {
             mGoogleFitManager = new GoogleFitManager(mReactContext, activity);
         }
         
-        if (mGoogleFitManager.isAuthorize()) {
-            WritableMap map = Arguments.createMap();
-            map.putBoolean("authorized", true);
-            success.invoke(map);
+        if (mGoogleFitManager.isAuthorized()) {
             return;
         }
-        mGoogleFitManager.authorize(error, success);
+        mGoogleFitManager.authorize();
     }
     
     @ReactMethod
@@ -210,7 +207,7 @@ LifecycleEventListener {
         if (mGoogleFitManager == null) {
             mGoogleFitManager = new GoogleFitManager(mReactContext, getCurrentActivity());
         }
-        return mGoogleFitManager.isAuthorize();
+        return mGoogleFitManager.isAuthorized();
     }
 
 }
