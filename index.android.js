@@ -9,8 +9,8 @@ const googleFit = NativeModules.RNGoogleFit;
 
 class RNGoogleFit {
     authorize() {
-		googleFit.authorize();
-	}
+        googleFit.authorize();
+    }
 
     /**
      * Start recording fitness data (steps, distance)
@@ -21,15 +21,15 @@ class RNGoogleFit {
     startRecording(callback) {
         googleFit.startFitnessRecording();
 
-		DeviceEventEmitter.addListener(
-			'STEP_RECORDING',
-			(steps) => callback(steps));
+        DeviceEventEmitter.addListener(
+            'STEP_RECORDING',
+            (steps) => callback(steps));
 
-		DeviceEventEmitter.addListener(
-			'DISTANCE_RECORDING',
-			(distance) => callback(distance));
+        DeviceEventEmitter.addListener(
+            'DISTANCE_RECORDING',
+            (distance) => callback(distance));
 
-		// TODO: add mote activity listeners
+        // TODO: add mote activity listeners
     }
 
     //Will be deprecated in future releases
@@ -257,21 +257,21 @@ class RNGoogleFit {
         DeviceEventEmitter.addListener(
             'StepHistoryChangedEvent',
             (steps) => callback(steps)
-		);
+        );
     }
 
     onAuthorize(callback) {
         DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeSuccess',
             (authorized) => callback(authorized)
-		);
+        );
     }
 
     onAuthorizeFailure(callback) {
         DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeFailure',
             (authorized) => callback(authorized)
-		);
+        );
     }
 
     usubscribeListeners() {
