@@ -195,6 +195,38 @@ class RNGoogleFit {
         });
     }
 
+  /**
+   * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
+   * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
+   *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @callback callback The function will be called with an array of elements.
+   */
+
+  getHeightSamples(options, callback) {
+    let startDate = Date.parse(options.startDate);
+    let endDate = Date.parse(options.endDate);
+    googleFit.getHeightSamples( startDate,
+      endDate,
+      (msg) => {
+        callback(msg, false);
+      },
+      (res) => {
+        if (res.length>0) {
+          res = res.map((el) => {
+            if (el.value) {
+              el.startDate = new Date(el.startDate).toISOString();
+              el.endDate = new Date(el.endDate).toISOString();
+              return el;
+            }
+          });
+          callback(false, res.filter(day => day != undefined));
+        } else {
+          callback("There is no any weight data for this period", false);
+        }
+      });
+  }
+
+
     saveWeight(options, callback) {
         if (options.unit == 'pound') {
             options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg

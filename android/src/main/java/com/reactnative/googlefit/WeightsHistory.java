@@ -53,20 +53,29 @@ public class WeightsHistory {
     }
 
     public ReadableArray displayLastWeeksData(long startTime, long endTime) {
+        return displayLastWeeksData(startTime, endTime, true);
+    }
+
+    public ReadableArray displayLastWeeksData(long startTime, long endTime, boolean isWeight) {
         DateFormat dateFormat = DateFormat.getDateInstance();
-        //Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
-        //Log.i(TAG, "Range End: " + dateFormat.format(endTime));
-
-        //Check how many steps were walked and recorded in the last 7 days
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+        Log.i(TAG, "isWeight: " + isWeight);
+        DataType dataSource = isWeight ? DataType.TYPE_WEIGHT : DataType.TYPE_HEIGHT;
+        DataType aggregate = isWeight ? DataType.AGGREGATE_WEIGHT_SUMMARY : DataType.AGGREGATE_HEIGHT_SUMMARY;
+        Log.i(TAG, "types: " + dataSource + aggregate);
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .read(dataSource)
+                // for height we need to take since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
+                .setTimeRange(1401926400, endTime, TimeUnit.MILLISECONDS)
+                .setLimit(1)
                 .build();
+        return calculateDisplayLastWeeksData(readRequest);
+    }
 
+    private ReadableArray calculateDisplayLastWeeksData(DataReadRequest readRequest) {
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
-
 
         WritableArray map = Arguments.createArray();
 

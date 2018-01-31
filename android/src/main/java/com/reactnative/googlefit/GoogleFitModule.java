@@ -139,6 +139,19 @@ LifecycleEventListener {
             errorCallback.invoke(e.getMessage());
         }
     }
+
+    @ReactMethod
+    public void getHeightSamples(double startDate,
+                                 double endDate,
+                                 Callback errorCallback,
+                                 Callback successCallback) {
+
+        try {
+            successCallback.invoke(mGoogleFitManager.getWeightsHistory().displayLastWeeksData((long)startDate, (long)endDate, false));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
     
     
     @ReactMethod
