@@ -12,7 +12,6 @@ package com.reactnative.googlefit;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -20,10 +19,10 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.uimanager.IllegalViewOperationException;
+import com.google.android.gms.fitness.data.DataType;
+import com.sun.prism.PixelFormat;
 
 
 public class GoogleFitModule extends ReactContextBaseJavaModule implements
@@ -134,7 +133,9 @@ LifecycleEventListener {
                                  Callback successCallback) {
         
         try {
-            successCallback.invoke(mGoogleFitManager.getWeightsHistory().displayLastWeeksData((long)startDate, (long)endDate));
+            BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
+            bodyHistory.setDataType(DataType.TYPE_WEIGHT);
+            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -147,7 +148,9 @@ LifecycleEventListener {
                                  Callback successCallback) {
 
         try {
-            successCallback.invoke(mGoogleFitManager.getWeightsHistory().displayLastWeeksData((long)startDate, (long)endDate, false));
+            BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
+            bodyHistory.setDataType(DataType.TYPE_HEIGHT);
+            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -173,7 +176,7 @@ LifecycleEventListener {
                            Callback successCallback) {
         
         try {
-            successCallback.invoke(mGoogleFitManager.getWeightsHistory().saveWeight(weightSample));
+            successCallback.invoke(mGoogleFitManager.getBodyHistory().save(weightSample));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -182,7 +185,7 @@ LifecycleEventListener {
     @ReactMethod
     public void deleteWeight(ReadableMap weightSample, Callback errorCallback, Callback successCallback) {
         try {
-            successCallback.invoke(mGoogleFitManager.getWeightsHistory().deleteWeight(weightSample));
+            successCallback.invoke(mGoogleFitManager.getBodyHistory().delete(weightSample));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }

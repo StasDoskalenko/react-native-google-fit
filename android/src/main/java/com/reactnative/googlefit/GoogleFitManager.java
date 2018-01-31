@@ -21,7 +21,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.ActivityEventListener;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
@@ -49,7 +48,7 @@ public class GoogleFitManager implements
 
     private DistanceHistory distanceHistory;
     private StepHistory stepHistory;
-    private WeightsHistory weightsHistory;
+    private BodyHistory bodyHistory;
     private CalorieHistory calorieHistory;
     private StepCounter mStepCounter;
     private StepSensor stepSensor;
@@ -67,7 +66,7 @@ public class GoogleFitManager implements
 
         this.mStepCounter = new StepCounter(mReactContext, this, activity);
         this.stepHistory = new StepHistory(mReactContext, this);
-        this.weightsHistory = new WeightsHistory(mReactContext, this);
+        this.bodyHistory = new BodyHistory(mReactContext, this);
         this.distanceHistory = new DistanceHistory(mReactContext, this);
         this.calorieHistory = new CalorieHistory(mReactContext, this);
         this.recordingApi = new RecordingApi(mReactContext, this);
@@ -90,8 +89,8 @@ public class GoogleFitManager implements
         return stepHistory;
     }
 
-    public WeightsHistory getWeightsHistory() {
-        return weightsHistory;
+    public BodyHistory getBodyHistory() {
+        return bodyHistory;
     }
 
     public DistanceHistory getDistanceHistory() {

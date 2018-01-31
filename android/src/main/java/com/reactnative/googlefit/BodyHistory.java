@@ -18,8 +18,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -39,41 +37,40 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class WeightsHistory {
+public class BodyHistory {
 
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
-    private DataSet WeightsDataset;
+    private DataSet Dataset;
+    private DataType dataType;
 
     private static final String TAG = "Weights History";
 
-    public WeightsHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
+    public BodyHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
+        this.dataType = dataType;
     }
 
-    public ReadableArray displayLastWeeksData(long startTime, long endTime) {
-        return displayLastWeeksData(startTime, endTime, true);
+    public BodyHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
+        this(reactContext, googleFitManager, DataType.TYPE_WEIGHT);
     }
 
-    public ReadableArray displayLastWeeksData(long startTime, long endTime, boolean isWeight) {
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public ReadableArray getHistory(long startTime, long endTime) {
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
-        Log.i(TAG, "isWeight: " + isWeight);
-        DataType dataSource = isWeight ? DataType.TYPE_WEIGHT : DataType.TYPE_HEIGHT;
-        DataType aggregate = isWeight ? DataType.AGGREGATE_WEIGHT_SUMMARY : DataType.AGGREGATE_HEIGHT_SUMMARY;
-        Log.i(TAG, "types: " + dataSource + aggregate);
+        // for height we need to take since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
+        startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .read(dataSource)
-                // for height we need to take since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
-                .setTimeRange(1401926400, endTime, TimeUnit.MILLISECONDS)
-                .setLimit(1)
+                .read(this.dataType)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .setLimit(1) // we just need the last one
                 .build();
-        return calculateDisplayLastWeeksData(readRequest);
-    }
-
-    private ReadableArray calculateDisplayLastWeeksData(DataReadRequest readRequest) {
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 
@@ -102,29 +99,24 @@ public class WeightsHistory {
         return map;
     }
 
-    public boolean saveWeight(ReadableMap weightSample) {
-        this.WeightsDataset = createDataForRequest(
-                DataType.TYPE_WEIGHT,    // for height, it would be DataType.TYPE_HEIGHT
+    public boolean save(ReadableMap sample) {
+        this.Dataset = createDataForRequest(
+                this.dataType,    // for height, it would be DataType.TYPE_HEIGHT
                 DataSource.TYPE_RAW,
-                weightSample.getDouble("value"),                  // weight in kgs
-                (long)weightSample.getDouble("date"),              // start time
-                (long)weightSample.getDouble("date"),                // end time
+                sample.getDouble("value"),                  // weight in kgs, height in metrs
+                (long)sample.getDouble("date"),              // start time
+                (long)sample.getDouble("date"),                // end time
                 TimeUnit.MILLISECONDS                // Time Unit, for example, TimeUnit.MILLISECONDS
         );
-        new InsertAndVerifyDataTask(this.WeightsDataset).execute();
+        new InsertAndVerifyDataTask(this.Dataset).execute();
 
         return true;
     }
 
-    public boolean deleteWeight(ReadableMap weightSample) {
-
-        DateFormat dateFormat = DateFormat.getDateInstance();
-
-        long endTime = (long) weightSample.getDouble("endTime");
-        long startTime = (long) weightSample.getDouble("startTime");
-
-        new DeleteDataTask(startTime, endTime).execute();
-
+    public boolean delete(ReadableMap sample) {
+        long endTime = (long) sample.getDouble("endTime");
+        long startTime = (long) sample.getDouble("startTime");
+        new DeleteDataTask(startTime, endTime, this.dataType).execute();
         return true;
     }
 
@@ -133,8 +125,9 @@ public class WeightsHistory {
 
         long startTime;
         long endTime;
+        DataType dataType;
 
-        DeleteDataTask(long startTime, long endTime) {
+        DeleteDataTask(long startTime, long endTime, DataType dataType) {
             this.startTime = startTime;
             this.endTime = endTime;
         }
@@ -144,7 +137,7 @@ public class WeightsHistory {
 
             DataDeleteRequest request = new DataDeleteRequest.Builder()
                     .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
-                    .addDataType(DataType.TYPE_WEIGHT)
+                    .addDataType(this.dataType)
                     .build();
 
             com.google.android.gms.common.api.Status insertStatus =
@@ -165,15 +158,15 @@ public class WeightsHistory {
     //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
 
-        private DataSet WeightsDataset;
+        private DataSet Dataset;
 
         InsertAndVerifyDataTask(DataSet dataset) {
-            this.WeightsDataset = dataset;
+            this.Dataset = dataset;
         }
 
         protected Void doInBackground(Void... params) {
             // Create a new dataset and insertion request.
-            DataSet dataSet = this.WeightsDataset;
+            DataSet dataSet = this.Dataset;
 
             // [START insert_dataset]
             // Then, invoke the History API to insert the data and await the result, which is
