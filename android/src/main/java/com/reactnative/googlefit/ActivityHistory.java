@@ -101,8 +101,6 @@ public class ActivityHistory {
         Log.i(TAG, "go into getActivitySamples" + startTime + endTime);
         WritableArray results = Arguments.createArray();
 
-        startTime = 1517350010674L;
-
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
