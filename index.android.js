@@ -129,6 +129,22 @@ class RNGoogleFit {
     }
 
 
+    getActivitySamples(options, callback) {
+        googleFit.getActivitySamples( options.startDate,
+            options.endDate,
+        (msg) => {
+                    callback(msg, false);
+            },
+          (res) => {
+            if (res.length>0) {
+              callback(false, res);
+            } else {
+              callback("There is no any distance data for this period", false);
+            }
+          });
+    }
+
+
 
     /**
      * Get the total calories per day over a specified date range.

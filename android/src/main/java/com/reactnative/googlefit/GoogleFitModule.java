@@ -112,6 +112,19 @@ LifecycleEventListener {
             errorCallback.invoke(e.getMessage());
         }
     }
+
+    @ReactMethod
+    public void getActivitySamples(double startDate,
+                                   double endDate,
+                                   Callback errorCallback,
+                                   Callback successCallback) {
+
+        try {
+            successCallback.invoke(mGoogleFitManager.getActivityHistory().getActivitySamples((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
     
     @ReactMethod
     public void getDailyDistanceSamples(double startDate,

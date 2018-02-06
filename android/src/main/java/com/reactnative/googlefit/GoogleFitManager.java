@@ -53,6 +53,7 @@ public class GoogleFitManager implements
     private StepCounter mStepCounter;
     private StepSensor stepSensor;
     private RecordingApi recordingApi;
+    private ActivityHistory activityHistory;
 
     private static final String TAG = "RNGoogleFit";
 
@@ -70,6 +71,7 @@ public class GoogleFitManager implements
         this.distanceHistory = new DistanceHistory(mReactContext, this);
         this.calorieHistory = new CalorieHistory(mReactContext, this);
         this.recordingApi = new RecordingApi(mReactContext, this);
+        this.activityHistory = new ActivityHistory(mReactContext, this);
         //        this.stepSensor = new StepSensor(mReactContext, activity);
     }
 
@@ -212,6 +214,14 @@ public class GoogleFitManager implements
 
     @Override
     public void onNewIntent(Intent intent) {
+    }
+
+    public ActivityHistory getActivityHistory() {
+        return activityHistory;
+    }
+
+    public void setActivityHistory(ActivityHistory activityHistory) {
+        this.activityHistory = activityHistory;
     }
 
     public static class GoogleFitCustomErrorDialig extends ErrorDialogFragment {
