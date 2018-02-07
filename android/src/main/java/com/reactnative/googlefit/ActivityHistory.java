@@ -115,13 +115,13 @@ public class ActivityHistory {
             String activityName = bucket.getActivity();
 //            Log.i(TAG, "next activity: " + activityName);
 
-            switch (activityName) {
-                case ACTIVITY_TYPE_UNKNOWN:
-                case ACTIVITY_TYPE_STILL:
-                case ACTIVITY_IN_VEHICLE:
-                    activityName = ACTIVITY_TYPE_WALKING;
-                    break;
-            }
+//            switch (activityName) {
+//                case ACTIVITY_TYPE_UNKNOWN:
+//                case ACTIVITY_TYPE_STILL:
+//                case ACTIVITY_IN_VEHICLE:
+//                    activityName = ACTIVITY_TYPE_WALKING;
+//                    break;
+//            }
 
             if (!bucket.getDataSets().isEmpty()) {
                 int steps = 0;

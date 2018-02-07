@@ -22,7 +22,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.google.android.gms.fitness.data.DataType;
-import com.sun.prism.PixelFormat;
 
 
 public class GoogleFitModule extends ReactContextBaseJavaModule implements
