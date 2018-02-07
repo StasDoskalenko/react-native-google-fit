@@ -55,40 +55,17 @@ public class ActivityHistory {
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
 
-    private static final String ACTIVITY_TYPE_UNKNOWN = "unknown";
-    private static final String ACTIVITY_TYPE_STILL = "still";
-    private static final String ACTIVITY_TYPE_WALKING = "walking";
-    private static final String ACTIVITY_IN_VEHICLE = "in_vehicle";
     private static final String STEPS_FIELD_NAME = "steps";
     private static final String DISTANCE_FIELD_NAME = "distance";
-    private static final String STRAVA = "strava";
+    private static final String HIGH_LONGITUDE = "high_longitude";
+    private static final String LOW_LONGITUDE = "low_longitude";
+    private static final String HIGH_LATITUDE = "high_latitude";
+    private static final String LOW_LATITUDE = "low_latitude";
+
 
     private static final int KCAL_MULTIPLIER = 1000;
     private static final int ONGOING_ACTIVITY_MIN_TIME_FROM_END = 10 * 60000;
     private static final String CALORIES_FIELD_NAME = "calories";
-
-    private enum ActivityDatasetType {
-
-        CALORIES("com.google.calories.expended"),
-        STEP_COUNT("com.google.step_count.delta"),
-        DISTANCE("com.google.distance.delta");
-        private final String id;
-
-        ActivityDatasetType(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public static ActivityDatasetType getTypeById(String id) {
-            for (ActivityDatasetType type : ActivityDatasetType.values()) {
-                if (type.getId().equals(id)) return type;
-            }
-            return null;
-        }
-    }
 
     private static final String TAG = "RNGoogleFit";
 
@@ -98,174 +75,88 @@ public class ActivityHistory {
     }
 
     public ReadableArray getActivitySamples(long startTime, long endTime) {
-        Log.i(TAG, "go into getActivitySamples" + startTime + endTime);
+        long begin = new Date().getTime();
+        Log.i(TAG, "go into getActivitySamples " + begin);
         WritableArray results = Arguments.createArray();
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
                 .bucketByActivitySegment(1, TimeUnit.SECONDS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 
+        long finish = new Date().getTime();
+        Log.i(TAG, "request takes " + (begin-finish));
+
         List<Bucket> buckets = dataReadResult.getBuckets();
         for (Bucket bucket : buckets) {
             String activityName = bucket.getActivity();
-//            Log.i(TAG, "next activity: " + activityName);
-
-//            switch (activityName) {
-//                case ACTIVITY_TYPE_UNKNOWN:
-//                case ACTIVITY_TYPE_STILL:
-//                case ACTIVITY_IN_VEHICLE:
-//                    activityName = ACTIVITY_TYPE_WALKING;
-//                    break;
-//            }
-
             if (!bucket.getDataSets().isEmpty()) {
-                int steps = 0;
-                float distance = 0f;
-                float calories = 0f;
                 long start = bucket.getStartTime(TimeUnit.MILLISECONDS);
                 long end = bucket.getEndTime(TimeUnit.MILLISECONDS);
+                WritableMap map = Arguments.createMap();
+                map.putDouble("startDate",start);
+                map.putDouble("endDate",end);
+                map.putString("type", activityName);
+                String deviceName = "";
+                WritableArray streamName = Arguments.createArray();
+                boolean isTracked = true;
                 for (DataSet dataSet : bucket.getDataSets()) {
-                    ActivityDatasetType datasetType = ActivityDatasetType.getTypeById(dataSet.getDataType().getName());
-//                    Log.i(TAG, "next dataset: " + datasetType.getId());
-
                     for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                        DataSource originalDataSource = dataPoint.getOriginalDataSource();
-
-//                        int deviceType = dataPoint.getOriginalDataSource().getDevice().getType();
-
-//                        if (deviceType == TYPE_WATCH) {
-//                            return ANDROID_WEAR;
-//                        } else {
-//                            return ANDROID;
-//                        }
-
-
-                        //code for detecting magical activities created by google fit and user inputs
-                        String streamName = dataPoint.getOriginalDataSource().getStreamName();
-//                        if (!TextUtils.isEmpty(streamName)) {
-//                            ActivityDataSourceStreamType dataSourceStreamType =
-//                                    ActivityDataSourceStreamType.getTypeByStreamName(streamName);
-//                            if (dataSourceStreamType != null) {
-//                                dataSourceStreamTypes.add(dataSourceStreamType);
-//                            }
-//                        }
-                        //end of code for detecting magical activities created by google fit and user inputs
-
+                        try {
+                            int deviceType = dataPoint.getOriginalDataSource().getDevice().getType();
+                            if (deviceType == TYPE_WATCH) {
+                                deviceName = "Android Wear";
+                            } else {
+                                deviceName = "Android";
+                            }
+                        } catch (Exception e) {
+                        }
+                        String stream = dataPoint.getOriginalDataSource().getStreamName();
+                        if (!stream.isEmpty()) {
+                            streamName.pushString(stream + " ");
+                            if (stream.equalsIgnoreCase("user_input")) {
+                                isTracked = false;
+                            }
+                        }
                         for (Field field : dataPoint.getDataType().getFields()) {
                             String fieldName = field.getName();
                             switch (fieldName) {
                                 case STEPS_FIELD_NAME:
-                                    steps += dataPoint.getValue(field).asInt();
+                                    map.putInt(fieldName, dataPoint.getValue(field).asInt());
                                     break;
                                 case DISTANCE_FIELD_NAME:
-                                    distance += dataPoint.getValue(field).asFloat();
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
                                     break;
                                 case CALORIES_FIELD_NAME:
-                                    calories += dataPoint.getValue(field).asFloat();
-                                    break;
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+                                case LOW_LATITUDE:
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+                                case HIGH_LATITUDE:
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+                                case LOW_LONGITUDE:
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+                                case HIGH_LONGITUDE:
+                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+                                default:
+                                    Log.w(TAG, "don't specified and handled: " + fieldName);
                             }
                         }
                     }
                 }
-                Log.i(TAG, activityName +" "+ steps + "\t" + distance + "\t" + calories);
-                WritableMap map = Arguments.createMap();
-                map.putDouble("distance", distance);
-                map.putDouble("calories", calories);
-                map.putInt("steps", steps);
-                map.putDouble("startDate",start);
-                map.putDouble("endDate",end);
-                map.putString("type", activityName);
+                map.putString("deviceName", deviceName);
+                map.putArray("streamNames", streamName);
+                map.putBoolean("isTracked", isTracked);
                 results.pushMap(map);
             }
-
-//            if (TextUtils.isEmpty(activity.getDevice())) {
-//                activity.setDevice(ANDROID);
-//            }
-//
-//            //code for detecting magical activities created by google fit
-//            if (dataSourceStreamTypes.isEmpty()) {
-//                return null;
-//            }
-//
-//            if (dataSourceStreamTypes.contains(FROM_ACTIVITIES) && !dataSourceStreamTypes.contains(STEP_COUNT)) {
-//                return null;
-//            }
-            //end of code for detecting magical activities created by google fit
-
-//            boolean isActivityTracked;
-//            if (dataSourceStreamTypes.contains(USER_INPUT)) {
-//                isActivityTracked = false;
-//            } else {
-//                if (dataSourceType == ActivityDataSourceType.STRAVA && activity.getDistance() > 0) {
-//                    // Logged activities in strava have only one decimal point, so for example 223.4,
-//                    // and the tracked activities have for example 522.3212
-//                    isActivityTracked = (activity.getDistance() * 10) % 1 != 0;
-//                } else {
-//                    //Because there is no consistent way to identify if an activity is logged or tracked, we are
-//                    // looking at the start and end times. If those end with 000, it means it is a logged activity.
-//                    isActivityTracked = startTime.getTime() % 1000 != 0 || endTime.getTime() % 1000 != 0;
-//                }
-//            }
-//            activity.setTracked(isActivityTracked);
-
-            //We don't want to process tracked walking activities without stepcount
-//            if (!testMode && isActivityTracked && activity.getStepCount() <= 0 &&
-//                    TextUtility.equalsOneOfThem(activity.getActivityName(), ACTIVITY_TYPE_WALKING,
-//                            ACTIVITY_TYPE_STILL, ACTIVITY_IN_VEHICLE, ACTIVITY_TYPE_UNKNOWN)) {
-//                return null;
-//            }
-
-//            long currentTime = DateUtility.getCalendar().getTimeInMillis();
-//            if (isActivityTracked && currentTime - endTime.getTime() < ONGOING_ACTIVITY_MIN_TIME_FROM_END) {
-//                //if the end of the activity is less then 10 minutes from now, and it is a tracked activity,
-//                // it is possibly an ongoing activity, and therefore we shouldn't sync it, because google
-//                // fit will modify that activity later
-//                return null;
-//            }
         }
 
 
         return results;
     }
-
-    private void processDataSet(DataSet dataSet, WritableArray map) {
-        //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-
-        WritableMap stepMap = Arguments.createMap();
-
-        for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(TAG, "\tData point:");
-            Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
-            Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-
-            for(Field field : dp.getDataType().getFields()) {
-                Log.i(TAG, "\t\tField: " + field.getName() +
-                        " Value: " + dp.getValue(field));
-
-                stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("steps", dp.getValue(field).asInt());
-                map.pushMap(stepMap);
-            }
-        }
-    }
-
-
-    private void sendEvent(ReactContext reactContext,
-                           String eventName,
-                           @Nullable WritableArray params) {
-        reactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
-    }
-
 }
