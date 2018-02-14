@@ -83,7 +83,7 @@ public class ActivityHistory {
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
+//                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
                 .bucketByActivitySegment(1, TimeUnit.SECONDS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
@@ -96,15 +96,16 @@ public class ActivityHistory {
         List<Bucket> buckets = dataReadResult.getBuckets();
         for (Bucket bucket : buckets) {
             String activityName = bucket.getActivity();
+            int activityType = bucket.getBucketType();
             if (!bucket.getDataSets().isEmpty()) {
                 long start = bucket.getStartTime(TimeUnit.MILLISECONDS);
                 long end = bucket.getEndTime(TimeUnit.MILLISECONDS);
                 WritableMap map = Arguments.createMap();
-                map.putDouble("startDate",start);
-                map.putDouble("endDate",end);
-                map.putString("type", activityName);
+                map.putDouble("start",start);
+                map.putDouble("end",end);
+                map.putInt("activityName", activityType);
                 String deviceName = "";
-                WritableArray streamName = Arguments.createArray();
+                String sourceId = "";
                 boolean isTracked = true;
                 for (DataSet dataSet : bucket.getDataSets()) {
                     for (DataPoint dataPoint : dataSet.getDataPoints()) {
@@ -117,41 +118,39 @@ public class ActivityHistory {
                             }
                         } catch (Exception e) {
                         }
-                        String stream = dataPoint.getOriginalDataSource().getStreamName();
-                        if (!stream.isEmpty()) {
-                            streamName.pushString(stream + " ");
-                            if (stream.equalsIgnoreCase("user_input")) {
-                                isTracked = false;
-                            }
+                        sourceId = dataPoint.getOriginalDataSource().getAppPackageName();
+                        if (dataPoint.getOriginalDataSource().getStreamName().equalsIgnoreCase("user_input")) {
+                            isTracked = false;
                         }
                         for (Field field : dataPoint.getDataType().getFields()) {
                             String fieldName = field.getName();
                             switch (fieldName) {
                                 case STEPS_FIELD_NAME:
-                                    map.putInt(fieldName, dataPoint.getValue(field).asInt());
+                                    map.putInt("quantity", dataPoint.getValue(field).asInt());
                                     break;
                                 case DISTANCE_FIELD_NAME:
                                     map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
                                     break;
                                 case CALORIES_FIELD_NAME:
                                     map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-                                case LOW_LATITUDE:
-                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-                                case HIGH_LATITUDE:
-                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-                                case LOW_LONGITUDE:
-                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-                                case HIGH_LONGITUDE:
-                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+//                                case LOW_LATITUDE:
+//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+//                                case HIGH_LATITUDE:
+//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+//                                case LOW_LONGITUDE:
+//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
+//                                case HIGH_LONGITUDE:
+//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
                                 default:
                                     Log.w(TAG, "don't specified and handled: " + fieldName);
                             }
                         }
                     }
                 }
-                map.putString("deviceName", deviceName);
-                map.putArray("streamNames", streamName);
-                map.putBoolean("isTracked", isTracked);
+                map.putString("device", deviceName);
+                map.putString("sourceName", deviceName);
+                map.putString("sourceId", sourceId);
+                map.putBoolean("tracked", isTracked);
                 results.pushMap(map);
             }
         }
