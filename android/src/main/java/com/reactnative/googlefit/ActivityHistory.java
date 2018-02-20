@@ -103,7 +103,7 @@ public class ActivityHistory {
                 WritableMap map = Arguments.createMap();
                 map.putDouble("start",start);
                 map.putDouble("end",end);
-                map.putInt("activityName", activityType);
+                map.putString("activityName", activityName);
                 String deviceName = "";
                 String sourceId = "";
                 boolean isTracked = true;
