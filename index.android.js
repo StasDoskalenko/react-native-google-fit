@@ -8,8 +8,15 @@ import {
 const googleFit = NativeModules.RNGoogleFit;
 
 class RNGoogleFit {
-    authorize() {
+    eventListeners = []
+
+    authorize () {
         googleFit.authorize();
+    }
+
+    removeListeners () {
+      this.eventListeners.forEach(eventListener => eventListener.remove())
+      this.eventListeners = []
     }
 
     /**
@@ -21,15 +28,17 @@ class RNGoogleFit {
     startRecording(callback) {
         googleFit.startFitnessRecording();
 
-        DeviceEventEmitter.addListener(
+        const recordingObserver = DeviceEventEmitter.addListener(
             'STEP_RECORDING',
             (steps) => callback(steps));
 
-        DeviceEventEmitter.addListener(
+        const distanceObserver = DeviceEventEmitter.addListener(
             'DISTANCE_RECORDING',
             (distance) => callback(distance));
 
         // TODO: add mote activity listeners
+
+        this.eventListeners.push(recordingObserver, distanceObserver)
     }
 
     //Will be deprecated in future releases
@@ -46,30 +55,28 @@ class RNGoogleFit {
     /**
      * Get the total steps per day over a specified date range.
      * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
+     * @param {Function} callback The function will be called with an array of elements.
      */
 
     getDailyStepCountSamples(options, callback) {
-        let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
-        let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
-        googleFit.getDailyStepCountSamples( startDate,
-            endDate,
-            (msg) => {
-            callback(msg, false);
-    },
-        (res) => {
-            if (res.length>0) {
-                callback(false, res.map(function(dev) {
-                        var obj = {};
-                        obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
-                        obj.steps = this.buildDailySteps(dev.steps);
-                        return obj;
-                    }, this)
-                );
-            } else {
-                callback("There is no any steps data for this period", false);
+        let startDate = options.startDate !== undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
+        let endDate = options.endDate !== undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
+        googleFit.getDailyStepCountSamples(startDate, endDate,
+            msg => callback(msg, false),
+            (res) => {
+              if (res.length>0) {
+                  callback(false, res.map(function(dev) {
+                          let obj = {};
+                          obj.source = dev.source.appPackage + ((dev.source.stream) ? ":" + dev.source.stream : "");
+                          obj.steps = this.buildDailySteps(dev.steps);
+                          return obj;
+                      }, this)
+                  );
+              } else {
+                  callback("There is no any steps data for this period", false);
+              }
             }
-        });
+        );
     }
 
     buildDailySteps(steps) {
@@ -196,7 +203,7 @@ class RNGoogleFit {
     }
 
     saveWeight(options, callback) {
-        if (options.unit == 'pound') {
+        if (options.unit === 'pound') {
             options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
         }
         options.date = Date.parse(options.date);
@@ -246,36 +253,40 @@ class RNGoogleFit {
     }
 
     observeSteps(callback) {
-        DeviceEventEmitter.addListener(
+        const stepsObserver = DeviceEventEmitter.addListener(
             'StepChangedEvent',
             (steps) => callback(steps)
         );
         googleFit.observeSteps();
+        this.eventListeners.push(stepsObserver)
     }
 
     observeHistory(callback) {
-        DeviceEventEmitter.addListener(
+        const historyObserver = DeviceEventEmitter.addListener(
             'StepHistoryChangedEvent',
             (steps) => callback(steps)
         );
+        this.eventListeners.push(historyObserver)
     }
 
     onAuthorize(callback) {
-        DeviceEventEmitter.addListener(
+        const authObserver = DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeSuccess',
             (authorized) => callback(authorized)
         );
+        this.eventListeners.push(authObserver)
     }
 
     onAuthorizeFailure(callback) {
-        DeviceEventEmitter.addListener(
+        const authFailedObserver = DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeFailure',
             (authorized) => callback(authorized)
         );
+        this.eventListeners.push(authFailedObserver)
     }
 
     usubscribeListeners() {
-        DeviceEventEmitter.removeAllListeners();
+        this.removeListeners()
     }
 
     lbsAndOzToK(imperial) {
