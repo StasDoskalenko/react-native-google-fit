@@ -14,7 +14,7 @@ class RNGoogleFit {
         googleFit.authorize();
     }
 
-    removeListeners () {
+    removeListeners = () => {
         this.eventListeners.forEach(eventListener => eventListener.remove())
         this.eventListeners = []
     }
@@ -25,7 +25,7 @@ class RNGoogleFit {
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording(callback) {
+    startRecording = (callback) => {
         googleFit.startFitnessRecording();
 
         const recordingObserver = DeviceEventEmitter.addListener(
@@ -58,7 +58,7 @@ class RNGoogleFit {
      * @param {Function} callback The function will be called with an array of elements.
      */
 
-    getDailyStepCountSamples(options, callback) {
+    getDailyStepCountSamples = (options, callback) => {
         let startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
         let endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
         googleFit.getDailyStepCountSamples(startDate, endDate,
@@ -176,7 +176,7 @@ class RNGoogleFit {
      * @callback callback The function will be called with an array of elements.
      */
 
-    getWeightSamples(options, callback) {
+    getWeightSamples = (options, callback) => {
         const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0,0,0,0);
         const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf();
         googleFit.getWeightSamples( startDate,
@@ -203,7 +203,7 @@ class RNGoogleFit {
         });
     }
 
-    saveWeight(options, callback) {
+    saveWeight = (options, callback) => {
         if (options.unit === 'pound') {
             options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
         }
@@ -217,7 +217,7 @@ class RNGoogleFit {
         });
     }
 
-    deleteWeight(options, callback) {
+    deleteWeight = (options, callback) => {
         if (options.unit === 'pound') {
             options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
         }
@@ -251,7 +251,7 @@ class RNGoogleFit {
         });
     }
 
-    observeSteps(callback) {
+    observeSteps = (callback) => {
         const stepsObserver = DeviceEventEmitter.addListener(
             'StepChangedEvent',
             (steps) => callback(steps)
@@ -260,7 +260,7 @@ class RNGoogleFit {
         this.eventListeners.push(stepsObserver)
     }
 
-    observeHistory(callback) {
+    observeHistory = (callback) => {
         const historyObserver = DeviceEventEmitter.addListener(
             'StepHistoryChangedEvent',
             (steps) => callback(steps)
@@ -268,7 +268,7 @@ class RNGoogleFit {
         this.eventListeners.push(historyObserver)
     }
 
-    onAuthorize(callback) {
+    onAuthorize = (callback) => {
         const authObserver = DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeSuccess',
             (authorized) => callback(authorized)
@@ -276,7 +276,7 @@ class RNGoogleFit {
         this.eventListeners.push(authObserver)
     }
 
-    onAuthorizeFailure(callback) {
+    onAuthorizeFailure = (callback) => {
         const authFailedObserver = DeviceEventEmitter.addListener(
             'GoogleFitAuthorizeFailure',
             (authorized) => callback(authorized)
@@ -284,7 +284,7 @@ class RNGoogleFit {
         this.eventListeners.push(authFailedObserver)
     }
 
-    unsubscribeListeners() {
+    unsubscribeListeners = () => {
         this.removeListeners()
     }
 
