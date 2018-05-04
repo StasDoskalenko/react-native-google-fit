@@ -23,6 +23,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 
 
@@ -68,7 +69,7 @@ LifecycleEventListener {
     }
     
     @ReactMethod
-    public void authorize() {
+    public void authorize(final Promise promise) {
         final Activity activity = getCurrentActivity();
         
         if (mGoogleFitManager == null) {
@@ -76,9 +77,10 @@ LifecycleEventListener {
         }
         
         if (mGoogleFitManager.isAuthorized()) {
+            promise.resolve(null);
             return;
         }
-        mGoogleFitManager.authorize();
+        mGoogleFitManager.authorize(promise);
     }
     
     @ReactMethod

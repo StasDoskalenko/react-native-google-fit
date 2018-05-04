@@ -11,7 +11,7 @@ class RNGoogleFit {
     eventListeners = []
 
     authorize () {
-        googleFit.authorize();
+        return googleFit.authorize();
     }
 
     removeListeners = () => {

@@ -25,6 +25,7 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -107,7 +108,7 @@ public class GoogleFitManager implements
 
     public CalorieHistory getCalorieHistory() { return calorieHistory; }
 
-    public void authorize() {
+    public void authorize(final Promise promise) {
         final ReactContext mReactContext = this.mReactContext;
 
         mApiClient = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
@@ -122,12 +123,15 @@ public class GoogleFitManager implements
                         @Override
                         public void onConnected(@Nullable Bundle bundle) {
                             Log.i(TAG, "Authorization - Connected");
+                            promise.resolve(null);
                             sendEvent(mReactContext, "GoogleFitAuthorizeSuccess", null);
                         }
 
                         @Override
                         public void onConnectionSuspended(int i) {
-                            Log.i(TAG, "Authorization - Connection Suspended");
+                            String message = "Authorization - Connection Suspended";
+                            Log.i(TAG, message);
+                            promise.reject("GoogleFitAuthorizeFailure", message);
                             if ((mApiClient != null) && (mApiClient.isConnected())) {
                                 mApiClient.disconnect();
                             }
@@ -141,7 +145,7 @@ public class GoogleFitManager implements
                             WritableMap map = Arguments.createMap();
                             map.putString("message", "" + connectionResult);
                             sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
-
+                            promise.reject("GoogleFitAuthorizeFailure", connectionResult.toString());
                             Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                             if (mAuthInProgress) {
                                 Log.i(TAG, "Authorization - Already attempting to resolve an error.");
