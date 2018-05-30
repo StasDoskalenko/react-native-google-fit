@@ -34,6 +34,8 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.Fitness.*;
+import com.google.android.gms.auth.api.signin.*;
 
 
 public class GoogleFitManager implements
@@ -165,6 +167,11 @@ public class GoogleFitManager implements
                 .build();
 
         mApiClient.connect();
+    }
+
+    public void  disconnect() {
+        GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
+        Fitness.getConfigClient(mReactContext, gsa).disableFit();
     }
 
     public boolean isAuthorized() {

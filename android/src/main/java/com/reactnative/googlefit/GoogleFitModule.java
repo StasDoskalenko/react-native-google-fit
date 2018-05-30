@@ -78,6 +78,11 @@ LifecycleEventListener {
         }
         mGoogleFitManager.authorize();
     }
+
+    @ReactMethod
+    public void disconnect() {
+        mGoogleFitManager.disconnect();
+    }
     
     @ReactMethod
     public void startFitnessRecording() {
