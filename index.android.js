@@ -12,6 +12,10 @@ class RNGoogleFit {
         googleFit.authorize();
     }
 
+    disconnect() {
+        googleFit.disconnect();
+    }
+
     /**
      * Start recording fitness data (steps, distance)
      * This function relies on sending events to signal the RecordingAPI status
