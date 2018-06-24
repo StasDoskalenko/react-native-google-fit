@@ -231,7 +231,8 @@ LifecycleEventListener {
         try {
             pm.getPackageInfo(GOOGLE_FIT_APP_URI, PackageManager.GET_ACTIVITIES);
             return true;
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
+            Log.i(REACT_MODULE, e.toString());
             return false;
         }
     }
