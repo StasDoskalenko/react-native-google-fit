@@ -75,10 +75,7 @@ public class ActivityHistory {
     }
 
     public ReadableArray getActivitySamples(long startTime, long endTime) {
-        long begin = new Date().getTime();
-        Log.i(TAG, "go into getActivitySamples " + begin);
         WritableArray results = Arguments.createArray();
-
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
@@ -90,9 +87,6 @@ public class ActivityHistory {
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 
-        long finish = new Date().getTime();
-        Log.i(TAG, "request takes " + (begin-finish));
-
         List<Bucket> buckets = dataReadResult.getBuckets();
         for (Bucket bucket : buckets) {
             String activityName = bucket.getActivity();
@@ -100,6 +94,8 @@ public class ActivityHistory {
             if (!bucket.getDataSets().isEmpty()) {
                 long start = bucket.getStartTime(TimeUnit.MILLISECONDS);
                 long end = bucket.getEndTime(TimeUnit.MILLISECONDS);
+                Date startDate = new Date(start);
+                Date endDate = new Date(end);
                 WritableMap map = Arguments.createMap();
                 map.putDouble("start",start);
                 map.putDouble("end",end);
@@ -119,7 +115,7 @@ public class ActivityHistory {
                         } catch (Exception e) {
                         }
                         sourceId = dataPoint.getOriginalDataSource().getAppPackageName();
-                        if (dataPoint.getOriginalDataSource().getStreamName().equalsIgnoreCase("user_input")) {
+                        if (startDate.getTime() % 1000 == 0 || endDate.getTime() % 1000 == 0) {
                             isTracked = false;
                         }
                         for (Field field : dataPoint.getDataType().getFields()) {
@@ -154,8 +150,7 @@ public class ActivityHistory {
                 results.pushMap(map);
             }
         }
-
-
+        
         return results;
     }
 }
