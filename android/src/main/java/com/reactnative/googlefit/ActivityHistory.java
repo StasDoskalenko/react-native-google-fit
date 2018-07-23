@@ -115,7 +115,7 @@ public class ActivityHistory {
                         } catch (Exception e) {
                         }
                         sourceId = dataPoint.getOriginalDataSource().getAppPackageName();
-                        if (startDate.getTime() % 1000 == 0 || endDate.getTime() % 1000 == 0) {
+                        if (startDate.getTime() % 1000 == 0 && endDate.getTime() % 1000 == 0) {
                             isTracked = false;
                         }
                         for (Field field : dataPoint.getDataType().getFields()) {
