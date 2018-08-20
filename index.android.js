@@ -246,6 +246,18 @@ class RNGoogleFit {
       });
   }
 
+  saveHeight(options, callback) {
+    options.date = Date.parse(options.date);
+    googleFit.saveHeight( options,
+        (msg) => {
+        callback(msg,false);
+},
+    (res) => {
+        callback(false,res);
+
+    });
+}
+
 
     saveWeight(options, callback) {
         if (options.unit == 'pound') {
