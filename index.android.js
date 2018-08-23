@@ -309,6 +309,10 @@ class RNGoogleFit {
         });
     }
 
+    openFit() {
+        googleFit.openFit();
+    }
+
     observeSteps(callback) {
         DeviceEventEmitter.addListener(
             'StepChangedEvent',

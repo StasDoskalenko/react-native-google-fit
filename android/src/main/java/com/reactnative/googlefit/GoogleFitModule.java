@@ -13,6 +13,7 @@ package com.reactnative.googlefit;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import android.content.Intent;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -242,6 +243,17 @@ LifecycleEventListener {
             successCallback.invoke(isEnabledCheck());
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void openFit() {
+        PackageManager pm = mReactContext.getPackageManager();
+        try {
+            Intent launchIntent = pm.getLaunchIntentForPackage(GOOGLE_FIT_APP_URI);
+            mReactContext.startActivity(launchIntent);
+        } catch (Exception e) {
+            Log.i(REACT_MODULE, e.toString());
         }
     }
 
