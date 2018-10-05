@@ -62,15 +62,19 @@ public class BodyHistory {
 
     public ReadableArray getHistory(long startTime, long endTime) {
         DateFormat dateFormat = DateFormat.getDateInstance();
-        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
-        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
-        // for height we need to take since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
+        // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
         startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .read(this.dataType)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .setLimit(1) // we just need the last one
-                .build();
+
+        if (this.dataType == DataType.TYPE_WEIGHT) {
+            readRequest.bucketByTime(1, TimeUnit.DAYS)
+        } else {
+            readRequest.setLimit(1) // need only one height
+        }
+
+        readRequest.build()
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 
@@ -78,7 +82,6 @@ public class BodyHistory {
 
         //Used for aggregated data
         if (dataReadResult.getBuckets().size() > 0) {
-            //Log.i(TAG, "Number of buckets: " + dataReadResult.getBuckets().size());
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 List<DataSet> dataSets = bucket.getDataSets();
                 for (DataSet dataSet : dataSets) {
@@ -88,14 +91,10 @@ public class BodyHistory {
         }
         //Used for non-aggregated data
         else if (dataReadResult.getDataSets().size() > 0) {
-            //Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
             for (DataSet dataSet : dataReadResult.getDataSets()) {
                 processDataSet(dataSet, map);
             }
         }
-
-        //Log.i("Returnable", map.toString());
-
         return map;
     }
 

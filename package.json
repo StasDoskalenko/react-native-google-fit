@@ -1,34 +1,10 @@
 {
-  "_args": [
-    [
-      "react-native-google-fit@0.5.0",
-      "/Users/Evgeny/project/scooch/scooch"
-    ]
-  ],
-  "_from": "react-native-google-fit@0.5.0",
-  "_id": "react-native-google-fit@0.5.0",
-  "_inBundle": false,
-  "_integrity": "sha512-yrj8lyHGT2cS0n0usT9CQ0jrjlBPZgw1/PLcV3OAjSY0L65er8ygetCWOwJtFYe7TVRucxtz9FPzwYHLRomCAg==",
-  "_location": "/react-native-google-fit",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "react-native-google-fit@0.5.0",
-    "name": "react-native-google-fit",
-    "escapedName": "react-native-google-fit",
-    "rawSpec": "0.5.0",
-    "saveSpec": null,
-    "fetchSpec": "0.5.0"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/react-native-google-fit/-/react-native-google-fit-0.5.0.tgz",
-  "_spec": "0.5.0",
-  "_where": "/Users/Evgeny/project/scooch/scooch",
-  "author": {
-    "name": "Stanislav Doskalenko"
+  "name": "react-native-google-fit",
+  "version": "0.6.1",
+  "description": "A React Native bridge module for interacting with Google Fit",
+  "main": "index.android.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/StasDoskalenko/react-native-google-fit/issues"
