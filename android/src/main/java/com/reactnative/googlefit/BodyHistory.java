@@ -64,17 +64,17 @@ public class BodyHistory {
         DateFormat dateFormat = DateFormat.getDateInstance();
         // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
         startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
-        DataReadRequest readRequest = new DataReadRequest.Builder()
+        DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .read(this.dataType)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
         if (this.dataType == DataType.TYPE_WEIGHT) {
-            readRequest.bucketByTime(1, TimeUnit.DAYS)
+            readRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
         } else {
-            readRequest.setLimit(1) // need only one height
+            readRequestBuilder.setLimit(1); // need only one height, since it's unchangable
         }
 
-        readRequest.build()
+        DataReadRequest readRequest = readRequestBuilder.build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 

@@ -239,7 +239,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void deleteHeight(ReadableMap weightSample, Callback errorCallback, Callback successCallback) {
+    public void deleteHeight(ReadableMap options, Callback errorCallback, Callback successCallback) {
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_HEIGHT);
