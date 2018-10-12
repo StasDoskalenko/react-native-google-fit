@@ -6,6 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bugs": {
+    "url": "https://github.com/StasDoskalenko/react-native-google-fit/issues"
+  },
+  "description": "A React Native bridge module for interacting with Google Fit",
+  "homepage": "https://github.com/StasDoskalenko/react-native-google-fit#readme",
   "keywords": [
     "react-native",
     "google-fit",
@@ -19,13 +24,15 @@
     "native",
     "ReactNative"
   ],
-  "author": "Stanislav Doskalenko",
   "license": "MIT",
+  "main": "index.android.js",
+  "name": "react-native-google-fit",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/StasDoskalenko/react-native-google-fit.git"
   },
-  "bugs": {
-    "url": "https://github.com/StasDoskalenko/react-native-google-fit/issues"
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.5.0"
 }

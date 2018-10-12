@@ -112,7 +112,7 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
 ];
 ```
 
-4. Retrieve Weights
+4. Retrieve Weights (the same logic for height)
 
     ```javascript
     const opt = {

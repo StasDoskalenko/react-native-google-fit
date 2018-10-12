@@ -1,14 +1,18 @@
 'use strict'
 
-import {DeviceEventEmitter, NativeModules} from 'react-native';
+import { DeviceEventEmitter, NativeModules} from 'react-native';
 
 const googleFit = NativeModules.RNGoogleFit;
 
 class RNGoogleFit {
     eventListeners = []
 
-    authorize() {
+    authorize = () => {
         googleFit.authorize();
+    }
+
+    disconnect = () => {
+      googleFit.disconnect();
     }
 
     removeListeners = () => {
@@ -132,6 +136,20 @@ class RNGoogleFit {
             });
     }
 
+    getActivitySamples(options, callback) {
+        googleFit.getActivitySamples( options.startDate,
+            options.endDate,
+        (msg) => {
+                    callback(msg, false);
+            },
+          (res) => {
+            if (res.length>0) {
+              callback(false, res);
+            } else {
+              callback("There is no any distance data for this period", false);
+            }
+          });
+    }
 
     /**
      * Get the total calories per day over a specified date range.
@@ -209,9 +227,45 @@ class RNGoogleFit {
             });
     }
 
-    saveWeight = (options, callback) => {
-        if (options.unit === 'pound') {
-            options.value = this.lbsAndOzToK({pounds: options.value, ounces: 0}); //convert pounds and ounces to kg
+    getHeightSamples(options, callback) {
+      let startDate = Date.parse(options.startDate);
+      let endDate = Date.parse(options.endDate);
+      googleFit.getHeightSamples( startDate,
+        endDate,
+        (msg) => {
+          callback(msg, false);
+        },
+        (res) => {
+          if (res.length>0) {
+            res = res.map((el) => {
+              if (el.value) {
+                el.startDate = new Date(el.startDate).toISOString();
+                el.endDate = new Date(el.endDate).toISOString();
+                return el;
+              }
+            });
+            callback(false, res.filter(day => day != undefined));
+          } else {
+            callback("There is no any height data for this period", false);
+          }
+        });
+    }
+
+    saveHeight(options, callback) {
+      options.date = Date.parse(options.date);
+      googleFit.saveHeight(options,
+        (msg) => {
+          callback(msg, false);
+        },
+        (res) => {
+          callback(false, res);
+
+        });
+    }
+
+    saveWeight(options, callback) {
+        if (options.unit == 'pound') {
+            options.value = this.lbsAndOzToK({ pounds: options.value, ounces: 0 }); //convert pounds and ounces to kg
         }
         options.date = Date.parse(options.date);
         googleFit.saveWeight(options,
@@ -237,6 +291,17 @@ class RNGoogleFit {
             });
     }
 
+    deleteHeight = (options, callback) => {
+      options.date = Date.parse(options.date);
+      googleFit.deleteWeight(options,
+        (msg) => {
+          callback(msg, false);
+        },
+        (res) => {
+          callback(false, res);
+        });
+    }
+
     isAvailable(callback) { // true if GoogleFit installed
         googleFit.isAvailable(
             (msg) => {
@@ -255,6 +320,10 @@ class RNGoogleFit {
             (res) => {
                 callback(false, res);
             });
+    }
+
+    openFit() {
+        googleFit.openFit();
     }
 
     observeSteps = (callback) => {

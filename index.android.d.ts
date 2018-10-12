@@ -5,6 +5,8 @@ declare module "react-native-google-fit" {
 
         authorize(): void;
 
+        disconnect(): void;
+
         removeListeners: () => void;
 
         /**
@@ -36,6 +38,13 @@ declare module "react-native-google-fit" {
         getDailyDistanceSamples(options: any, callback: ((isError: boolean, result: any) => void)): void;
 
         /**
+        * Get the total distance per day over a specified date range.
+        * @param {Object} options getActivitySamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+        * @callback {Function} callback The function will be called with an array of elements.
+        */
+         getActivitySamples(options: any, callback: ((isError: boolean, result: any) => void)): void;
+
+        /**
          * Get the total calories per day over a specified date range.
          * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
          * @callback {Function} callback The function will be called with an array of elements.
@@ -46,19 +55,31 @@ declare module "react-native-google-fit" {
 
         /**
          * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
-         * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
+         * @param {Object} options  getWeightSamples accepts an options object containing unit: "pound"/"kg",
          *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
          * @callback callback The function will be called with an array of elements.
          */
         getWeightSamples: (options: any, callback: ((isError: boolean, result: WeightSample[]) => void)) => void;
 
+        /**
+         * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
+         * @param {Object} options  getHeightSamples accepts an options object containing unit: "pound"/"kg",
+         *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+         * @callback callback The function will be called with an array of elements.
+         */
+        getHeightSamples: (options: any, callback: ((isError: boolean, result: WeightSample[]) => void)) => void;
+
         saveWeight: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
+
+        saveHeight: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
 
         deleteWeight: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
 
         isAvailable(callback: ((isError: boolean, result: boolean) => void)): void;
 
         isEnabled(callback: ((isError: boolean, result: boolean) => void)): void;
+
+        openFit(): void;
 
         observeSteps: (callback: ((isError: boolean, result: any) => void)) => void;
 
