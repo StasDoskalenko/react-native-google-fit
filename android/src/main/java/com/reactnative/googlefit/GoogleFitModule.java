@@ -64,6 +64,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @Override
     public void onHostDestroy() {
+        // todo disconnect from Google Fit
     }
 
     @ReactMethod
@@ -82,7 +83,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @ReactMethod
     public void disconnect() {
-        mGoogleFitManager.disconnect();
+        if (mGoogleFitManager != null) {
+            mGoogleFitManager.disconnect();
+        }
     }
 
     @ReactMethod
@@ -178,7 +181,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     public void saveHeight(ReadableMap heightSample,
                            Callback errorCallback,
                            Callback successCallback) {
-        
+
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_HEIGHT);
