@@ -175,10 +175,11 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
 ### Changelog:
 
 ```
+0.7.1   - Fix for disconnect() (@dmitriys-lits thanks for the PR)
 0.7     - Retrieve Heights, open fit activity, unified body method (@EJohnF thanks for the PR!)
 
 0.6     - RN 0.56+ support (@skb1129 thanks for the PR)
-        - nutrition scenario (@@13thdeus thanks for the PR)
+        - nutrition scenario (@13thdeus thanks for the PR)
         
 0.5     - New auth process (@priezz thanks for PR)
         - Fix unsubscribe listeners
