@@ -172,6 +172,7 @@ public class GoogleFitManager implements
     public void  disconnect() {
         GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
         Fitness.getConfigClient(mReactContext, gsa).disableFit();
+        mApiClient.disconnect();
     }
 
     public boolean isAuthorized() {
