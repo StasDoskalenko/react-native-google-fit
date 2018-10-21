@@ -128,14 +128,6 @@ public class ActivityHistory {
                                     break;
                                 case CALORIES_FIELD_NAME:
                                     map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-//                                case LOW_LATITUDE:
-//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-//                                case HIGH_LATITUDE:
-//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-//                                case LOW_LONGITUDE:
-//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
-//                                case HIGH_LONGITUDE:
-//                                    map.putDouble(fieldName, dataPoint.getValue(field).asFloat());
                                 default:
                                     Log.w(TAG, "don't specified and handled: " + fieldName);
                             }
