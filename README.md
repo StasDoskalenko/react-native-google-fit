@@ -112,7 +112,7 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
 ];
 ```
 
-4. Retrieve Weights (the same logic for height)
+4. Retrieve Weights
 
     ```javascript
     const opt = {
@@ -153,8 +153,55 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
       if (err) throw "Cant save data to the Google Fit";
     });
     ```
+    
+7. Get all activities
+    ```javascript
+      let options = {
+        startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
+        endDate: new Date(2018, 9, 18).valueOf()
+      };
+      GoogleFit.getActivitySamples(options, (err, res) => {
+        console.log(err, res)
+      });
+    ```
+    response:
+    ```javascript
+     [ { 
+      sourceName: 'Android',
+      device: 'Android',
+      sourceId: 'com.google.android.gms',
+      calories: 764.189208984375,
+      quantity: 6,
+      end: 1539774300992,
+      tracked: true,
+      activityName: 'still',
+      start: 1539727200000 },
+    { sourceName: 'Android',
+      device: 'Android',
+      sourceId: 'com.google.android.gms',
+      calories: 10.351096153259277,
+      quantity: 138,
+      end: 1539774486088,
+      tracked: true,
+      distance: 88.09545135498047,
+      activityName: 'walking',
+    }]
+    ```
+    Where:
+    ```
+    sourceName = device - 'Android' or 'Android Wear' string
+    sourceId - return a value of dataSource.getAppPackageName(). For more info see: https://developers.google.com/fit/android/data-attribution
+    start/end - timestamps of activity in format of milliseconds since the Unix Epoch
+    tracked - bool flag, is this activity was entered by user or tracked by device. Detected by checking milliseconds of start/end timestamps. Since when user log activity in googleFit they can't set milliseconds
+    distance(opt) - A distance in meters.
+    activityName - string, equivalent one of these https://developers.google.com/fit/rest/v1/reference/activity-types 
+    calories(opt) - double value of burned Calories in kcal.
+    quantity(opt) - equivalent of steps number
+    ```
+    Note that optional parametrs are not presented in all activities - only where google fit return some results for this field.
+    Like no distance for still activity. 
 
-7. Other methods:
+8. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
@@ -170,6 +217,16 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
     isEnabled(callback); // Checks is permissions granted
     
     deleteWeight(options, callback); // method to delete weights by options (same as in save weights)
+ 
+    openFit(); //method to open google fit app
+    
+    saveHeight(options, callback);
+ 
+    deleteHeight(options, callback);
+ 
+    deleteWeight(options, callback);
+ 
+    disconnect(); // Closes the connection to Google Play services.
     ```
 
 ### Changelog:
@@ -233,7 +290,6 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
 
 ### PLANS / TODO
 
-* support of all Google Fit activity types
 * code refactoring
 * optimization
 
