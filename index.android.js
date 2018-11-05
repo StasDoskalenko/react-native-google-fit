@@ -152,6 +152,18 @@ class RNGoogleFit {
             });
     }
 
+    getWorkoutSamples(options, callback) {
+        googleFit.getWorkoutSamples(
+            options.startDate,
+            options.endDate,
+            (error) => {
+                callback(error, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
+    }
+
     /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.

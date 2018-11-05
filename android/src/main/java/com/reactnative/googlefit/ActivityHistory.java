@@ -22,6 +22,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -142,6 +143,53 @@ public class ActivityHistory {
             }
         }
         
+        return results;
+    }
+
+    public ReadableArray getWorkoutSamples(long startTime, long endTime) {
+        WritableArray results = Arguments.createArray();
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .bucketByActivitySegment(15, TimeUnit.MINUTES)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        List<Bucket> buckets = dataReadResult.getBuckets();
+        for (Bucket bucket : buckets) {
+            String activity = bucket.getActivity();
+
+            if (
+                !activity.equalsIgnoreCase(FitnessActivities.UNKNOWN) &&
+                !activity.contains(FitnessActivities.SLEEP) &&
+                !activity.equalsIgnoreCase(FitnessActivities.IN_VEHICLE) &&
+                !activity.equalsIgnoreCase(FitnessActivities.STILL)
+            ) {
+                WritableMap map = Arguments.createMap();
+                map.putDouble("start", bucket.getStartTime(TimeUnit.MILLISECONDS));
+                map.putDouble("end", bucket.getEndTime(TimeUnit.MILLISECONDS));
+
+                if (activity.contains(FitnessActivities.WALKING)) {
+                    map.putString("workoutType", "walk");
+                } else if (activity.contains(FitnessActivities.RUNNING)) {
+                    map.putString("workoutType", "run");
+                } else if (activity.equalsIgnoreCase(FitnessActivities.YOGA)) {
+                    map.putString("workoutType", "yoga");
+                } else if (activity.equalsIgnoreCase(FitnessActivities.STRENGTH_TRAINING)) {
+                    map.putString("workoutType", "strengthTraining");
+                } else if (activity.contains(FitnessActivities.SWIMMING)) {
+                    map.putString("workoutType", "swimming");
+                } else if (activity.contains(FitnessActivities.BIKING)) {
+                    map.putString("workoutType", "cycling");
+                } else {
+                    map.putString("workoutType", "other");
+                }
+
+                results.pushMap(map);
+            }
+        }
+
         return results;
     }
 }
