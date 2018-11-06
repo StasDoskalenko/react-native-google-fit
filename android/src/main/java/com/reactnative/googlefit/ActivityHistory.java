@@ -18,9 +18,11 @@ import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
@@ -191,5 +193,48 @@ public class ActivityHistory {
         }
 
         return results;
+    }
+
+    public boolean submitWorkout(long startTime, long endTime, String workoutType) {
+        DataSource dataSource = new DataSource.Builder()
+                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
+                .setDataType(DataType.TYPE_ACTIVITY_SEGMENT)
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+        DataSet dataSet = DataSet.create(dataSource);
+        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+
+        String activityType;
+
+        switch (workoutType) {
+            case "walk":
+                activityType = FitnessActivities.WALKING;
+                break;
+            case "run":
+                activityType = FitnessActivities.RUNNING;
+                break;
+            case "yoga":
+                activityType = FitnessActivities.YOGA;
+                break;
+            case "strengthTraining":
+                activityType = FitnessActivities.STRENGTH_TRAINING;
+                break;
+            case "swimming":
+                activityType = FitnessActivities.SWIMMING;
+                break;
+            case "cycling":
+                activityType = FitnessActivities.BIKING;
+                break;
+            default:
+                activityType = FitnessActivities.OTHER;
+                break;
+        }
+
+        dataPoint.getValue(Field.FIELD_ACTIVITY).setActivity(activityType);
+        dataSet.add(dataPoint);
+
+        Status status = Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet).await(1, TimeUnit.MINUTES);
+        return status.isSuccess();
     }
 }
