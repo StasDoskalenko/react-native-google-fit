@@ -20,6 +20,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.uimanager.IllegalViewOperationException;
@@ -89,8 +90,8 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void startFitnessRecording() {
-        mGoogleFitManager.getRecordingApi().subscribe();
+    public void startFitnessRecording(ReadableArray dataTypes) {
+        mGoogleFitManager.getRecordingApi().subscribe(dataTypes);
     }
 
     @ReactMethod

@@ -14,6 +14,8 @@ package com.reactnative.googlefit;
 import com.reactnative.googlefit.GoogleFitManager;
 
 import com.facebook.react.bridge.ReactContext;
+
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.fitness.Fitness;
@@ -33,6 +35,8 @@ import com.google.android.gms.fitness.data.Subscription;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+
 
 public class RecordingApi {
 
@@ -41,6 +45,25 @@ public class RecordingApi {
 
     private static final String TAG = "RecordingApi";
 
+    @Nullable
+    public static DataType getDataType(String dataTypeName) {
+        switch (dataTypeName) {
+            case "step":
+                return DataType.TYPE_STEP_COUNT_CUMULATIVE;
+            case "distance":
+                return DataType.TYPE_DISTANCE_DELTA;
+            case "activity":
+                return DataType.TYPE_ACTIVITY_SAMPLES;
+            default:
+                Log.v(TAG, "Unknown data type " + dataTypeName);
+                return null;
+        }
+    }
+
+    public static String getEventName(String dataTypeName) {
+        return dataTypeName.toUpperCase() + "_RECORDING";
+    }
+
     public RecordingApi (ReactContext reactContext, GoogleFitManager googleFitManager) {
 
         this.reactContext = reactContext;
@@ -48,48 +71,44 @@ public class RecordingApi {
 
     }
 
-    public void subscribe () {
+    public void subscribe(ReadableArray dataTypes) {
+        ArrayList<String> dataTypesList = new ArrayList<String>();
 
-        Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), DataType.TYPE_STEP_COUNT_CUMULATIVE)
-            .setResultCallback(new ResultCallback <Status> () {
+        for (Object type : dataTypes.toArrayList()) {
+            dataTypesList.add(type.toString());
+        }
 
-                @Override
-                public void onResult(Status status) {
 
-                    WritableMap map = Arguments.createMap();
+        for (String dataTypeName : dataTypesList) {
+            DataType dataType = getDataType(dataTypeName);
 
-                    if (status.isSuccess()) {
-                        map.putBoolean("recording", true);
-                        Log.i(TAG, "RecordingAPI - Connected");
-                        sendEvent(reactContext, "STEP_RECORDING", map);
+            // Just skip unknown data types
+            if (dataType == null) {
+                continue;
+            }
 
-                    } else {
-                        map.putBoolean("recording", false);
-                        Log.i(TAG, "RecordingAPI - Error connecting");
-                        sendEvent(reactContext, "STEP_RECORDING", map);
-                    }
-                }
-            });
-            Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), DataType.TYPE_DISTANCE_DELTA)
-            .setResultCallback(new ResultCallback <Status> () {
+            final String eventName = getEventName(dataTypeName);
 
-                @Override
-                public void onResult(Status status) {
+            Fitness.RecordingApi.subscribe(googleFitManager.getGoogleApiClient(), dataType)
+                    .setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            WritableMap map = Arguments.createMap();
 
-                    WritableMap map = Arguments.createMap();
+                            map.putString("type", eventName);
 
-                    if (status.isSuccess()) {
-                        map.putBoolean("recording", true);
-                        // Log.i(TAG, "RecordingAPI - Connected");
-                        sendEvent(reactContext, "DISTANCE_RECORDING", map);
-
-                    } else {
-                        map.putBoolean("recording", false);
-                        // Log.i(TAG, "RecordingAPI - Error connecting");
-                        sendEvent(reactContext, "DISTANCE_RECORDING", map);
-                    }
-                }
-            });
+                            if (status.isSuccess()) {
+                                map.putBoolean("recording", true);
+                                Log.i(TAG, "RecordingAPI - Connected");
+                                sendEvent(reactContext, eventName, map);
+                            } else {
+                                map.putBoolean("recording", false);
+                                Log.i(TAG, "RecordingAPI - Error connecting");
+                                sendEvent(reactContext, eventName, map);
+                            }
+                        }
+                    });
+        }
     }
 
 
