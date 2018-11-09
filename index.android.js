@@ -21,25 +21,27 @@ class RNGoogleFit {
     }
 
     /**
-     * Start recording fitness data (steps, distance)
+     * Start recording fitness data
+     * 
+     * You could specify data by array dataTypes. Possible values - step, distance, activity which corresponds
+     * DataTypes.TYPE_STEP_CUMULATIVE, DataType.TYPE_DISTANCE_DELTA and DataType.TYPE_ACTIVITIES_SAMPLES
+     * 
+     * Default value for dataTypes is steps and distance data
+     *
      * This function relies on sending events to signal the RecordingAPI status
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording = (callback) => {
-        googleFit.startFitnessRecording();
+    startRecording = (callback, dataTypes = ['step', 'distance']) => {
+        googleFit.startFitnessRecording(dataTypes);
 
-        const recordingObserver = DeviceEventEmitter.addListener(
-            'STEP_RECORDING',
-            (steps) => callback(steps));
+        const eventListeners = dataTypes.map(dataTypeName => {
+            const eventName = `${dataTypeName.toUpperCase()}_RECORDING`;
 
-        const distanceObserver = DeviceEventEmitter.addListener(
-            'DISTANCE_RECORDING',
-            (distance) => callback(distance));
+            return DeviceEventEmitter.addListener(eventName, event => callback(event));
+        });
 
-        // TODO: add mote activity listeners
-
-        this.eventListeners.push(recordingObserver, distanceObserver)
+        this.eventListeners.push(...eventListeners);
     }
 
     //Will be deprecated in future releases
