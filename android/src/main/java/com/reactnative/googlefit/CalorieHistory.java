@@ -21,6 +21,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -94,6 +95,23 @@ public class CalorieHistory {
         return map;
     }
 
+    public void insertCalories(float calories, long startTime, long endTime) throws Exception {
+        DataSource dataSource = new DataSource.Builder()
+                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
+                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+        DataSet dataSet = DataSet.create(dataSource);
+        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+        dataPoint.getValue(Field.FIELD_CALORIES).setFloat(calories);
+        dataSet.add(dataPoint);
+
+        Status status = Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet).await(1, TimeUnit.MINUTES);
+        if (!status.isSuccess()) {
+            throw new Exception(status.getStatusMessage());
+        }
+    }
 
     // utility function that gets the basal metabolic rate averaged over a week
     private float getBasalAVG(long _et) throws Exception {
@@ -156,13 +174,7 @@ public class CalorieHistory {
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                float basal = 0;
-                try {
-                    basal = getBasalAVG(dp.getEndTime(TimeUnit.MILLISECONDS));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
+                stepMap.putDouble("calorie", dp.getValue(field).asFloat());
                 map.pushMap(stepMap);
             }
         }

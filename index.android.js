@@ -74,7 +74,7 @@ class RNGoogleFit {
                         }, this)
                     );
                 } else {
-                    callback("There is no any steps data for this period", false);
+                    callback(false, []);
                 }
             }
         );
@@ -166,9 +166,10 @@ class RNGoogleFit {
 
     submitWorkout(options, callback) {
         googleFit.submitWorkout(
+            options.workoutType,
             options.startDate,
             options.endDate,
-            options.workoutType,
+            options.calories,
             (error) => {
                 callback(error, false);
             },
@@ -203,7 +204,7 @@ class RNGoogleFit {
                     });
                     callback(false, res.filter(day => day != undefined));
                 } else {
-                    callback("There is no any calorie data for this period", false);
+                    callback(false, []);
                 }
             });
     }

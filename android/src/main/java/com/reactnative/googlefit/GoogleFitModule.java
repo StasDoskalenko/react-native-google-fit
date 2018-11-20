@@ -148,15 +148,18 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void submitWorkout(double startDate,
+    public void submitWorkout(String workoutType,
+                              double startDate,
                               double endDate,
-                              String workoutType,
+                              double calories,
                               Callback errorCallback,
                               Callback successCallback) {
 
         try {
-            successCallback.invoke(mGoogleFitManager.getActivityHistory().submitWorkout((long)startDate, (long) endDate, workoutType));
-        } catch (IllegalViewOperationException e) {
+            mGoogleFitManager.getActivityHistory().submitWorkout(workoutType, (long)startDate, (long)endDate);
+            mGoogleFitManager.getCalorieHistory().insertCalories((float) calories, (long) startDate, (long) endDate);
+            successCallback.invoke(true);
+        } catch (Exception e) {
             errorCallback.invoke(e.getMessage());
         }
     }

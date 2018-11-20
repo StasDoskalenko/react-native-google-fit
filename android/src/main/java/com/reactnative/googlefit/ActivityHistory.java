@@ -195,7 +195,7 @@ public class ActivityHistory {
         return results;
     }
 
-    public boolean submitWorkout(long startTime, long endTime, String workoutType) {
+    public void submitWorkout(String workoutType, long startTime, long endTime) throws Exception {
         DataSource dataSource = new DataSource.Builder()
                 .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
                 .setDataType(DataType.TYPE_ACTIVITY_SEGMENT)
@@ -235,6 +235,8 @@ public class ActivityHistory {
         dataSet.add(dataPoint);
 
         Status status = Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet).await(1, TimeUnit.MINUTES);
-        return status.isSuccess();
+        if (!status.isSuccess()) {
+            throw new Exception(status.getStatusMessage());
+        }
     }
 }
