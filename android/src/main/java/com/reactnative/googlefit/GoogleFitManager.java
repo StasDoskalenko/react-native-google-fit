@@ -120,6 +120,7 @@ public class GoogleFitManager implements
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
                 .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope("https://www.googleapis.com/auth/fitness.blood_pressure.read"))
                 .addConnectionCallbacks(
                     new GoogleApiClient.ConnectionCallbacks() {
                         @Override

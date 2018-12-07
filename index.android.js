@@ -375,6 +375,54 @@ class RNGoogleFit {
         return metric * 2.2046;
     }
 
+    getHeartRateSamples(options, callback) {
+        let startDate = Date.parse(options.startDate);
+        let endDate = Date.parse(options.endDate);
+        googleFit.getHeartRateSamples( startDate,
+            endDate,
+            (msg) => {
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.value) {
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any heart rate data for this period", false);
+                }
+            });
+    }
+
+    getBloodPressureSamples(options, callback) {
+        let startDate = Date.parse(options.startDate);
+        let endDate = Date.parse(options.endDate);
+        googleFit.getBloodPressureSamples( startDate,
+            endDate,
+            (msg) => {
+                callback(msg, false);
+            },
+            (res) => {
+                if (res.length>0) {
+                    res = res.map((el) => {
+                        if (el.value) {
+                            el.startDate = new Date(el.startDate).toISOString();
+                            el.endDate = new Date(el.endDate).toISOString();
+                            return el;
+                        }
+                    });
+                    callback(false, res.filter(day => day != undefined));
+                } else {
+                    callback("There is no any heart rate data for this period", false);
+                }
+            });
+    }
+
 }
 
 export default new RNGoogleFit();

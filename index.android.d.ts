@@ -69,6 +69,10 @@ declare module "react-native-google-fit" {
          */
         getHeightSamples: (options: any, callback: ((isError: boolean, result: WeightSample[]) => void)) => void;
 
+        getHeartRateSamples: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
+
+        getBloodPressureSamples: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
+
         saveWeight: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
 
         saveHeight: (options: any, callback: ((isError: boolean, result: any) => void)) => void;
