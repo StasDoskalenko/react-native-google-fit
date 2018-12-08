@@ -306,7 +306,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                  double endDate,
                                  Callback errorCallback,
                                  Callback successCallback) {
-        Log.d("DKM", "helllo");
         Log.i(REACT_MODULE, "helllo");
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
