@@ -28,6 +28,8 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
+import com.google.android.gms.fitness.data.HealthDataTypes;
+import com.google.android.gms.fitness.data.HealthFields;
 
 import java.text.DateFormat;
 import java.text.Format;
@@ -230,14 +232,22 @@ public class BodyHistory {
 
             int i = 0;
 
-            for (Field field : dp.getDataType().getFields()) {
-                i++;
-                if (i > 1) continue; //Get only average instance
-
+            if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("value", dp.getValue(field).asFloat());
+                stepMap.putDouble("value2", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
+                stepMap.putDouble("value", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
+            } else {
+                for (Field field : dp.getDataType().getFields()) {
+                    i++;
+                    if (i > 1) continue; //Get only average instance
+
+                    stepMap.putString("day", day);
+                    stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+                    stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+                    stepMap.putDouble("value", dp.getValue(field).asFloat());
+              }
             }
         }
         map.pushMap(stepMap);
