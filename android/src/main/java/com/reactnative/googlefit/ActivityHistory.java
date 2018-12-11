@@ -154,8 +154,8 @@ public class ActivityHistory {
     public ReadableArray getWorkoutSamples(long startTime, long endTime) {
         WritableArray results = Arguments.createArray();
         DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                .bucketByActivitySegment(1, TimeUnit.SECONDS)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .bucketByActivityType(1, TimeUnit.SECONDS)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
@@ -189,6 +189,14 @@ public class ActivityHistory {
                     map.putString("workoutType", "cycling");
                 } else {
                     map.putString("workoutType", "other");
+                }
+
+                for (DataSet dataSet : bucket.getDataSets()) {
+                    // Each bucket should realistically have one dataset since we are querying by one single datatype
+                    for (DataPoint dataPoint : dataSet.getDataPoints()) {
+                        // There should be only one datapoint in each dataset
+                        map.putDouble("calories", dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
+                    }
                 }
 
                 results.pushMap(map);
