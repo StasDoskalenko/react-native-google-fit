@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class BodyHistory {
+public class HeartrateHistory {
 
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
@@ -48,13 +48,13 @@ public class BodyHistory {
 
     private static final String TAG = "Weights History";
 
-    public BodyHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
+    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
         this.dataType = dataType;
     }
 
-    public BodyHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
+    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this(reactContext, googleFitManager, DataType.TYPE_WEIGHT);
     }
 
@@ -65,15 +65,14 @@ public class BodyHistory {
     public ReadableArray getHistory(long startTime, long endTime) {
         DateFormat dateFormat = DateFormat.getDateInstance();
         // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
-        startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
+
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .read(this.dataType)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
-
-        if (this.dataType == DataType.TYPE_WEIGHT) {
-            readRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
+        if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
+            readRequestBuilder.setLimit(2);
         } else {
-            readRequestBuilder.setLimit(1); // need only one height, since it's unchangable
+            readRequestBuilder.setLimit(5); // need only one height, since it's unchangable
         }
 
         DataReadRequest readRequest = readRequestBuilder.build();
@@ -221,37 +220,25 @@ public class BodyHistory {
     }
 
     private void processDataSet(DataSet dataSet, WritableArray map) {
+
         //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         Format formatter = new SimpleDateFormat("EEE");
+//        WritableMap stepMap = Arguments.createMap();
 
-        WritableMap stepMap = Arguments.createMap();
-
-        int j = 0;
         for (DataPoint dp : dataSet.getDataPoints()) {
-            j++;
+            WritableMap stepMap = Arguments.createMap();
             String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
-
             int i = 0;
-
-            if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
+            for(Field field : dp.getDataType().getFields()) {
+                i++;
+                if (i > 1) continue;
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("value2", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
-                stepMap.putDouble("value", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
-            } else {
-                for (Field field : dp.getDataType().getFields()) {
-                    i++;
-                    if (i > 1) continue; //Get only average instance
-
-                    stepMap.putString("day", day);
-                    stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                    stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                    stepMap.putDouble("value", dp.getValue(field).asFloat());
-                }
+                stepMap.putDouble("value", dp.getValue(field).asFloat());
+                map.pushMap(stepMap);
             }
         }
-        map.pushMap(stepMap);
     }
 
 }

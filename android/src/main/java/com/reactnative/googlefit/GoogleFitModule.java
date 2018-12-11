@@ -306,11 +306,10 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                  double endDate,
                                  Callback errorCallback,
                                  Callback successCallback) {
-        Log.i(REACT_MODULE, "helllo");
         try {
-            BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
-            bodyHistory.setDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE);
-            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
+            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
+            heartrateHistory.setDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE);
+            successCallback.invoke(heartrateHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -323,9 +322,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                  Callback successCallback) {
 
         try {
-            BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
-            bodyHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
-            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
+            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
+            heartrateHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
+            successCallback.invoke(heartrateHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
