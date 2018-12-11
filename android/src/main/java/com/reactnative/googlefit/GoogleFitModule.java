@@ -156,8 +156,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                               Callback successCallback) {
 
         try {
-            mGoogleFitManager.getActivityHistory().submitWorkout(workoutType, (long)startDate, (long)endDate);
-            mGoogleFitManager.getCalorieHistory().insertCalories((float) calories, (long) startDate, (long) endDate);
+            mGoogleFitManager.getActivityHistory().submitWorkout(workoutType, (long)startDate, (long)endDate, (float) calories);
             successCallback.invoke(true);
         } catch (Exception e) {
             errorCallback.invoke(e.getMessage());

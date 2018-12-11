@@ -31,8 +31,10 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.DataSource;
+import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.request.SessionInsertRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.google.android.gms.fitness.data.Device;
@@ -45,6 +47,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -195,16 +198,39 @@ public class ActivityHistory {
         return results;
     }
 
-    public void submitWorkout(String workoutType, long startTime, long endTime) throws Exception {
-        DataSource dataSource = new DataSource.Builder()
+    public void submitWorkout(String workoutType, long startTime, long endTime, float calories) throws Exception {
+        // Create calories
+        DataSource caloriesDataSource = new DataSource.Builder()
                 .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
-                .setDataType(DataType.TYPE_ACTIVITY_SEGMENT)
+                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
                 .setType(DataSource.TYPE_RAW)
                 .build();
 
-        DataSet dataSet = DataSet.create(dataSource);
-        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+        DataSet caloriesDataSet = DataSet.create(caloriesDataSource);
+        DataPoint caloriesDataPoint = caloriesDataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+        caloriesDataPoint.getValue(Field.FIELD_CALORIES).setFloat(calories);
+        caloriesDataSet.add(caloriesDataPoint);
 
+        // Persist everything in google store
+        Session session = new Session.Builder()
+                .setActivity(getActivityType(workoutType))
+                .setIdentifier(UUID.randomUUID().toString())
+                .setStartTime(startTime, TimeUnit.MILLISECONDS)
+                .setEndTime(endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
+                .setSession(session)
+                .addDataSet(caloriesDataSet)
+                .build();
+
+        Status status = Fitness.SessionsApi.insertSession(googleFitManager.getGoogleApiClient(), insertRequest).await(1, TimeUnit.MINUTES);
+        if (!status.isSuccess()) {
+            throw new Exception(status.getStatusMessage());
+        }
+    }
+
+    private String getActivityType(String workoutType) {
         String activityType;
 
         switch (workoutType) {
@@ -231,12 +257,6 @@ public class ActivityHistory {
                 break;
         }
 
-        dataPoint.getValue(Field.FIELD_ACTIVITY).setActivity(activityType);
-        dataSet.add(dataPoint);
-
-        Status status = Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet).await(1, TimeUnit.MINUTES);
-        if (!status.isSuccess()) {
-            throw new Exception(status.getStatusMessage());
-        }
+        return activityType;
     }
 }

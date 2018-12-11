@@ -95,24 +95,6 @@ public class CalorieHistory {
         return map;
     }
 
-    public void insertCalories(float calories, long startTime, long endTime) throws Exception {
-        DataSource dataSource = new DataSource.Builder()
-                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
-                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
-                .setType(DataSource.TYPE_RAW)
-                .build();
-
-        DataSet dataSet = DataSet.create(dataSource);
-        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
-        dataPoint.getValue(Field.FIELD_CALORIES).setFloat(calories);
-        dataSet.add(dataPoint);
-
-        Status status = Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet).await(1, TimeUnit.MINUTES);
-        if (!status.isSuccess()) {
-            throw new Exception(status.getStatusMessage());
-        }
-    }
-
     // utility function that gets the basal metabolic rate averaged over a week
     private float getBasalAVG(long _et) throws Exception {
         float basalAVG = 0;
