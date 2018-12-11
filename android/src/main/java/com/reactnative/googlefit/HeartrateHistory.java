@@ -229,13 +229,21 @@ public class HeartrateHistory {
             WritableMap stepMap = Arguments.createMap();
             String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
             int i = 0;
+
             for(Field field : dp.getDataType().getFields()) {
                 i++;
                 if (i > 1) continue;
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("value", dp.getValue(field).asFloat());
+                if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
+                    stepMap.putDouble("value2", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
+                    stepMap.putDouble("value", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
+                } else {
+                  stepMap.putDouble("value", dp.getValue(field).asFloat());
+                }
+
+
                 map.pushMap(stepMap);
             }
         }
