@@ -155,7 +155,7 @@ public class ActivityHistory {
         WritableArray results = Arguments.createArray();
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketByActivitySegment(1, TimeUnit.SECONDS)
+                .bucketByActivitySegment(5, TimeUnit.MINUTES)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
