@@ -114,12 +114,10 @@ public class GoogleFitManager implements
         final ReactContext mReactContext = this.mReactContext;
 
         mApiClient = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
-                .addApi(Fitness.SENSORS_API)
                 .addApi(Fitness.HISTORY_API)
                 .addApi(Fitness.RECORDING_API)
-                .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
-                .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope(Scopes.FITNESS_NUTRITION_READ_WRITE))
                 .addConnectionCallbacks(
                     new GoogleApiClient.ConnectionCallbacks() {
                         @Override
@@ -216,6 +214,9 @@ public class GoogleFitManager implements
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Log.e(TAG, "Authorization - Cancel");
+                WritableMap map = Arguments.createMap();
+                map.putString("message", "" + "Authorization cancelled");
+                sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
             }
         }
     }
