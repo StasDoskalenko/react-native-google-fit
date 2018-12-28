@@ -22,12 +22,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.data.Bucket;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataSource;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.*;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 
@@ -94,7 +89,42 @@ public class CalorieHistory {
         return map;
     }
 
+    public ReadableArray aggregateNutritionDataByDate(long startTime, long endTime) {
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
 
+        //Check how much calories were expended in specific days.
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_NUTRITION, DataType.AGGREGATE_NUTRITION_SUMMARY)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        WritableArray map = Arguments.createArray();
+
+        //Used for aggregated data
+        if (dataReadResult.getBuckets().size() > 0) {
+            Log.i(TAG, "Number of buckets: " + dataReadResult.getBuckets().size());
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    processNutritionDataSet(dataSet, map);
+                }
+            }
+        }
+        //Used for non-aggregated data
+        else if (dataReadResult.getDataSets().size() > 0) {
+            Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                processNutritionDataSet(dataSet, map);
+            }
+        }
+
+        return map;
+
+    }
     // utility function that gets the basal metabolic rate averaged over a week
     private float getBasalAVG(long _et) throws Exception {
         float basalAVG = 0;
@@ -164,6 +194,70 @@ public class CalorieHistory {
                 }
                 stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
                 map.pushMap(stepMap);
+            }
+        }
+    }
+
+    final String[] NUTRIENTS = {
+        Field.NUTRIENT_CALORIES,
+        Field.NUTRIENT_TOTAL_FAT,
+        Field.NUTRIENT_SATURATED_FAT,
+        Field.NUTRIENT_UNSATURATED_FAT,
+        Field.NUTRIENT_POLYUNSATURATED_FAT,
+        Field.NUTRIENT_MONOUNSATURATED_FAT,
+        Field.NUTRIENT_TRANS_FAT,
+        Field.NUTRIENT_CHOLESTEROL,
+        Field.NUTRIENT_SODIUM,
+        Field.NUTRIENT_POTASSIUM,
+        Field.NUTRIENT_TOTAL_CARBS,
+        Field.NUTRIENT_DIETARY_FIBER,
+        Field.NUTRIENT_SUGAR,
+        Field.NUTRIENT_PROTEIN,
+        Field.NUTRIENT_VITAMIN_A,
+        Field.NUTRIENT_VITAMIN_C,
+        Field.NUTRIENT_CALCIUM,
+        Field.NUTRIENT_IRON
+    };
+
+    public void processNutritionDataSet(DataSet dataSet, WritableArray map) {
+        Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        DateFormat timeFormat = DateFormat.getTimeInstance();
+        DateFormat simpleDate  = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (DataPoint dp : dataSet.getDataPoints()) {
+            WritableMap dataPointMap = Arguments.createMap();
+
+            //Log.i(TAG, "Data point:");
+            //Log.i(TAG, "\tType: " + dp.getDataType().getName());
+            //Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)) + " " + timeFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            //Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + " " + timeFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+
+            String day = simpleDate.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            Log.i(TAG, "Day: " + day);
+
+            dataPointMap.putString("date", day);
+            dataPointMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            dataPointMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+
+            WritableMap nutrientsMap = Arguments.createMap();
+            boolean nutrientsMapMutated  = false;
+            for (Field field : dp.getDataType().getFields()) {
+                final Value fieldValue = dp.getValue(field);
+                //Log.i("History", "\tField: " + field.getName() + " Value: " + fieldValue);
+                if (field.equals(Field.FIELD_NUTRIENTS)) {
+                    for (final String nutrientName : this.NUTRIENTS) {
+                        Float nutrientValue = fieldValue.getKeyValue(nutrientName);
+                        if (nutrientValue != null) {
+                            nutrientsMap.putDouble(nutrientName, nutrientValue.doubleValue());
+                            nutrientsMapMutated = true;
+                        }
+                    }
+                }
+            }
+            if (nutrientsMapMutated) {
+                dataPointMap.putMap("nutrients", nutrientsMap);
+                map.pushMap(dataPointMap);
             }
         }
     }
