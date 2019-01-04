@@ -51,7 +51,9 @@ declare module "react-native-google-fit" {
          */
         getDailyCalorieSamples(options: any, callback: ((isError: boolean, result: any) => void)): void;
 
-        saveFood(options: FoodIntake, callback: ((isError: boolean) => void)): void;
+        saveFood(options: FoodIntake, callback: ((isError: boolean, result: any) => void)): void;
+        updateFood(options: FoodIntake, callback: ((isError: boolean, result: any) => void)): void;
+        deleteFood(options: FoodDeletion, callback: ((isError: boolean, result: any) => void)): void;
 
         /**
          * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
@@ -107,6 +109,10 @@ declare module "react-native-google-fit" {
         mealType: MealType;
         foodName: string;
         nutrients: Object;
+        date: string;
+    }
+
+    export interface FoodDeletion {
         date: string;
     }
 

@@ -11,19 +11,24 @@
 package com.reactnative.googlefit;
 
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+import android.service.autofill.Dataset;
 import android.util.Log;
 
+import com.facebook.common.internal.Supplier;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.Promise;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.*;
+import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.request.DataUpdateRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
 
 import org.json.JSONObject;
@@ -41,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 public class CalorieHistory {
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
-    private DataSet FoodDataSet;
 
     private static final String TAG = "CalorieHistory";
 
@@ -262,10 +266,41 @@ public class CalorieHistory {
         }
     }
 
-    public boolean saveFood(ReadableMap foodSample) {
-        this.FoodDataSet = createDataForRequest(
-                DataType.TYPE_NUTRITION,    // for height, it would be DataType.TYPE_HEIGHT
-                DataSource.TYPE_RAW,
+    private class ExecuteAndVerifyDataTask extends  AsyncTask<Void, Void, Void> {
+        private Supplier<PendingResult<com.google.android.gms.common.api.Status>> task;
+        private final Promise promise;
+
+        ExecuteAndVerifyDataTask(
+            Supplier<PendingResult<com.google.android.gms.common.api.Status>> task,
+            final Promise promise) {
+            this.task = task;
+            this.promise = promise;
+        }
+
+        protected Void doInBackground(Void... params) {
+            Log.d(TAG, "Executing the data task on the history API.");
+            //Always include a timeout when calling await() to prevent hanging that can occur from
+            // the service being shutdown because of low memory or other conditions.
+            com.google.android.gms.common.api.Status status = this.task.get().await(
+                1,
+                TimeUnit.MINUTES);
+            if (status.isSuccess()) {
+                Log.d(TAG, "Data task completed");
+                this.promise.resolve(true);
+            } else {
+                String statusMessage = status.getStatusMessage();
+                this.promise.reject(
+                    Integer.toString(status.getStatusCode()),
+                    statusMessage);
+                Log.e(TAG, "The data task is done with errors.");
+                Log.e(TAG, statusMessage);
+            }
+            return null;
+        }
+    }
+
+    private DataSet foodSampleToDataSet(ReadableMap foodSample) {
+        return createDataForRequest(
                 foodSample.getMap("nutrients").toHashMap(),
                 foodSample.getInt("mealType"),                  // meal type
                 foodSample.getString("foodName"),               // food name
@@ -273,51 +308,73 @@ public class CalorieHistory {
                 (long)foodSample.getDouble("date"),             // end time
                 TimeUnit.MILLISECONDS                // Time Unit, for example, TimeUnit.MILLISECONDS
         );
-        new CalorieHistory.InsertAndVerifyDataTask(this.FoodDataSet).execute();
-
-        return true;
     }
 
-    //Async fit data insert
-    private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
+    public void saveFood(ReadableMap foodSample, final Promise promise) {
+        final DataSet foodDataSet =  foodSampleToDataSet(foodSample);
+        new ExecuteAndVerifyDataTask(
+            new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
+                @Override
+                public PendingResult<com.google.android.gms.common.api.Status> get() {
+                    return Fitness.HistoryApi.insertData(
+                        googleFitManager.getGoogleApiClient(),
+                        foodDataSet);
+                }
+            },
+            promise
+        ).execute();
+    }
 
-        private DataSet FoodDataset;
+    public void updateFood(ReadableMap foodSample, final Promise promise) {
+        long time = (long)foodSample.getDouble("date");
+        final DataUpdateRequest request = new DataUpdateRequest.Builder()
+            .setDataSet(this.foodSampleToDataSet(foodSample))
+            .setTimeInterval(time, time, TimeUnit.MILLISECONDS)
+            .build();
+        new ExecuteAndVerifyDataTask(
+            new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
+                @Override
+                public PendingResult<com.google.android.gms.common.api.Status> get() {
+                    return Fitness.HistoryApi.updateData(
+                        googleFitManager.getGoogleApiClient(),
+                        request);
+                }
+            },
+            promise
+        ).execute();
+    }
 
-        InsertAndVerifyDataTask(DataSet dataset) {
-            this.FoodDataset = dataset;
-        }
+    public void deleteFood(ReadableMap options, final Promise promise) {
+        long time = (long)options.getDouble("date");
+        // The start and end time must not be the same or else it will throw an error. The fix is to
+        // add 1 to the endtime.
+        final DataDeleteRequest request = new DataDeleteRequest.Builder()
+            .addDataSource(this.createNutritionDataSource())
+            .setTimeInterval(time, time + 1, TimeUnit.MILLISECONDS)
+            .build();
+        new ExecuteAndVerifyDataTask(
+            new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
+                @Override
+                public PendingResult<com.google.android.gms.common.api.Status> get() {
+                    return Fitness.HistoryApi.deleteData(
+                        googleFitManager.getGoogleApiClient(),
+                        request);
+                }
+            },
+            promise).execute();
+    }
 
-        protected Void doInBackground(Void... params) {
-            // Create a new dataset and insertion request.
-            DataSet dataSet = this.FoodDataset;
-
-            // [START insert_dataset]
-            // Then, invoke the History API to insert the data and await the result, which is
-            // possible here because of the {@link AsyncTask}. Always include a timeout when calling
-            // await() to prevent hanging that can occur from the service being shutdown because
-            // of low memory or other conditions.
-            //Log.i(TAG, "Inserting the dataset in the History API.");
-            com.google.android.gms.common.api.Status insertStatus =
-                    Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet)
-                            .await(1, TimeUnit.MINUTES);
-
-            // Before querying the data, check to see if the insertion succeeded.
-            if (!insertStatus.isSuccess()) {
-                //Log.i(TAG, "There was a problem inserting the dataset.");
-                return null;
-            }
-
-            //Log.i(TAG, "Data insert was successful!");
-
-            return null;
-        }
+    private DataSource createNutritionDataSource() {
+        return new DataSource.Builder()
+                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
+                .setDataType(DataType.TYPE_NUTRITION)
+                .setType(DataSource.TYPE_RAW)
+                .build();
     }
 
     /**
      * This method creates a dataset object to be able to insert data in google fit
      *
-     * @param dataType       DataType Fitness Data Type object
-     * @param dataSourceType int Data Source Id. For example, DataSource.TYPE_RAW
      * @param values         Object Values for the fitness data. They must be HashMap
      * @param mealType       int Value of enum. For example Field.MEAL_TYPE_SNACK
      * @param name           String Dish name. For example "banana"
@@ -326,15 +383,10 @@ public class CalorieHistory {
      * @param timeUnit       TimeUnit Time unit in which period is expressed
      * @return
      */
-    private DataSet createDataForRequest(DataType dataType, int dataSourceType,
-                                         HashMap<String, Object> values, int mealType, String name,
+    private DataSet createDataForRequest(HashMap<String, Object> values, int mealType, String name,
                                          long startTime, long endTime, TimeUnit timeUnit) {
 
-        DataSource dataSource = new DataSource.Builder()
-                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
-                .setDataType(dataType)
-                .setType(dataSourceType)
-                .build();
+        DataSource dataSource = this.createNutritionDataSource();
 
         DataSet dataSet = DataSet.create(dataSource);
         DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, timeUnit);

@@ -22,10 +22,10 @@ class RNGoogleFit {
 
     /**
      * Start recording fitness data
-     * 
+     *
      * You could specify data by array dataTypes. Possible values - step, distance, activity which corresponds
      * DataTypes.TYPE_STEP_CUMULATIVE, DataType.TYPE_DISTANCE_DELTA and DataType.TYPE_ACTIVITIES_SAMPLES
-     * 
+     *
      * Default value for dataTypes is steps and distance data
      *
      * This function relies on sending events to signal the RecordingAPI status
@@ -205,13 +205,38 @@ class RNGoogleFit {
 
     saveFood(options, callback) {
         options.date = Date.parse(options.date);
-        googleFit.saveFood(options,
-            (msg) => {
-                callback(msg, false);
-            },
-            (res) => {
-                callback(false, res);
-            });
+        const promise = googleFit.saveFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason) => {callback(reason, false)});
+        } else {
+            return promise;
+        }
+    }
+
+    updateFood(options, callback) {
+        options.date = Date.parse(options.date);
+        const promise = googleFit.updateFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason)=> {callback(reason, false)});
+        } else {
+            return promise;
+        }
+    }
+
+    deleteFood(options, callback) {
+        options.date = Date.parse(options.date);
+        const promise = googleFit.deleteFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason) => {callback(reason, false)});
+        } else {
+            return promise;
+        }
     }
 
     /**
