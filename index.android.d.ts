@@ -113,7 +113,8 @@ declare module "react-native-google-fit" {
     }
 
     export interface FoodDeletion {
-        date: string;
+        startDate: string;
+        endDate: string;
     }
 
     export enum MealType {

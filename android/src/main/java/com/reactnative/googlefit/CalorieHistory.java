@@ -345,12 +345,14 @@ public class CalorieHistory {
     }
 
     public void deleteFood(ReadableMap options, final Promise promise) {
-        long time = (long)options.getDouble("date");
+        long startTime = (long)options.getDouble("dateStart");
+        long endTime = (long)options.getDouble("dateEnd");
+
         // The start and end time must not be the same or else it will throw an error. The fix is to
         // add 1 to the endtime.
         final DataDeleteRequest request = new DataDeleteRequest.Builder()
             .addDataSource(this.createNutritionDataSource())
-            .setTimeInterval(time, time + 1, TimeUnit.MILLISECONDS)
+            .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
             .build();
         new ExecuteAndVerifyDataTask(
             new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {

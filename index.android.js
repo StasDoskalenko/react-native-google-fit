@@ -228,7 +228,9 @@ class RNGoogleFit {
     }
 
     deleteFood(options, callback) {
-        options.date = Date.parse(options.date);
+        options.startDate = Date.parse(options.startDate);
+        options.endDate = Date.parse(options.endDate);
+
         const promise = googleFit.deleteFood(options);
         if (callback) {
             promise
@@ -528,7 +530,7 @@ export const Nutrient = Object.freeze({
 TODO: Add food example to readme
 
 same as here: https://developers.google.com/fit/scenarios/add-nutrition-data
-
+3
 import GoogleFit, {Nutrient, MealType, FoodIntake, WeightSample} from "react-native-google-fit";
 ...
     addFoodExample(): Promise<void> {
