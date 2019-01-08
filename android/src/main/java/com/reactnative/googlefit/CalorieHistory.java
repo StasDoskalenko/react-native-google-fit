@@ -345,8 +345,8 @@ public class CalorieHistory {
     }
 
     public void deleteFood(ReadableMap options, final Promise promise) {
-        long startTime = (long)options.getDouble("dateStart");
-        long endTime = (long)options.getDouble("dateEnd");
+        long startTime = (long)options.getDouble("startDate");
+        long endTime = (long)options.getDouble("endDate");
 
         // The start and end time must not be the same or else it will throw an error. The fix is to
         // add 1 to the endtime.
