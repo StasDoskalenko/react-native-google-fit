@@ -174,22 +174,7 @@ public class ActivityHistory {
                 WritableMap map = Arguments.createMap();
                 map.putDouble("start", bucket.getStartTime(TimeUnit.MILLISECONDS));
                 map.putDouble("end", bucket.getEndTime(TimeUnit.MILLISECONDS));
-
-                if (activity.contains(FitnessActivities.WALKING)) {
-                    map.putString("workoutType", "walk");
-                } else if (activity.contains(FitnessActivities.RUNNING)) {
-                    map.putString("workoutType", "run");
-                } else if (activity.equalsIgnoreCase(FitnessActivities.YOGA)) {
-                    map.putString("workoutType", "yoga");
-                } else if (activity.equalsIgnoreCase(FitnessActivities.STRENGTH_TRAINING)) {
-                    map.putString("workoutType", "strengthTraining");
-                } else if (activity.contains(FitnessActivities.SWIMMING)) {
-                    map.putString("workoutType", "swimming");
-                } else if (activity.contains(FitnessActivities.BIKING)) {
-                    map.putString("workoutType", "cycling");
-                } else {
-                    map.putString("workoutType", "other");
-                }
+                map.putString("workoutType", getWorkoutType(activity));
 
                 for (DataSet dataSet : bucket.getDataSets()) {
                     // Each bucket should realistically have one dataset since we are querying by one single datatype
@@ -260,11 +245,47 @@ public class ActivityHistory {
             case "cycling":
                 activityType = FitnessActivities.BIKING;
                 break;
+            case "mindfulness":
+                activityType = FitnessActivities.MEDITATION;
+                break;
             default:
                 activityType = FitnessActivities.OTHER;
                 break;
         }
 
         return activityType;
+    }
+
+    private String getWorkoutType(String activityType) {
+        String workoutType;
+
+        switch (activityType) {
+            case FitnessActivities.WALKING:
+                workoutType = "walk";
+                break;
+            case FitnessActivities.RUNNING:
+                workoutType = "run";
+                break;
+            case FitnessActivities.YOGA:
+                workoutType = "yoga";
+                break;
+            case FitnessActivities.STRENGTH_TRAINING:
+                workoutType = "strengthTraining";
+                break;
+            case FitnessActivities.SWIMMING:
+                workoutType = "swimming";
+                break;
+            case FitnessActivities.BIKING:
+                workoutType = "cycling";
+                break;
+            case FitnessActivities.MEDITATION:
+                workoutType = "mindfulness";
+                break;
+            default:
+                workoutType = "other";
+                break;
+        }
+
+        return workoutType;
     }
 }
