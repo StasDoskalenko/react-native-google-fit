@@ -76,7 +76,7 @@ class RNGoogleFit {
                         }, this)
                     );
                 } else {
-                    callback("There is no any steps data for this period", false);
+                    callback(false, []);
                 }
             }
         );
@@ -154,6 +154,32 @@ class RNGoogleFit {
             });
     }
 
+    getWorkoutSamples(options, callback) {
+        googleFit.getWorkoutSamples(
+            options.startDate,
+            options.endDate,
+            (error) => {
+                callback(error, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
+    }
+
+    submitWorkout(options, callback) {
+        googleFit.submitWorkout(
+            options.workoutType,
+            options.startDate,
+            options.endDate,
+            options.calories,
+            (error) => {
+                callback(error, false);
+            },
+            (res) => {
+                callback(false, res);
+            });
+    }
+
     /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
@@ -180,7 +206,7 @@ class RNGoogleFit {
                     });
                     callback(false, res.filter(day => day != undefined));
                 } else {
-                    callback("There is no any calorie data for this period", false);
+                    callback(false, []);
                 }
             });
     }

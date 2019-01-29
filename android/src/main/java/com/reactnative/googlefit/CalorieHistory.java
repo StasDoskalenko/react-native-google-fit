@@ -21,6 +21,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -94,7 +95,6 @@ public class CalorieHistory {
         return map;
     }
 
-
     // utility function that gets the basal metabolic rate averaged over a week
     private float getBasalAVG(long _et) throws Exception {
         float basalAVG = 0;
@@ -156,13 +156,7 @@ public class CalorieHistory {
                 stepMap.putString("day", day);
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                float basal = 0;
-                try {
-                    basal = getBasalAVG(dp.getEndTime(TimeUnit.MILLISECONDS));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
+                stepMap.putDouble("calorie", dp.getValue(field).asFloat());
                 map.pushMap(stepMap);
             }
         }
