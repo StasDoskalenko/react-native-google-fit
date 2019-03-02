@@ -55,7 +55,8 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
      compile project(':react-native-google-fit')
    ```
 
-### Just in case SIGN_IN_REQUIRED error (thanks, @salles-sandro )
+### SIGN_IN_REQUIRED
+(thanks, @salles-sandro )
 
 Just to let anyone else that, like me, spent lots of precious time struggling with the authorize method and the error below:
 
@@ -65,7 +66,7 @@ Just to let anyone else that, like me, spent lots of precious time struggling wi
 
 After searching the entire internet i found a comment mentioning that the client_secrets.json file generated after the https://developers.google.com/fit/android/get-api-key process should be store exactly at this location:
 
-app/android/app/src/main/resources/client_secrets.json
+**app/android/app/src/main/resources/client_secrets.json**
 
 Then... at least for me, things are finally working.
 
