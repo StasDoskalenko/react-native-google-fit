@@ -42,6 +42,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+class InvalidFoodSample extends  Exception {
+    public InvalidFoodSample(String errorMessage) {
+        super(errorMessage);
+    }
+}
+
 
 public class CalorieHistory {
     private ReactContext mReactContext;
@@ -299,7 +305,7 @@ public class CalorieHistory {
         }
     }
 
-    private DataSet foodSampleToDataSet(ReadableMap foodSample) {
+    private DataSet foodSampleToDataSet(ReadableMap foodSample) throws InvalidFoodSample {
         return createDataForRequest(
                 foodSample.getMap("nutrients").toHashMap(),
                 foodSample.getInt("mealType"),                  // meal type
@@ -311,37 +317,45 @@ public class CalorieHistory {
     }
 
     public void saveFood(ReadableMap foodSample, final Promise promise) {
-        final DataSet foodDataSet =  foodSampleToDataSet(foodSample);
-        new ExecuteAndVerifyDataTask(
-            new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
-                @Override
-                public PendingResult<com.google.android.gms.common.api.Status> get() {
-                    return Fitness.HistoryApi.insertData(
-                        googleFitManager.getGoogleApiClient(),
-                        foodDataSet);
-                }
-            },
-            promise
-        ).execute();
+        try {
+            final DataSet foodDataSet = foodSampleToDataSet(foodSample);
+            new ExecuteAndVerifyDataTask(
+                new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
+                    @Override
+                    public PendingResult<com.google.android.gms.common.api.Status> get() {
+                        return Fitness.HistoryApi.insertData(
+                            googleFitManager.getGoogleApiClient(),
+                            foodDataSet);
+                    }
+                },
+                promise
+            ).execute();
+        } catch(InvalidFoodSample e) {
+            promise.reject("bad_food_sample", e);
+        }
     }
 
     public void updateFood(ReadableMap foodSample, final Promise promise) {
         long time = (long)foodSample.getDouble("date");
-        final DataUpdateRequest request = new DataUpdateRequest.Builder()
-            .setDataSet(this.foodSampleToDataSet(foodSample))
-            .setTimeInterval(time, time, TimeUnit.MILLISECONDS)
-            .build();
-        new ExecuteAndVerifyDataTask(
-            new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
-                @Override
-                public PendingResult<com.google.android.gms.common.api.Status> get() {
-                    return Fitness.HistoryApi.updateData(
-                        googleFitManager.getGoogleApiClient(),
-                        request);
-                }
-            },
-            promise
-        ).execute();
+        try {
+            final DataUpdateRequest request = new DataUpdateRequest.Builder()
+                .setDataSet(this.foodSampleToDataSet(foodSample))
+                .setTimeInterval(time, time, TimeUnit.MILLISECONDS)
+                .build();
+            new ExecuteAndVerifyDataTask(
+                        new Supplier<PendingResult<com.google.android.gms.common.api.Status>>() {
+                            @Override
+                            public PendingResult<com.google.android.gms.common.api.Status> get() {
+                                return Fitness.HistoryApi.updateData(
+                                    googleFitManager.getGoogleApiClient(),
+                                    request);
+                            }
+                        },
+                        promise
+                    ).execute();
+        } catch (InvalidFoodSample e ) {
+            promise.reject("bad_food_sample", e);
+        }
     }
 
     public void deleteFood(ReadableMap options, final Promise promise) {
@@ -386,7 +400,7 @@ public class CalorieHistory {
      * @return
      */
     private DataSet createDataForRequest(HashMap<String, Object> values, int mealType, String name,
-                                         long startTime, long endTime, TimeUnit timeUnit) {
+                                         long startTime, long endTime, TimeUnit timeUnit) throws InvalidFoodSample {
 
         DataSource dataSource = this.createNutritionDataSource();
 
@@ -395,12 +409,18 @@ public class CalorieHistory {
 
         dataPoint.getValue(Field.FIELD_FOOD_ITEM).setString(name);
         dataPoint.getValue(Field.FIELD_MEAL_TYPE).setInt(mealType);
+        int nutrientsWritten = 0;
         for (String key : values.keySet()) {
             Float value = Float.valueOf(values.get(key).toString());
 
             if (value > 0) {
                 dataPoint.getValue(Field.FIELD_NUTRIENTS).setKeyValue(key, value);
+                nutrientsWritten += 1;
             }
+        }
+
+        if (nutrientsWritten == 0) {
+            throw new InvalidFoodSample("No value nutrients written");
         }
 
         dataSet.add(dataPoint);
