@@ -15,21 +15,31 @@ A React Native bridge module for interacting with Google Fit
 2. Authorize:
 
     ```javascript
-    GoogleFit.onAuthorize(() => {
-      dispatch('AUTH SUCCESS');
-    });
     
-    GoogleFit.onAuthorizeFailure(() => {
-      dispatch('AUTH ERROR');
-    });
-    
-    GoogleFit.authorize();
+    GoogleFit.authorize()
+     .then(() => {
+       dispatch('AUTH_SUCCESS')
+     })
+     .catch(() => {
+       dispatch('AUTH_ERROR')
+     })
     
     // ...
     // Call when authorized
     GoogleFit.startRecording((callback) => {
       // Process data from Google Fit Recording API (no google fit app needed)
     });
+    ```
+    
+    Alternatively you can use event listeners
+    ```javascript
+     GoogleFit.onAuthorize(() => {
+       dispatch('AUTH SUCCESS')
+     })
+         
+     GoogleFit.onAuthorizeFailure(() => {
+       dispatch('AUTH ERROR')
+     })
     ```
 
 3. Retrieve Steps For Period

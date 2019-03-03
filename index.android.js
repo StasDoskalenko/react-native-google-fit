@@ -1,7 +1,7 @@
 'use strict'
 
 import { DeviceEventEmitter, NativeModules } from 'react-native'
-import { KgToLbs, lbsAndOzToK } from 'src/utils'
+import { buildDailySteps, KgToLbs, lbsAndOzToK } from 'src/utils'
 
 const googleFit = NativeModules.RNGoogleFit
 
@@ -10,6 +10,10 @@ class RNGoogleFit {
 
     authorize = () => {
       googleFit.authorize()
+      return new Promise((resolve, reject) => {
+        this.onAuthorize(() => resolve({success: true}))
+        this.onAuthorizeFailure(() => reject({success: false}))
+      })
     }
 
     disconnect = () => {
@@ -72,7 +76,7 @@ class RNGoogleFit {
             callback(false, res.map(function (dev) {
               const obj = {}
               obj.source = dev.source.appPackage + ((dev.source.stream) ? ':' + dev.source.stream : '')
-              obj.steps = this.buildDailySteps(dev.steps)
+              obj.steps = buildDailySteps(dev.steps)
               return obj
             }, this)
             )
@@ -81,32 +85,6 @@ class RNGoogleFit {
           }
         }
       )
-    }
-
-    buildDailySteps (steps) {
-      const results = {}
-      for (const step of steps) {
-        if (step == undefined) {continue}
-
-        const date = new Date(step.startDate)
-
-        const day = ('0' + date.getDate()).slice(-2)
-        const month = ('0' + (date.getMonth() + 1)).slice(-2)
-        const year = date.getFullYear()
-        const dateFormatted = year + '-' + month + '-' + day
-
-        if (!(dateFormatted in results)) {
-          results[dateFormatted] = 0
-        }
-
-        results[dateFormatted] += step.steps
-      }
-
-      const dateMap = []
-      for (const index in results) {
-        dateMap.push({date: index, value: results[index]})
-      }
-      return dateMap
     }
 
     /**
