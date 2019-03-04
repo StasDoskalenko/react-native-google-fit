@@ -111,7 +111,20 @@ A React Native bridge module for interacting with Google Fit
     });
     ```
     
-7. Get all activities
+7. Blood pressure and Heart rate methods (since version 0.8)
+    ```javascript
+       const options = {
+         startDate: "2017-01-01T00:00:17.971Z", // required
+         endDate: new Date().toISOString(), // required
+       }
+       const callback = ((error, resoponse) => {
+       
+       })
+       GoogleFit.getHeartRateSamples(options, callback)
+       GoogleFit.getBloodPressureSamples(options, callback)
+    ```
+    
+8. Get all activities
     ```javascript
       let options = {
         startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
@@ -158,7 +171,7 @@ A React Native bridge module for interacting with Google Fit
     Note that optional parametrs are not presented in all activities - only where google fit return some results for this field.
     Like no distance for still activity. 
 
-8. Other methods:
+9. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event

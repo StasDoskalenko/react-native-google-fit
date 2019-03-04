@@ -1,6 +1,9 @@
 ### Changelog:
 
 ```
+0.9.0   ~ authorize() - is now a promise
+        + getHeartRateSamples (thanks @damnnkst)
+        + getBloodPressureSamples (thanks @damnnkst)
 0.7.1   - Fix for disconnect() (@dmitriys-lits thanks for the PR)
 0.7     - Retrieve Heights, open fit activity, unified body method (@EJohnF thanks for the PR!)
 
