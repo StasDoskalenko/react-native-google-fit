@@ -51,6 +51,7 @@ public class GoogleFitManager implements
     private DistanceHistory distanceHistory;
     private StepHistory stepHistory;
     private BodyHistory bodyHistory;
+    private HeartrateHistory heartrateHistory;
     private CalorieHistory calorieHistory;
     private StepCounter mStepCounter;
     private StepSensor stepSensor;
@@ -70,6 +71,7 @@ public class GoogleFitManager implements
         this.mStepCounter = new StepCounter(mReactContext, this, activity);
         this.stepHistory = new StepHistory(mReactContext, this);
         this.bodyHistory = new BodyHistory(mReactContext, this);
+        this.heartrateHistory = new HeartrateHistory(mReactContext, this);
         this.distanceHistory = new DistanceHistory(mReactContext, this);
         this.calorieHistory = new CalorieHistory(mReactContext, this);
         this.recordingApi = new RecordingApi(mReactContext, this);
@@ -97,6 +99,10 @@ public class GoogleFitManager implements
         return bodyHistory;
     }
 
+    public HeartrateHistory getHeartrateHistory() {
+        return heartrateHistory;
+    }
+
     public DistanceHistory getDistanceHistory() {
         return distanceHistory;
     }
@@ -120,6 +126,7 @@ public class GoogleFitManager implements
                 .addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ))
                 .addScope(new Scope(Scopes.FITNESS_BODY_READ_WRITE))
                 .addScope(new Scope(Scopes.FITNESS_LOCATION_READ))
+                .addScope(new Scope("https://www.googleapis.com/auth/fitness.blood_pressure.read"))
                 .addConnectionCallbacks(
                     new GoogleApiClient.ConnectionCallbacks() {
                         @Override
