@@ -11,15 +11,18 @@
 
 package com.reactnative.googlefit;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -42,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class StepHistory {
 
@@ -55,7 +59,7 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime) {
+    public void aggregateDataByDate(long startTime, long endTime, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
@@ -63,7 +67,7 @@ public class StepHistory {
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
 
-        WritableArray results = Arguments.createArray();
+        final WritableArray results = Arguments.createArray();
 
         List<DataSource> dataSources = new ArrayList<>();
 
@@ -111,8 +115,10 @@ public class StepHistory {
         dataSources.addAll( dataSourcesResult.getDataSources() );
         */
 
+        final AtomicInteger dataSourcesToLoad = new AtomicInteger(dataSources.size());
+
         for (DataSource dataSource : dataSources) {
-            WritableMap source = Arguments.createMap();
+            final WritableMap source = Arguments.createMap();
 
             DataType type = dataSource.getDataType();
             Device device = dataSource.getDevice();
@@ -183,36 +189,42 @@ public class StepHistory {
                         .build();
             }
 
-            DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+            PendingResult<DataReadResult> readPendingResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest);
+            readPendingResult.setResultCallback(new ResultCallback<DataReadResult>() {
+                @Override
+                public void onResult(@NonNull DataReadResult dataReadResult) {
+                    WritableArray steps = Arguments.createArray();
 
-            WritableArray steps = Arguments.createArray();
+                    //Used for aggregated data
+                    if (dataReadResult.getBuckets().size() > 0) {
+                        Log.i(TAG, "  +++ Number of buckets: " + dataReadResult.getBuckets().size());
+                        for (Bucket bucket : dataReadResult.getBuckets()) {
+                            List<DataSet> dataSets = bucket.getDataSets();
+                            for (DataSet dataSet : dataSets) {
+                                processDataSet(dataSet, steps);
+                            }
+                        }
+                    }
 
-            //Used for aggregated data
-            if (dataReadResult.getBuckets().size() > 0) {
-                Log.i(TAG, "  +++ Number of buckets: " + dataReadResult.getBuckets().size());
-                for (Bucket bucket : dataReadResult.getBuckets()) {
-                    List<DataSet> dataSets = bucket.getDataSets();
-                    for (DataSet dataSet : dataSets) {
-                        processDataSet(dataSet, steps);
+                    //Used for non-aggregated data
+                    if (dataReadResult.getDataSets().size() > 0) {
+                        Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResult.getDataSets().size());
+                        for (DataSet dataSet : dataReadResult.getDataSets()) {
+                            processDataSet(dataSet, steps);
+                        }
+                    }
+
+                    WritableMap map = Arguments.createMap();
+                    map.putMap("source", source);
+                    map.putArray("steps", steps);
+                    results.pushMap(map);
+
+                    if (dataSourcesToLoad.decrementAndGet() <= 0) {
+                        successCallback.invoke(results);
                     }
                 }
-            }
-
-            //Used for non-aggregated data
-            if (dataReadResult.getDataSets().size() > 0) {
-                Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResult.getDataSets().size());
-                for (DataSet dataSet : dataReadResult.getDataSets()) {
-                    processDataSet(dataSet, steps);
-                }
-            }
-
-            WritableMap map = Arguments.createMap();
-            map.putMap("source", source);
-            map.putArray("steps", steps);
-            results.pushMap(map);
+            }, 1, TimeUnit.MINUTES);
         }
-
-        return results;
     }
 
     //Will be deprecated in future releases
