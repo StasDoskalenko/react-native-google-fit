@@ -49,26 +49,17 @@ class RNGoogleFit {
       this.eventListeners.push(...eventListeners)
     }
 
-    //Will be deprecated in future releases
+    // Will be deprecated in future releases
     getSteps (dayStart, dayEnd) {
       googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd))
     }
 
-    //Will be deprecated in future releases
+    // Will be deprecated in future releases
     getWeeklySteps (startDate) {
       googleFit.getWeeklySteps(Date.parse(startDate), Date.now())
     }
 
-
-    /**
-     * Get the total steps per day over a specified date range.
-     * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @param {Function} callback The function will be called with an array of elements.
-     */
-
-    getDailyStepCountSamples = (options, callback) => {
-      const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-      const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf()
+    _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
       googleFit.getDailyStepCountSamples(startDate, endDate,
         (msg) => callback(msg, false),
         (res) => {
@@ -88,9 +79,32 @@ class RNGoogleFit {
     }
 
     /**
+     * Get the total steps per day over a specified date range.
+     * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Function} callback The function will be called with an array of elements.
+     */
+
+    getDailyStepCountSamples = (options, callback) => {
+      const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+      const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf()
+      if (!callback) {
+        return new Promise((resolve, reject) => {
+          this._retrieveDailyStepCountSamples(startDate, endDate, (error, result) => {
+            if (!error) {
+              resolve(result)
+            } else {
+              reject(error)
+            }
+          })
+        })
+      }
+      this._retrieveDailyStepCountSamples(startDate, endDate, callback)
+    }
+
+    /**
      * Get the total distance per day over a specified date range.
      * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
+     * @param {function} callback The function will be called with an array of elements.
      */
 
     getDailyDistanceSamples (options, callback) {

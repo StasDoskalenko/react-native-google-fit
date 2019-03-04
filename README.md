@@ -50,13 +50,11 @@ A React Native bridge module for interacting with Google Fit
       endDate: new Date().toISOString() // required ISO8601Timestamp
     };
     
-    GoogleFit.getDailyStepCountSamples(options, (err, res) => {
-      if (err) {
-        throw err;
-      }
-    
-      console.log("Daily steps >>>", res);
-    });
+    GoogleFit.getDailyStepCountSamples(options)
+     .then((res) => {
+         console.log('Daily steps >>> ', res)
+     })
+     .catch((err) => {console.warn(err)})
     ```
 
 **Response:**

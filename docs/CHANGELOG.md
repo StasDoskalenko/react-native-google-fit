@@ -1,7 +1,9 @@
 ### Changelog:
 
 ```
+0.9.1   ~ getDailyStepCountSamples - now returns promise if no callback is provided
 0.9.0   ~ authorize() - is now a promise
+        ~ non-blocking step retrieve
         + getHeartRateSamples (thanks @damnnkst)
         + getBloodPressureSamples (thanks @damnnkst)
 0.7.1   - Fix for disconnect() (@dmitriys-lits thanks for the PR)
