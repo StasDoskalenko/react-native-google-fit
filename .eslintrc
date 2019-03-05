@@ -84,6 +84,7 @@
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
     "react/no-unused-prop-types": [1, { "skipShapeProps": true }],
+    "standard/no-callback-literal": "off",
     "semi": [2, "never"],
     "space-before-function-paren": [
       1,

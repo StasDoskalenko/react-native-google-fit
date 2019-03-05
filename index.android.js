@@ -1,7 +1,7 @@
 'use strict'
 
 import { DeviceEventEmitter, NativeModules } from 'react-native'
-import { buildDailySteps, KgToLbs, lbsAndOzToK } from 'src/utils'
+import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareResponse } from 'src/utils'
 
 const googleFit = NativeModules.RNGoogleFit
 
@@ -85,9 +85,9 @@ class RNGoogleFit {
      */
 
     getDailyStepCountSamples = (options, callback) => {
-      const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-      const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf()
-      if (!callback) {
+      const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+      const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
+      if (!callback || typeof callback !== 'function') {
         return new Promise((resolve, reject) => {
           this._retrieveDailyStepCountSamples(startDate, endDate, (error, result) => {
             if (!error) {
@@ -108,8 +108,8 @@ class RNGoogleFit {
      */
 
     getDailyDistanceSamples (options, callback) {
-      const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-      const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf()
+      const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+      const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
       googleFit.getDailyDistanceSamples(startDate,
         endDate,
         (msg) => {
@@ -117,14 +117,7 @@ class RNGoogleFit {
         },
         (res) => {
           if (res.length > 0) {
-            res = res.map((el) => {
-              if (el.distance) {
-                el.startDate = new Date(el.startDate).toISOString()
-                el.endDate = new Date(el.endDate).toISOString()
-                return el
-              }
-            })
-            callback(false, res.filter((day) => day != undefined))
+            callback(false, prepareResponse(res, 'distance'))
           } else {
             callback('There is no any distance data for this period', false)
           }
@@ -164,14 +157,7 @@ class RNGoogleFit {
         },
         (res) => {
           if (res.length > 0) {
-            res = res.map((el) => {
-              if (el.calorie) {
-                el.startDate = new Date(el.startDate).toISOString()
-                el.endDate = new Date(el.endDate).toISOString()
-                return el
-              }
-            })
-            callback(false, res.filter((day) => day != undefined))
+            callback(false, prepareResponse(res, 'calorie'))
           } else {
             callback('There is no any calorie data for this period', false)
           }
@@ -197,8 +183,8 @@ class RNGoogleFit {
      */
 
     getWeightSamples = (options, callback) => {
-      const startDate = options.startDate != undefined ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-      const endDate = options.endDate != undefined ? Date.parse(options.endDate) : (new Date()).valueOf()
+      const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+      const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
       googleFit.getWeightSamples(startDate,
         endDate,
         (msg) => {
@@ -216,7 +202,7 @@ class RNGoogleFit {
                 return el
               }
             })
-            callback(false, res.filter((day) => day != undefined))
+            callback(false, res.filter((day) => !isNil(day)))
           } else {
             callback('There is no any weight data for this period', false)
           }
@@ -232,15 +218,8 @@ class RNGoogleFit {
           callback(msg, false)
         },
         (res) => {
-          if (res.length>0) {
-            res = res.map((el) => {
-              if (el.value) {
-                el.startDate = new Date(el.startDate).toISOString()
-                el.endDate = new Date(el.endDate).toISOString()
-                return el
-              }
-            })
-            callback(false, res.filter((day) => day != undefined))
+          if (res.length > 0) {
+            callback(false, prepareResponse(res, 'value'))
           } else {
             callback('There is no any height data for this period', false)
           }
@@ -362,21 +341,15 @@ class RNGoogleFit {
     getHeartRateSamples (options, callback) {
       const startDate = Date.parse(options.startDate)
       const endDate = Date.parse(options.endDate)
-      googleFit.getHeartRateSamples( startDate,
+      googleFit.getHeartRateSamples(
+        startDate,
         endDate,
         (msg) => {
           callback(msg, false)
         },
         (res) => {
-          if (res.length>0) {
-            res = res.map((el) => {
-              if (el.value) {
-                el.startDate = new Date(el.startDate).toISOString()
-                el.endDate = new Date(el.endDate).toISOString()
-                return el
-              }
-            })
-            callback(false, res.filter((day) => day != undefined))
+          if (res.length > 0) {
+            callback(false, prepareResponse(res, 'value'))
           } else {
             callback('There is no any heart rate data for this period', false)
           }
@@ -386,21 +359,15 @@ class RNGoogleFit {
     getBloodPressureSamples (options, callback) {
       const startDate = Date.parse(options.startDate)
       const endDate = Date.parse(options.endDate)
-      googleFit.getBloodPressureSamples( startDate,
+      googleFit.getBloodPressureSamples(
+        startDate,
         endDate,
         (msg) => {
           callback(msg, false)
         },
         (res) => {
-          if (res.length>0) {
-            res = res.map((el) => {
-              if (el.value) {
-                el.startDate = new Date(el.startDate).toISOString()
-                el.endDate = new Date(el.endDate).toISOString()
-                return el
-              }
-            })
-            callback(false, res.filter((day) => day != undefined))
+          if (res.length > 0) {
+            callback(false, prepareResponse(res, 'value'))
           } else {
             callback('There is no any heart rate data for this period', false)
           }

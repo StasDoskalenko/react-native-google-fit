@@ -30,3 +30,17 @@ export function lbsAndOzToK (imperial) {
 }
 
 export const KgToLbs = (metric) => metric * 2.2046
+
+export function isNil (value) {
+  return value == null
+}
+
+export function prepareResponse (response, byKey = 'value') {
+  return response.map((el) => {
+    if (!isNil(el[byKey])) {
+      el.startDate = new Date(el.startDate).toISOString()
+      el.endDate = new Date(el.endDate).toISOString()
+      return el
+    }
+  }).filter((day) => !isNil(day))
+}
