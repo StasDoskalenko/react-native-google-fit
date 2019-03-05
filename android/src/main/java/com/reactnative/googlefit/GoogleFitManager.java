@@ -223,6 +223,9 @@ public class GoogleFitManager implements
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Log.e(TAG, "Authorization - Cancel");
+                WritableMap map = Arguments.createMap();
+                map.putString("message", "" + "Authorization cancelled");
+                sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
             }
         }
     }
