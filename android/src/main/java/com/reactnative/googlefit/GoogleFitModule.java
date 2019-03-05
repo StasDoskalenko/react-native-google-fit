@@ -17,6 +17,7 @@ import android.content.Intent;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -83,6 +84,17 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             return;
         }
         mGoogleFitManager.authorize();
+    }
+
+    @ReactMethod
+    public boolean isAuthorized (final Promise promise) {
+        boolean isAuthorized = false
+        if (mGoogleFitManager != null && mGoogleFitManager.isAuthorized() ) {
+            isAuthorized = true
+        }
+        WritableMap map = Arguments.createMap();
+        map.putBoolean("isAuthorized", isAuthorized);
+        promise.resolve(map);
     }
 
     @ReactMethod

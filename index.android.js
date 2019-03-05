@@ -7,17 +7,40 @@ const googleFit = NativeModules.RNGoogleFit
 
 class RNGoogleFit {
     eventListeners = []
+    isAuthorized = false
 
-    authorize = () => {
-      googleFit.authorize()
-      return new Promise((resolve, reject) => {
-        this.onAuthorize(() => resolve({success: true}))
-        this.onAuthorizeFailure(() => reject({success: false}))
-      })
+    authorize = async () => {
+      const successResponse = {success: true}
+      try {
+        await this.checkIsAuthorized()
+        if (this.isAuthorized) {
+          return successResponse
+        }
+        return new Promise((resolve, reject) => {
+          googleFit.authorize()
+          this.onAuthorize(() => {
+            this.isAuthorized = true
+            resolve(successResponse)
+          })
+          this.onAuthorizeFailure(() => {
+            this.isAuthorized = false
+            reject({success: false})
+          })
+        })
+      } catch (err) {
+        return {success: false}
+      }
+    }
+
+    checkIsAuthorized = async () => {
+      const { isAuthorized } = await googleFit.isAuthorized()
+      this.isAuthorized = isAuthorized
     }
 
     disconnect = () => {
+      this.isAuthorized = false
       googleFit.disconnect()
+      this.removeListeners()
     }
 
     removeListeners = () => {
