@@ -29,6 +29,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.HealthDataTypes;
+import com.facebook.react.bridge.WritableMap;
 
 
 public class GoogleFitModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
@@ -89,7 +90,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public boolean isAuthorized (final Promise promise) {
+    public void isAuthorized (final Promise promise) {
         boolean isAuthorized = false;
         if (mGoogleFitManager != null && mGoogleFitManager.isAuthorized() ) {
             isAuthorized = true;
