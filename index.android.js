@@ -11,35 +11,36 @@ class RNGoogleFit {
   eventListeners = []
   isAuthorized = false
 
-  authorize = async (onSuccess, onError, options = {}) => {
+  authorize = async (options = {}) => {
     const successResponse = { success: true };
-
     try {
       await this.checkIsAuthorized();
       if (this.isAuthorized) {
-        onSuccess(successResponse);
+        return successResponse;
       }
+      const authResult = await new Promise((resolve, reject) => {
+        this.onAuthorize(() => {
+          this.isAuthorized = true;
+          resolve(successResponse);
+        });
+        this.onAuthorizeFailure(error => {
+          this.isAuthorized = false;
+          reject({ success: false, message: error.message });
+        });
 
-      this.onAuthorize(() => {
-        this.isAuthorized = true;
-        onSuccess(successResponse);
-      });
-      this.onAuthorizeFailure(error => {
-        this.isAuthorized = false;
-        onError({ success: false, error });
-      });
+        const defaultScopes = [
+          Scopes.FITNESS_ACTIVITY_READ,
+          Scopes.FITNESS_BODY_READ_WRITE,
+          Scopes.FITNESS_LOCATION_READ,
+        ];
 
-      const defaultScopes = [
-        Scopes.FITNESS_ACTIVITY_READ,
-        Scopes.FITNESS_BODY_READ_WRITE,
-        Scopes.FITNESS_LOCATION_READ,
-      ];
-
-      googleFit.authorize({
-        scopes: (options && options.scopes) || defaultScopes,
+        googleFit.authorize({
+          scopes: (options && options.scopes) || defaultScopes,
+        });
       });
+      return authResult;
     } catch (error) {
-      return onError({ success: false, error });
+      return { success: false, message: error.message };
     }
   };
 
