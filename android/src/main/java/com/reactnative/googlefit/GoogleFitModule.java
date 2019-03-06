@@ -58,6 +58,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @Override
     public void onHostResume() {
+        super.onHostResume();
         if (mGoogleFitManager != null) {
             mGoogleFitManager.resetAuthInProgress();
         }
@@ -65,6 +66,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @Override
     public void onHostPause() {
+        super.onHostPause();
     }
 
     @Override
@@ -88,9 +90,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @ReactMethod
     public boolean isAuthorized (final Promise promise) {
-        boolean isAuthorized = false
+        boolean isAuthorized = false;
         if (mGoogleFitManager != null && mGoogleFitManager.isAuthorized() ) {
-            isAuthorized = true
+            isAuthorized = true;
         }
         WritableMap map = Arguments.createMap();
         map.putBoolean("isAuthorized", isAuthorized);
