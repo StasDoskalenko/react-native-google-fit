@@ -148,10 +148,6 @@ public class GoogleFitManager implements
                     new GoogleApiClient.OnConnectionFailedListener() {
                         @Override
                         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                            WritableMap map = Arguments.createMap();
-                            map.putString("message", "" + connectionResult);
-                            sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
-
                             Log.i(TAG, "Authorization - Failed Authorization Mgr:" + connectionResult);
                             if (mAuthInProgress) {
                                 Log.i(TAG, "Authorization - Already attempting to resolve an error.");
@@ -167,6 +163,9 @@ public class GoogleFitManager implements
                                 Log.i(TAG, "Show dialog using GoogleApiAvailability.getErrorDialog()");
                                 showErrorDialog(connectionResult.getErrorCode());
                                 mAuthInProgress = true;
+                                WritableMap map = Arguments.createMap();
+                                map.putString("message", "" + connectionResult);
+                                sendEvent(mReactContext, "GoogleFitAuthorizeFailure", map);
                             }
                         }
                     }
