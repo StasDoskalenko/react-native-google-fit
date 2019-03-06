@@ -59,7 +59,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @Override
     public void onHostResume() {
-        super.onHostResume();
         if (mGoogleFitManager != null) {
             mGoogleFitManager.resetAuthInProgress();
         }
@@ -67,7 +66,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @Override
     public void onHostPause() {
-        super.onHostPause();
     }
 
     @Override
