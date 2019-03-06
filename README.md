@@ -7,6 +7,7 @@ A React Native bridge module for interacting with Google Fit
 # Quick Links
 - [Installation](/docs/INSTALLATION.md)
 - [Changelog](/docs/CHANGELOG.md)
+- [Example app](https://github.com/StasDoskalenko/react-native-google-fit-example)
 
 ### USAGE
 
