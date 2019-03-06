@@ -3,35 +3,45 @@
 import {DeviceEventEmitter, NativeModules} from 'react-native'
 import {buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareResponse} from './src/utils'
 
+import PossibleScopes from './src/scopes'
+
 const googleFit = NativeModules.RNGoogleFit
 
 class RNGoogleFit {
   eventListeners = []
   isAuthorized = false
 
-  authorize = async () => {
-    const successResponse = {success: true}
+  authorize = async (onSuccess, onError, options = {}) => {
+    const successResponse = { success: true };
+
     try {
-      await this.checkIsAuthorized()
+      await this.checkIsAuthorized();
       if (this.isAuthorized) {
-        return successResponse
+        onSuccess(successResponse);
       }
-      const authResult = await new Promise((resolve, reject) => {
-        googleFit.authorize()
-        this.onAuthorize(() => {
-          this.isAuthorized = true
-          resolve(successResponse)
-        })
-        this.onAuthorizeFailure((error) => {
-          this.isAuthorized = false
-          reject({success: false, message: error.message})
-        })
-      })
-      return authResult
+
+      this.onAuthorize(() => {
+        this.isAuthorized = true;
+        onSuccess(successResponse);
+      });
+      this.onAuthorizeFailure(error => {
+        this.isAuthorized = false;
+        onError({ success: false, error });
+      });
+
+      const defaultScopes = [
+        Scopes.FITNESS_ACTIVITY_READ,
+        Scopes.FITNESS_BODY_READ_WRITE,
+        Scopes.FITNESS_LOCATION_READ,
+      ];
+
+      googleFit.authorize({
+        scopes: (options && options.scopes) || defaultScopes,
+      });
     } catch (error) {
-      return {success: false, message: error.message}
+      return onError({ success: false, error });
     }
-  }
+  };
 
   checkIsAuthorized = async () => {
     const {isAuthorized} = await googleFit.isAuthorized()
@@ -400,6 +410,9 @@ class RNGoogleFit {
 }
 
 export default new RNGoogleFit()
+
+// Possible Scopes
+export const Scopes = Object.freeze(PossibleScopes);
 
 //Data types for food addition
 export const MealType = Object.freeze({
