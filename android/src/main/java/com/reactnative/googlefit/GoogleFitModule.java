@@ -75,9 +75,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             mGoogleFitManager = new GoogleFitManager(mReactContext, activity);
         }
 
-        if (mGoogleFitManager.isAuthorized()) {
-            return;
-        }
         mGoogleFitManager.authorize();
     }
 
