@@ -389,42 +389,48 @@ public class CalorieHistory {
     }
 
     /**
-     * This method creates a dataset object to be able to insert data in google fit
-     *
-     * @param values         Object Values for the fitness data. They must be HashMap
-     * @param mealType       int Value of enum. For example Field.MEAL_TYPE_SNACK
-     * @param name           String Dish name. For example "banana"
-     * @param startTime      long Time when the fitness activity started
-     * @param endTime        long Time when the fitness activity finished
-     * @param timeUnit       TimeUnit Time unit in which period is expressed
-     * @return
-     */
-    private DataSet createDataForRequest(HashMap<String, Object> values, int mealType, String name,
-                                         long startTime, long endTime, TimeUnit timeUnit) throws InvalidFoodSample {
+    * This method creates a dataset object to be able to insert data in google fit
+    *
+    * @param values         Object Values for the fitness data. They must be HashMap
+    * @param mealType       int Value of enum. For example Field.MEAL_TYPE_SNACK
+    * @param name           String Dish name. For example "banana"
+    * @param startTime      long Time when the fitness activity started
+    * @param endTime        long Time when the fitness activity finished
+    * @param timeUnit       TimeUnit Time unit in which period is expressed
+    * @return
+    */
+   private DataSet createDataForRequest(HashMap<String, Object> values, int mealType, String name,
+                                        long startTime, long endTime, TimeUnit timeUnit) throws InvalidFoodSample {
 
-        DataSource dataSource = this.createNutritionDataSource();
+       DataSource dataSource = this.createNutritionDataSource();
 
-        DataSet dataSet = DataSet.create(dataSource);
-        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, timeUnit);
+       DataSet dataSet = DataSet.create(dataSource);
+       DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, timeUnit);
 
-        dataPoint.getValue(Field.FIELD_FOOD_ITEM).setString(name);
-        dataPoint.getValue(Field.FIELD_MEAL_TYPE).setInt(mealType);
-        int nutrientsWritten = 0;
-        for (String key : values.keySet()) {
-            Float value = Float.valueOf(values.get(key).toString());
+       dataPoint.getValue(Field.FIELD_FOOD_ITEM).setString(name);
+       dataPoint.getValue(Field.FIELD_MEAL_TYPE).setInt(mealType);
+       int nutrientsWritten = 0;
+       for (String key : values.keySet()) {
+           String valueAsStr = values.get(key).toString();
+           try {
+               Float value = Float.valueOf(valueAsStr);
 
-            if (value > 0) {
-                dataPoint.getValue(Field.FIELD_NUTRIENTS).setKeyValue(key, value);
-                nutrientsWritten += 1;
-            }
-        }
+               if (value >= 0) {
+                   dataPoint.getValue(Field.FIELD_NUTRIENTS).setKeyValue(key, value);
+                   nutrientsWritten += 1;
+               }
+           } catch (NumberFormatException nfe) {
+               throw new InvalidFoodSample(String.format(
+                   "Could not convert key %s w/ value  %s to float", key, valueAsStr));
+           }
+       }
 
-        if (nutrientsWritten == 0) {
-            throw new InvalidFoodSample("No value nutrients written");
-        }
+       if (nutrientsWritten == 0) {
+           throw new InvalidFoodSample("No value nutrients written");
+       }
 
-        dataSet.add(dataPoint);
+       dataSet.add(dataPoint);
 
-        return dataSet;
-    }
+       return dataSet;
+   }
 }
