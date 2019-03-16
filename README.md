@@ -8,16 +8,24 @@ A React Native bridge module for interacting with Google Fit
 - [Installation](/docs/INSTALLATION.md)
 - [Changelog](/docs/CHANGELOG.md)
 - [Example app](https://github.com/StasDoskalenko/react-native-google-fit-example)
+- [F.A.Q.](/docs/FAQ.md)
+
 
 ### USAGE
 
-1. `import GoogleFit from 'react-native-google-fit';`
+1. `import GoogleFit, { Scopes } from 'react-native-google-fit'`
 
 2. Authorize:
 
     ```javascript
-    
-    GoogleFit.authorize()
+    // The list of available scopes inside of src/scopes.js file
+    const options = {
+      scopes: [
+        Scopes.FITNESS_ACTIVITY_READ_WRITE,
+        Scopes.FITNESS_BODY_READ_WRITE,
+      ],
+    }
+    GoogleFit.authorize(options)
      .then(() => {
        dispatch('AUTH_SUCCESS')
      })
@@ -32,7 +40,7 @@ A React Native bridge module for interacting with Google Fit
     });
     ```
     
-    Alternatively you can use event listeners
+    Alternatively you can use event listeners (deprecated)
     ```javascript
      GoogleFit.onAuthorize(() => {
        dispatch('AUTH SUCCESS')

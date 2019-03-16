@@ -1,6 +1,9 @@
 ### Changelog:
 
 ```
+0.9.10-beta
+        + Scope authorizations (thanks, @gaykov)
+        
 0.9.1   ~ getDailyStepCountSamples - now returns promise if no callback is provided
 0.9.0   ~ authorize() - is now a promise
         ~ non-blocking step retrieve
