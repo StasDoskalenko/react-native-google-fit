@@ -43,4 +43,4 @@ GoogleFit.authorize(options)
 
 The calories values are approx matching with that of Google Fit app apart from current day's calories value.
 Subtracting basal avg value.
-Consider adding endDate parameter to get the same value as in Google Fit
+Consider adding endDate parameter as current DateTime to get the same value as in Google Fit
