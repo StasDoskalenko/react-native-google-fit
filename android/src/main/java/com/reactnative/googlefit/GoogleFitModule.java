@@ -13,6 +13,7 @@ package com.reactnative.googlefit;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import java.util.ArrayList;
 import android.content.Intent;
 
 import com.facebook.react.bridge.Arguments;
@@ -74,7 +75,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void authorize() {
+    public void authorize(ReadableMap options) {
         final Activity activity = getCurrentActivity();
 
         if (mGoogleFitManager == null) {
@@ -84,7 +85,15 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
         if (mGoogleFitManager.isAuthorized()) {
             return;
         }
-        mGoogleFitManager.authorize();
+
+        ReadableArray scopes = options.getArray("scopes");
+        ArrayList<String> scopesList = new ArrayList<String>();
+
+        for (Object type : scopes.toArrayList()) {
+            scopesList.add(type.toString());
+        }
+
+        mGoogleFitManager.authorize(scopesList);
     }
 
     @ReactMethod
