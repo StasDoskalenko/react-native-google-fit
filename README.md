@@ -184,8 +184,16 @@ A React Native bridge module for interacting with Google Fit
     observeSteps(callback); // On Step Changed Event
     
     unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
-    
-    getDailyCalorieSamples(options, callback); // method to get calories per day
+    /**
+    * {@see getDailyCalorieSamples}
+    * const options = {
+    *         startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
+    *         endDate: new Date().now(),
+    *         basalCalculation: false,     
+    * }
+    * method to get calories per day, options object could contain basalCalculation (bool) to calculate or not basalAVG over the week
+    */
+    getDailyCalorieSamples(options, callback);
     
     getDailyDistanceSamples(options, callback); // method to get daily distance
     

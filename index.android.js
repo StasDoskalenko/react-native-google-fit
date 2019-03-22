@@ -176,16 +176,20 @@ class RNGoogleFit {
 
   /**
    * Get the total calories per day over a specified date range.
-   * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * @callback callback The function will be called with an array of elements.
+   * @param {Object} options getDailyCalorieSamples accepts an options object containing:
+   * required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp
+   * optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
+   * @param {Function} callback The function will be called with an array of elements.
    */
 
   getDailyCalorieSamples(options, callback) {
+    const basalCalculation = options.basalCalculation !== false
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
     googleFit.getDailyCalorieSamples(
       startDate,
       endDate,
+      basalCalculation,
       (msg) => {
         callback(msg, false)
       },

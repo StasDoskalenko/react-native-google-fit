@@ -55,7 +55,7 @@ public class CalorieHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime) {
+    public ReadableArray aggregateDataByDate(long startTime, long endTime, boolean basalCalculation) {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -79,7 +79,7 @@ public class CalorieHistory {
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 List<DataSet> dataSets = bucket.getDataSets();
                 for (DataSet dataSet : dataSets) {
-                    processDataSet(dataSet, map);
+                    processDataSet(dataSet, map, basalCalculation);
                 }
             }
         }
@@ -87,7 +87,7 @@ public class CalorieHistory {
         else if (dataReadResult.getDataSets().size() > 0) {
             Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
             for (DataSet dataSet : dataReadResult.getDataSets()) {
-                processDataSet(dataSet, map);
+                processDataSet(dataSet, map, basalCalculation);
             }
         }
 
@@ -132,7 +132,7 @@ public class CalorieHistory {
     }
 
 
-    private void processDataSet(DataSet dataSet, WritableArray map) {
+    private void processDataSet(DataSet dataSet, WritableArray map, boolean basalCalculation) {
         Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         DateFormat dateFormat = DateFormat.getDateInstance();
         DateFormat timeFormat = DateFormat.getTimeInstance();
@@ -157,10 +157,12 @@ public class CalorieHistory {
                 stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
                 float basal = 0;
-                try {
-                    basal = getBasalAVG(dp.getEndTime(TimeUnit.MILLISECONDS));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (basalCalculation) {
+                    try {
+                        basal = getBasalAVG(dp.getEndTime(TimeUnit.MILLISECONDS));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
                 map.pushMap(stepMap);

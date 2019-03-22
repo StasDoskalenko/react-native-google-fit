@@ -221,11 +221,12 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getDailyCalorieSamples(double startDate,
                                        double endDate,
+                                       boolean basalCalculation,
                                        Callback errorCallback,
                                        Callback successCallback) {
 
         try {
-            successCallback.invoke(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate));
+            successCallback.invoke(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate, basalCalculation));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
