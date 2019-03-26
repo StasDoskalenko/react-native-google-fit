@@ -248,6 +248,12 @@ public class ActivityHistory {
             case "mindfulness":
                 activityType = FitnessActivities.MEDITATION;
                 break;
+            case "dance":
+                activityType = FitnessActivities.DANCING;
+                break;
+            case "crossTraining":
+                activityType = FitnessActivities.CROSSFIT;
+                break;
             default:
                 activityType = FitnessActivities.OTHER;
                 break;
@@ -280,6 +286,12 @@ public class ActivityHistory {
                 break;
             case FitnessActivities.MEDITATION:
                 workoutType = "mindfulness";
+                break;
+            case FitnessActivities.DANCING:
+                workoutType = "dance";
+                break;
+            case FitnessActivities.CROSSFIT:
+                workoutType = "crossTraining";
                 break;
             default:
                 workoutType = "other";
