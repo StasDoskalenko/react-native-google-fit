@@ -1,6 +1,10 @@
 ### Changelog:
 
 ```
+0.9.12  ~ Update typescript definitions for Scoped Authorization
+
+0.9.11  ~ getDailyCalorieSamples, now includes basalCalculation: boolean flag
+
 0.9.10-beta
         + Scope authorizations (thanks, @gaykov)
         
