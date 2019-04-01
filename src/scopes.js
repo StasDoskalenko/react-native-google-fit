@@ -33,6 +33,6 @@ const fitnessScopes = {
     'https://www.googleapis.com/auth/fitness.reproductive_health.read',
   FITNESS_REPRODUCTIVE_HEALTH_READ_WRITE:
     'https://www.googleapis.com/auth/fitness.reproductive_health.write'
-};
+}
 
-export default fitnessScopes;
+export default fitnessScopes
