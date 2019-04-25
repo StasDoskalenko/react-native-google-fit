@@ -26,12 +26,16 @@ A React Native bridge module for interacting with Google Fit
       ],
     }
     GoogleFit.authorize(options)
-     .then(() => {
-       dispatch('AUTH_SUCCESS')
-     })
-     .catch(() => {
-       dispatch('AUTH_ERROR')
-     })
+      .then(authResult => {
+        if (authResult.success) {
+          dispatch("AUTH_SUCCESS");
+        } else {
+          dispatch("AUTH_DENIED", authResult.message);
+        }
+      })
+      .catch(() => {
+        dispatch("AUTH_ERROR");
+      })
     
     // ...
     // Call when authorized
