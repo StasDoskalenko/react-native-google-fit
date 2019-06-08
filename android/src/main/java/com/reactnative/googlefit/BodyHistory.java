@@ -70,9 +70,23 @@ public class BodyHistory {
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
         if (this.dataType == DataType.TYPE_WEIGHT) {
+            // In general here we want to set the bucket size to the smallest possible allowed, in case the 
+            // user weighs themselves in a short interval (e.g. before and after a meal)
+            //
+            // The Google Fit API seems to have a limit of around 3,000 as the maximum number of buckets that 
+            // can be returned in an aggregated query - anything more than this and the fitness API takes 
+            // ages to respond and/or no response at all on both Galaxy S5 (6.0.1) and Huawei P9 Lite (7.0)
+            //
+            // So, divide the time range by 2,000 to be on the safe side
+            long bucketSizeMillis = (endTime - startTime) / 2000;
+
+            // We don't need any finer granularity than 1 minute, so make buckets at least this size to keep 
+            // the number of buckets low if not much time has elapsed since the last query
+            bucketSizeMillis = Math.max(bucketSizeMillis, 60 * 1000);
+
             readRequestBuilder
                 .aggregate(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
-                .bucketByTime(1, TimeUnit.DAYS);
+                .bucketByTime((int)bucketSizeMillis, TimeUnit.MILLISECONDS);
         } else {
             readRequestBuilder.read(this.dataType);
             readRequestBuilder.setLimit(1); // need only one height, since it's unchangable
@@ -228,21 +242,22 @@ public class BodyHistory {
 
         WritableMap stepMap = Arguments.createMap();
 
-        int j = 0;
         for (DataPoint dp : dataSet.getDataPoints()) {
-            j++;
             String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
 
-            int i = 0;
-            for (Field field : dp.getDataType().getFields()) {
-                i++;
-                if (i > 1) continue; //Get only average instance
+            stepMap.putString("day", day);
+            stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
 
-                stepMap.putString("day", day);
-                stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("value", dp.getValue(field).asFloat());
-            }
+            // When there is a short interval between weight readings (< 1 hour or so), some phones e.g.
+            // Galaxy S5 use the average of the readings, whereas other phones e.g. Huawei P9 Lite use the
+            // most recent of the bunch (this might be related to Android versions - 6.0.1 vs 7.0 in this
+            // example for former and latter)
+            //
+            // For aggregated weight summary, only the min, max and average values are available (i.e. the
+            // most recent sample is not an option), so use average value to maximise the match between values
+            // returned here and values as reported by Google Fit app
+            stepMap.putDouble("value", dp.getValue(Field.FIELD_AVERAGE).asFloat());
         }
         map.pushMap(stepMap);
     }
