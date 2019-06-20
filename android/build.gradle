@@ -35,6 +35,6 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.google.android.gms:play-services-auth:+'
-    implementation 'com.google.android.gms:play-services-fitness:+'
+    implementation "com.google.android.gms:play-services-auth:${safeExtGet('authVersion', '+')}"
+    implementation "com.google.android.gms:play-services-fitness:${safeExtGet('fitnessVersion', '+')}"
 }
