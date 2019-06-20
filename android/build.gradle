@@ -1,11 +1,13 @@
 buildscript {
     repositories {
+        google()
+        mavenLocal()
         mavenCentral()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.+'
+        classpath 'com.android.tools.build:gradle:3.3.1'
     }
 }
 
@@ -16,17 +18,14 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 23)
-    buildToolsVersion safeExtGet('buildToolsVersion', '23.0.1')
+    compileSdkVersion safeExtGet('compileSdkVersion', 27)
+    buildToolsVersion safeExtGet('buildToolsVersion', '27.0.3')
 
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
-        targetSdkVersion safeExtGet('targetSdkVersion', 23)
+        targetSdkVersion safeExtGet('targetSdkVersion', 27)
         versionCode 1
         versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
     }
     lintOptions {
        warning 'InvalidPackage'
@@ -34,8 +33,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.facebook.react:react-native:+'
-    compile 'com.google.android.gms:play-services-auth:+'
-    compile 'com.google.android.gms:play-services-fitness:+'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.facebook.react:react-native:+'
+    implementation "com.google.android.gms:play-services-auth:${safeExtGet('authVersion', '+')}"
+    implementation "com.google.android.gms:play-services-fitness:${safeExtGet('fitnessVersion', '+')}"
 }
