@@ -10,4 +10,7 @@ android/.gradle/
 android/.idea/
 android/.project
 android/.settings
+android/gradle/**
+android/gradlew*
+android/local.properties
 *.iml
