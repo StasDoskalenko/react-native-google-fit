@@ -1,9 +1,8 @@
 'use strict'
+import { DeviceEventEmitter, NativeModules } from 'react-native';
 
-import { DeviceEventEmitter, NativeModules } from 'react-native'
-import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareResponse } from './src/utils'
-
-import PossibleScopes from './src/scopes'
+import PossibleScopes from './src/scopes';
+import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareResponse } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
 
@@ -23,7 +22,7 @@ class RNGoogleFit {
           this.isAuthorized = true
           resolve(successResponse)
         })
-        this.onAuthorizeFailure((error) => {
+        this.onAuthorizeFailure(error => {
           this.isAuthorized = false
           reject({ success: false, message: error.message })
         })
@@ -45,7 +44,7 @@ class RNGoogleFit {
   }
 
   checkIsAuthorized = async () => {
-    const {isAuthorized} = await googleFit.isAuthorized()
+    const { isAuthorized } = await googleFit.isAuthorized()
     this.isAuthorized = isAuthorized
   }
 
@@ -56,7 +55,7 @@ class RNGoogleFit {
   }
 
   removeListeners = () => {
-    this.eventListeners.forEach((eventListener) => eventListener.remove())
+    this.eventListeners.forEach(eventListener => eventListener.remove())
     this.eventListeners = []
   }
 
@@ -75,10 +74,10 @@ class RNGoogleFit {
   startRecording = (callback, dataTypes = ['step', 'distance']) => {
     googleFit.startFitnessRecording(dataTypes)
 
-    const eventListeners = dataTypes.map((dataTypeName) => {
+    const eventListeners = dataTypes.map(dataTypeName => {
       const eventName = `${dataTypeName.toUpperCase()}_RECORDING`
 
-      return DeviceEventEmitter.addListener(eventName, (event) => callback(event))
+      return DeviceEventEmitter.addListener(eventName, event => callback(event))
     })
 
     this.eventListeners.push(...eventListeners)
@@ -95,16 +94,23 @@ class RNGoogleFit {
   }
 
   _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
-    googleFit.getDailyStepCountSamples(startDate, endDate,
-      (msg) => callback(msg, false),
-      (res) => {
+    googleFit.getDailyStepCountSamples(
+      startDate,
+      endDate,
+      msg => callback(msg, false),
+      res => {
         if (res.length > 0) {
-          callback(false, res.map(function (dev) {
-            const obj = {}
-            obj.source = dev.source.appPackage + ((dev.source.stream) ? ':' + dev.source.stream : '')
-            obj.steps = buildDailySteps(dev.steps)
-            return obj
-          }, this))
+          callback(
+            false,
+            res.map(function(dev) {
+              const obj = {}
+              obj.source =
+                dev.source.appPackage +
+                (dev.source.stream ? ':' + dev.source.stream : '')
+              obj.steps = buildDailySteps(dev.steps)
+              return obj
+            }, this)
+          )
         } else {
           callback('There is no any steps data for this period', false)
         }
@@ -119,17 +125,25 @@ class RNGoogleFit {
    */
 
   getDailyStepCountSamples = (options, callback) => {
-    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
+    const startDate = !isNil(options.startDate)
+      ? Date.parse(options.startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate)
+      ? Date.parse(options.endDate)
+      : new Date().valueOf()
     if (!callback || typeof callback !== 'function') {
       return new Promise((resolve, reject) => {
-        this._retrieveDailyStepCountSamples(startDate, endDate, (error, result) => {
-          if (!error) {
-            resolve(result)
-          } else {
-            reject(error)
+        this._retrieveDailyStepCountSamples(
+          startDate,
+          endDate,
+          (error, result) => {
+            if (!error) {
+              resolve(result)
+            } else {
+              reject(error)
+            }
           }
-        })
+        )
       })
     }
     this._retrieveDailyStepCountSamples(startDate, endDate, callback)
@@ -142,36 +156,43 @@ class RNGoogleFit {
    */
 
   getDailyDistanceSamples(options, callback) {
-    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
-    googleFit.getDailyDistanceSamples(startDate,
+    const startDate = !isNil(options.startDate)
+      ? Date.parse(options.startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate)
+      ? Date.parse(options.endDate)
+      : new Date().valueOf()
+    googleFit.getDailyDistanceSamples(
+      startDate,
       endDate,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, prepareResponse(res, 'distance'))
         } else {
           callback('There is no any distance data for this period', false)
         }
-      })
+      }
+    )
   }
 
   getActivitySamples(options, callback) {
     googleFit.getActivitySamples(
       options.startDate,
       options.endDate,
-      (error) => {
+      error => {
         callback(error, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, res)
         } else {
           callback('There is no any distance data for this period', false)
         }
-      })
+      }
+    )
   }
 
   /**
@@ -190,27 +211,30 @@ class RNGoogleFit {
       startDate,
       endDate,
       basalCalculation,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, prepareResponse(res, 'calorie'))
         } else {
           callback('There is no any calorie data for this period', false)
         }
-      })
+      }
+    )
   }
 
   saveFood(options, callback) {
     options.date = Date.parse(options.date)
-    googleFit.saveFood(options,
-      (msg) => {
+    googleFit.saveFood(
+      options,
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
   /**
@@ -221,16 +245,21 @@ class RNGoogleFit {
    */
 
   getWeightSamples = (options, callback) => {
-    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
-    googleFit.getWeightSamples(startDate,
+    const startDate = !isNil(options.startDate)
+      ? Date.parse(options.startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate)
+      ? Date.parse(options.endDate)
+      : new Date().valueOf()
+    googleFit.getWeightSamples(
+      startDate,
       endDate,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
-          res = res.map((el) => {
+          res = res.map(el => {
             if (el.value) {
               if (options.unit === 'pound') {
                 el.value = KgToLbs(el.value) //convert back to pounds
@@ -240,134 +269,148 @@ class RNGoogleFit {
               return el
             }
           })
-          callback(false, res.filter((day) => !isNil(day)))
+          callback(false, res.filter(day => !isNil(day)))
         } else {
           callback('There is no any weight data for this period', false)
         }
-      })
+      }
+    )
   }
 
   getHeightSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
-    googleFit.getHeightSamples(startDate,
+    googleFit.getHeightSamples(
+      startDate,
       endDate,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, prepareResponse(res, 'value'))
         } else {
           callback('There is no any height data for this period', false)
         }
-      })
+      }
+    )
   }
 
   saveHeight(options, callback) {
     options.date = Date.parse(options.date)
-    googleFit.saveHeight(options,
-      (msg) => {
+    googleFit.saveHeight(
+      options,
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-
-      })
+      }
+    )
   }
 
   saveWeight(options, callback) {
     if (options.unit == 'pound') {
-      options.value = lbsAndOzToK({pounds: options.value, ounces: 0}) //convert pounds and ounces to kg
+      options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
     }
     options.date = Date.parse(options.date)
-    googleFit.saveWeight(options,
-      (msg) => {
+    googleFit.saveWeight(
+      options,
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
   deleteWeight = (options, callback) => {
     if (options.unit === 'pound') {
-      options.value = lbsAndOzToK({pounds: options.value, ounces: 0}) //convert pounds and ounces to kg
+      options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
     }
     options.date = Date.parse(options.date)
-    googleFit.deleteWeight(options,
-      (msg) => {
+    googleFit.deleteWeight(
+      options,
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
   deleteHeight = (options, callback) => {
     options.date = Date.parse(options.date)
-    googleFit.deleteWeight(options,
-      (msg) => {
+    googleFit.deleteWeight(
+      options,
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
-  isAvailable(callback) { // true if GoogleFit installed
+  isAvailable(callback) {
+    // true if GoogleFit installed
     googleFit.isAvailable(
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
-  isEnabled(callback) { // true if permission granted
+  isEnabled(callback) {
+    // true if permission granted
     googleFit.isEnabled(
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         callback(false, res)
-      })
+      }
+    )
   }
 
   openFit() {
     googleFit.openFit()
   }
 
-  observeSteps = (callback) => {
+  observeSteps = callback => {
     const stepsObserver = DeviceEventEmitter.addListener(
       'StepChangedEvent',
-      (steps) => callback(steps)
+      steps => callback(steps)
     )
     googleFit.observeSteps()
     this.eventListeners.push(stepsObserver)
   }
 
-  observeHistory = (callback) => {
+  observeHistory = callback => {
     const historyObserver = DeviceEventEmitter.addListener(
       'StepHistoryChangedEvent',
-      (steps) => callback(steps)
+      steps => callback(steps)
     )
     this.eventListeners.push(historyObserver)
   }
 
-  onAuthorize = (callback) => {
+  onAuthorize = callback => {
     const authObserver = DeviceEventEmitter.addListener(
       'GoogleFitAuthorizeSuccess',
-      (authorized) => callback(authorized)
+      authorized => callback(authorized)
     )
     this.eventListeners.push(authObserver)
   }
 
-  onAuthorizeFailure = (callback) => {
+  onAuthorizeFailure = callback => {
     const authFailedObserver = DeviceEventEmitter.addListener(
       'GoogleFitAuthorizeFailure',
-      (authorized) => callback(authorized)
+      authorized => callback(authorized)
     )
     this.eventListeners.push(authFailedObserver)
   }
@@ -382,16 +425,17 @@ class RNGoogleFit {
     googleFit.getHeartRateSamples(
       startDate,
       endDate,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, prepareResponse(res, 'value'))
         } else {
           callback('There is no any heart rate data for this period', false)
         }
-      })
+      }
+    )
   }
 
   getBloodPressureSamples(options, callback) {
@@ -400,18 +444,18 @@ class RNGoogleFit {
     googleFit.getBloodPressureSamples(
       startDate,
       endDate,
-      (msg) => {
+      msg => {
         callback(msg, false)
       },
-      (res) => {
+      res => {
         if (res.length > 0) {
           callback(false, prepareResponse(res, 'value'))
         } else {
           callback('There is no any heart rate data for this period', false)
         }
-      })
+      }
+    )
   }
-
 }
 
 export default new RNGoogleFit()

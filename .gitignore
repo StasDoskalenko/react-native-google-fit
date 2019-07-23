@@ -5,5 +5,9 @@ system-notification.iml
 react-native-system-notification.iml
 .DS_Store
 .idea/
+android/.classpath
+android/.gradle/
 android/.idea/
+android/.project
+android/.settings
 *.iml
