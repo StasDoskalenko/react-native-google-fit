@@ -224,6 +224,25 @@ class RNGoogleFit {
     )
   }
 
+  getDailyNutritionSamples(options, callback) {
+    const startDate = Date.parse(options.startDate)
+    const endDate = Date.parse(options.endDate)
+    googleFit.getDailyNutritionSamples(
+      startDate,
+      endDate,
+      msg => {
+        callback(msg, false)
+      },
+      res => {
+        if (res.length > 0) {
+          callback(false, prepareResponse(res, 'nutrition'))
+        } else {
+          callback('There is no any nutrition data for this period', false)
+        }
+      }
+    )
+  }
+
   saveFood(options, callback) {
     options.date = Date.parse(options.date)
     googleFit.saveFood(

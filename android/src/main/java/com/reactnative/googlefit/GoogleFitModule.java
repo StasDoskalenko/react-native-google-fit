@@ -233,6 +233,18 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
+    public void getDailyNutritionSamples(double startDate,
+                                        double endDate,
+                                        Callback errorCallback,
+                                        Callback successCallback) {
+        try {
+            successCallback.invoke(mGoogleFitManager.getNutritionHistory().aggregateDataByDate((long) startDate, (long) endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
     public void saveFood(ReadableMap foodSample,
                          Callback errorCallback,
                          Callback successCallback) {
