@@ -232,25 +232,17 @@ A React Native bridge module for interacting with Google Fit
     Note that optional parametrs are not presented in all activities - only where google fit return some results for this field.
     Like no distance for still activity. 
 
-9. Other methods:
-
+9. Retrieve Calories For Period
     ```javascript
-    observeSteps(callback); // On Step Changed Event
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+        basalCalculation: true, // optional, to calculate or not basalAVG over the week
+      };
 
-    unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
-    ```
-
-    ```javascript
-    /**
-    * {@see getDailyCalorieSamples}
-    * const options = {
-    *         startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
-    *         endDate: new Date().now(),
-    *         basalCalculation: false,     
-    * }
-    * method to get calories per day, options object could contain basalCalculation (bool) to calculate or not basalAVG over the week
-    */
-    getDailyCalorieSamples(options, callback);
+      GoogleFit.getDailyCalorieSamples(opt, (err, res) => {
+        console.log(res);
+      });
     ```
 
     **Response:**
@@ -272,8 +264,16 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
+10. Retrieve Disctance For Period:
     ```javascript
-    getDailyDistanceSamples(options, callback); // method to get daily distance
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+      };
+
+      GoogleFit.getDailyDistanceSamples(opt, (err, res) => {
+        console.log(res);
+      });
     ```
 
     **Response:**
@@ -294,6 +294,13 @@ A React Native bridge module for interacting with Google Fit
       }
     ]
     ```
+
+11. Other methods:
+
+    ```javascript
+    observeSteps(callback); // On Step Changed Event
+
+    unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
 
     isAvailable(callback); // Checks is GoogleFit available for current account / installed on device
     
