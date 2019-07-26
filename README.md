@@ -196,7 +196,7 @@ A React Native bridge module for interacting with Google Fit
         "day":"Fri"
       }
     ]
-    
+
     // blood pressure
     [
       {
@@ -290,7 +290,7 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
-10. Retrieve Disctance For Period:
+10. Retrieve Distance For Period:
     ```javascript
       const opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
