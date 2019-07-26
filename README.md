@@ -69,7 +69,9 @@ A React Native bridge module for interacting with Google Fit
      })
      .catch((err) => {console.warn(err)})
     ```
-  **Response:**
+
+    **Response:**
+    
     ```javascript
     [
       { source: "com.google.android.gms:estimated_steps", steps: [
@@ -108,7 +110,9 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
-  **Response:**
+
+    **Response:**
+    
     ```javascript
     [
       {
@@ -138,7 +142,9 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
-  **Response:**
+
+    **Response:**
+
     ```javascript
     [
       {
@@ -187,7 +193,9 @@ A React Native bridge module for interacting with Google Fit
         console.log(err, res)
       });
     ```
-    **Response:**
+
+      **Response:**
+    
     ```javascript
      [ { 
       sourceName: 'Android',
@@ -244,7 +252,9 @@ A React Native bridge module for interacting with Google Fit
     */
     getDailyCalorieSamples(options, callback);
     ```
-  **Response:**
+
+    **Response:**
+    
     ```javascript
     [
       {
@@ -265,7 +275,9 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     getDailyDistanceSamples(options, callback); // method to get daily distance
     ```
-  **Response:**
+
+    **Response:**
+    
     ```javascript
     [
       {
