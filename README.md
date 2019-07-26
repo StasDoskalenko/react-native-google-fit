@@ -69,16 +69,30 @@ A React Native bridge module for interacting with Google Fit
      })
      .catch((err) => {console.warn(err)})
     ```
-
-**Response:**
-
-```javascript
-[
-  { source: "com.google.android.gms:estimated_steps", steps: [] },
-  { source: "com.google.android.gms:merge_step_deltas", steps: [] },
-  { source: "com.xiaomi.hm.health", steps: [] }
-];
-```
+  **Response:**
+    ```javascript
+    [
+      { source: "com.google.android.gms:estimated_steps", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.google.android.gms:merge_step_deltas", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.xiaomi.hm.health", steps: [] }
+    ];
+    ```
 
 4. Retrieve Weights
 
@@ -94,7 +108,24 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
-    
+  **Response:**
+    ```javascript
+    [
+      {
+        "value":72,
+        "endDate":"2019-06-29T15:02:23.413Z",
+        "startDate":"2019-06-29T15:02:23.413Z",
+        "day":"Sat"
+      },
+      {
+        "value":72.4000015258789,
+        "endDate":"2019-07-26T08:06:42.903Z",
+        "startDate":"2019-07-26T08:06:42.903Z",
+        "day":"Fri"
+      }
+    ]
+    ```
+
 5. Retrieve Heights
 
     ```javascript
@@ -106,6 +137,17 @@ A React Native bridge module for interacting with Google Fit
     GoogleFit.getHeightSamples(opt, (err, res) => {
       console.log(res);
     });
+    ```
+  **Response:**
+    ```javascript
+    [
+      {
+        "value":1.7699999809265137,
+        "endDate":"2019-06-29T15:02:23.409Z",
+        "startDate":"2019-06-29T15:02:23.409Z",
+        "day":"Sat"
+      }
+    ]
     ```
 
 6. Save Weights
@@ -145,7 +187,7 @@ A React Native bridge module for interacting with Google Fit
         console.log(err, res)
       });
     ```
-    response:
+    **Response:**
     ```javascript
      [ { 
       sourceName: 'Android',
@@ -186,8 +228,11 @@ A React Native bridge module for interacting with Google Fit
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
-    
+
     unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
+    ```
+
+    ```javascript
     /**
     * {@see getDailyCalorieSamples}
     * const options = {
@@ -198,9 +243,46 @@ A React Native bridge module for interacting with Google Fit
     * method to get calories per day, options object could contain basalCalculation (bool) to calculate or not basalAVG over the week
     */
     getDailyCalorieSamples(options, callback);
-    
+    ```
+  **Response:**
+    ```javascript
+    [
+      {
+        "calorie":1721.948974609375,
+        "endDate":"2019-06-27T15:13:27.000Z",
+        "startDate":"2019-06-27T15:02:23.409Z",
+        "day":"Thu"
+      },
+      {
+        "calorie":1598.25,
+        "endDate":"2019-06-28T15:13:27.000Z",
+        "startDate":"2019-06-27T15:13:27.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
+    ```javascript
     getDailyDistanceSamples(options, callback); // method to get daily distance
-    
+    ```
+  **Response:**
+    ```javascript
+    [
+      {
+        "distance":2254.958251953125,
+        "endDate":"2019-06-30T15:45:32.987Z",
+        "startDate":"2019-06-29T16:57:01.047Z",
+        "day":"Sat"
+      },
+      {
+        "distance":3020.439453125,
+        "endDate":"2019-07-01T13:08:31.332Z",
+        "startDate":"2019-06-30T16:58:44.818Z",
+        "day":"Sun"
+      }
+    ]
+    ```
+
     isAvailable(callback); // Checks is GoogleFit available for current account / installed on device
     
     isEnabled(callback); // Checks is permissions granted
