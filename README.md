@@ -172,17 +172,43 @@ A React Native bridge module for interacting with Google Fit
     
 7. Blood pressure and Heart rate methods (since version 0.8)
     ```javascript
-       const options = {
-         startDate: "2017-01-01T00:00:17.971Z", // required
-         endDate: new Date().toISOString(), // required
-       }
-       const callback = ((error, resoponse) => {
-       
-       })
-       GoogleFit.getHeartRateSamples(options, callback)
-       GoogleFit.getBloodPressureSamples(options, callback)
+    const options = {
+      startDate: "2017-01-01T00:00:17.971Z", // required
+      endDate: new Date().toISOString(), // required
+    }
+    const callback = ((error, response) => {
+      console.log(error, response)
+    });
+
+    GoogleFit.getHeartRateSamples(options, callback)
+    GoogleFit.getBloodPressureSamples(options, callback)
     ```
+
+    **Response:**
+
+    ```javascript
+    // heart rate
+    [
+      {
+        "value":80,
+        "endDate":"2019-07-26T10:19:21.348Z",
+        "startDate":"2019-07-26T10:19:21.348Z",
+        "day":"Fri"
+      }
+    ]
     
+    // blood pressure
+    [
+      {
+        "value":120,
+        "value2":80,
+        "endDate":"2019-07-26T08:39:28.493Z",
+        "startDate":"1970-01-01T00:00:00.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
 8. Get all activities
     ```javascript
       let options = {
