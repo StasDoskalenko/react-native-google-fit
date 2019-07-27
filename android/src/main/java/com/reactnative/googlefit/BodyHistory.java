@@ -257,7 +257,11 @@ public class BodyHistory {
             // For aggregated weight summary, only the min, max and average values are available (i.e. the
             // most recent sample is not an option), so use average value to maximise the match between values
             // returned here and values as reported by Google Fit app
-            stepMap.putDouble("value", dp.getValue(Field.FIELD_AVERAGE).asFloat());
+            if (this.dataType == DataType.TYPE_WEIGHT) {
+                stepMap.putDouble("value", dp.getValue(Field.FIELD_AVERAGE).asFloat());
+            } else {
+                stepMap.putDouble("value", dp.getValue(Field.FIELD_HEIGHT).asFloat());
+            }
         }
         map.pushMap(stepMap);
     }
