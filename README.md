@@ -70,15 +70,31 @@ A React Native bridge module for interacting with Google Fit
      .catch((err) => {console.warn(err)})
     ```
 
-**Response:**
-
-```javascript
-[
-  { source: "com.google.android.gms:estimated_steps", steps: [] },
-  { source: "com.google.android.gms:merge_step_deltas", steps: [] },
-  { source: "com.xiaomi.hm.health", steps: [] }
-];
-```
+    **Response:**
+    
+    ```javascript
+    [
+      { source: "com.google.android.gms:estimated_steps", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.google.android.gms:merge_step_deltas", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.xiaomi.hm.health", steps: [] }
+    ];
+    ```
 
 4. Retrieve Weights
 
@@ -94,7 +110,26 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
+
+    **Response:**
     
+    ```javascript
+    [
+      {
+        "value":72,
+        "endDate":"2019-06-29T15:02:23.413Z",
+        "startDate":"2019-06-29T15:02:23.413Z",
+        "day":"Sat"
+      },
+      {
+        "value":72.4000015258789,
+        "endDate":"2019-07-26T08:06:42.903Z",
+        "startDate":"2019-07-26T08:06:42.903Z",
+        "day":"Fri"
+      }
+    ]
+    ```
+
 5. Retrieve Heights
 
     ```javascript
@@ -106,6 +141,19 @@ A React Native bridge module for interacting with Google Fit
     GoogleFit.getHeightSamples(opt, (err, res) => {
       console.log(res);
     });
+    ```
+
+    **Response:**
+
+    ```javascript
+    [
+      {
+        "value":1.7699999809265137,
+        "endDate":"2019-06-29T15:02:23.409Z",
+        "startDate":"2019-06-29T15:02:23.409Z",
+        "day":"Sat"
+      }
+    ]
     ```
 
 6. Save Weights
@@ -124,17 +172,43 @@ A React Native bridge module for interacting with Google Fit
     
 7. Blood pressure and Heart rate methods (since version 0.8)
     ```javascript
-       const options = {
-         startDate: "2017-01-01T00:00:17.971Z", // required
-         endDate: new Date().toISOString(), // required
-       }
-       const callback = ((error, resoponse) => {
-       
-       })
-       GoogleFit.getHeartRateSamples(options, callback)
-       GoogleFit.getBloodPressureSamples(options, callback)
+    const options = {
+      startDate: "2017-01-01T00:00:17.971Z", // required
+      endDate: new Date().toISOString(), // required
+    }
+    const callback = ((error, response) => {
+      console.log(error, response)
+    });
+
+    GoogleFit.getHeartRateSamples(options, callback)
+    GoogleFit.getBloodPressureSamples(options, callback)
     ```
-    
+
+    **Response:**
+
+    ```javascript
+    // heart rate
+    [
+      {
+        "value":80,
+        "endDate":"2019-07-26T10:19:21.348Z",
+        "startDate":"2019-07-26T10:19:21.348Z",
+        "day":"Fri"
+      }
+    ]
+
+    // blood pressure
+    [
+      {
+        "value":120,
+        "value2":80,
+        "endDate":"2019-07-26T08:39:28.493Z",
+        "startDate":"1970-01-01T00:00:00.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
 8. Get all activities
     ```javascript
       let options = {
@@ -145,7 +219,9 @@ A React Native bridge module for interacting with Google Fit
         console.log(err, res)
       });
     ```
-    response:
+
+      **Response:**
+    
     ```javascript
      [ { 
       sourceName: 'Android',
@@ -182,25 +258,76 @@ A React Native bridge module for interacting with Google Fit
     Note that optional parametrs are not presented in all activities - only where google fit return some results for this field.
     Like no distance for still activity. 
 
-9. Other methods:
+9. Retrieve Calories For Period
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+        basalCalculation: true, // optional, to calculate or not basalAVG over the week
+      };
+
+      GoogleFit.getDailyCalorieSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "calorie":1721.948974609375,
+        "endDate":"2019-06-27T15:13:27.000Z",
+        "startDate":"2019-06-27T15:02:23.409Z",
+        "day":"Thu"
+      },
+      {
+        "calorie":1598.25,
+        "endDate":"2019-06-28T15:13:27.000Z",
+        "startDate":"2019-06-27T15:13:27.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
+10. Retrieve Distance For Period:
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+      };
+
+      GoogleFit.getDailyDistanceSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "distance":2254.958251953125,
+        "endDate":"2019-06-30T15:45:32.987Z",
+        "startDate":"2019-06-29T16:57:01.047Z",
+        "day":"Sat"
+      },
+      {
+        "distance":3020.439453125,
+        "endDate":"2019-07-01T13:08:31.332Z",
+        "startDate":"2019-06-30T16:58:44.818Z",
+        "day":"Sun"
+      }
+    ]
+    ```
+
+11. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
-    
+
     unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
-    /**
-    * {@see getDailyCalorieSamples}
-    * const options = {
-    *         startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
-    *         endDate: new Date().now(),
-    *         basalCalculation: false,     
-    * }
-    * method to get calories per day, options object could contain basalCalculation (bool) to calculate or not basalAVG over the week
-    */
-    getDailyCalorieSamples(options, callback);
-    
-    getDailyDistanceSamples(options, callback); // method to get daily distance
-    
+
     isAvailable(callback); // Checks is GoogleFit available for current account / installed on device
     
     isEnabled(callback); // Checks is permissions granted
