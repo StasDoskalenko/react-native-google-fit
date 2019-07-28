@@ -29,11 +29,14 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +54,13 @@ public class NutritionHistory {
     private DataSet FoodDataSet;
 
     private static final String TAG = "NutritionHistory";
+    private static final String[] NUTRIENTS_ARRAY = new String[] { Field.NUTRIENT_CALORIES, Field.NUTRIENT_TOTAL_FAT,
+            Field.NUTRIENT_SATURATED_FAT, Field.NUTRIENT_UNSATURATED_FAT, Field.NUTRIENT_POLYUNSATURATED_FAT,
+            Field.NUTRIENT_MONOUNSATURATED_FAT, Field.NUTRIENT_TRANS_FAT, Field.NUTRIENT_CHOLESTEROL,
+            Field.NUTRIENT_SODIUM, Field.NUTRIENT_POTASSIUM, Field.NUTRIENT_TOTAL_CARBS, Field.NUTRIENT_DIETARY_FIBER,
+            Field.NUTRIENT_SUGAR, Field.NUTRIENT_PROTEIN, Field.NUTRIENT_VITAMIN_A, Field.NUTRIENT_VITAMIN_C,
+            Field.NUTRIENT_CALCIUM, Field.NUTRIENT_IRON };
+    public static final Set<String> NUTRIENTS_SET = new HashSet<>(Arrays.asList(NUTRIENTS_ARRAY));
 
     public NutritionHistory(ReactContext reactContext, GoogleFitManager googleFitManager) {
         this.mReactContext = reactContext;
@@ -108,23 +118,7 @@ public class NutritionHistory {
 
             String foodItem = dp.getValue((Field.FIELD_FOOD_ITEM)).asString();
             Integer mealType = dp.getValue((Field.FIELD_MEAL_TYPE)).asInt();
-            String nutrientsJson = dp.getValue((Field.FIELD_NUTRIENTS)).asString();
-            ObjectMapper mapper = new ObjectMapper();
-
-            try {
-
-                // convert JSON string to Map
-                Map<String, String> nutrientsMap = mapper.readValue(nutrientsJson, Map.class);
-
-                // it works
-                // Map<String, String> map = mapper.readValue(json, new
-                // TypeReference<Map<String, String>>() {});
-
-                Log.i(TAG, "\tNutrients map: " + nutrientsMap);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Value nutrients = dp.getValue((Field.FIELD_NUTRIENTS));
 
             WritableMap nutritionMap = Arguments.createMap();
 
@@ -132,9 +126,24 @@ public class NutritionHistory {
             nutritionMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
             nutritionMap.putString("foodItem", foodItem);
             nutritionMap.putInt("mealType", mealType);
+            nutritionMap.putMap("nutrients", getNutrientsAsMap(nutrients));
 
             map.pushMap(nutritionMap);
         }
+    }
+
+    private WritableMap getNutrientsAsMap(Value nutrients) {
+        WritableMap nutrientsMap = Arguments.createMap();
+
+        for (String nutrientKey : NUTRIENTS_SET) {
+            try {
+                Float nutrientVal = nutrients.getKeyValue(nutrientKey);
+                nutrientsMap.putDouble(nutrientKey, nutrientVal);
+            } catch (Exception e) {
+            }
+        }
+
+        return nutrientsMap;
     }
 
     public boolean saveFood(ReadableMap foodSample) {
