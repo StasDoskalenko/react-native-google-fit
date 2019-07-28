@@ -235,7 +235,7 @@ class RNGoogleFit {
       },
       res => {
         if (res.length > 0) {
-          callback(false, prepareResponse(res, 'nutrition'))
+          callback(false, prepareResponse(res, 'nutrients'))
         } else {
           callback('There is no any nutrition data for this period', false)
         }
