@@ -2,7 +2,7 @@
 import { DeviceEventEmitter, NativeModules } from 'react-native';
 
 import PossibleScopes from './src/scopes';
-import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareResponse } from './src/utils';
+import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareDailyResponse, prepareResponse } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
 
@@ -235,7 +235,7 @@ class RNGoogleFit {
       },
       res => {
         if (res.length > 0) {
-          callback(false, prepareResponse(res, 'nutrients'))
+          callback(false, prepareDailyResponse(res))
         } else {
           callback('There is no any nutrition data for this period', false)
         }

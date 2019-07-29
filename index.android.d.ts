@@ -63,12 +63,12 @@ declare module 'react-native-google-fit' {
       callback: (isError: boolean, result: any) => void
     ): void
 
+    saveFood(options: FoodIntake, callback: (isError: boolean) => void): void
+
     getDailyNutritionSamples(
       options: any,
       callback: (isError: boolean, result: any) => void
     ): void
-
-    saveFood(options: FoodIntake, callback: (isError: boolean) => void): void
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
