@@ -19,7 +19,7 @@ def safeExtGet(prop, fallback) {
 
 android {
     compileSdkVersion safeExtGet('compileSdkVersion', 27)
-    buildToolsVersion safeExtGet('buildToolsVersion', '27.0.3')
+    // buildToolsVersion safeExtGet('buildToolsVersion', '27.0.3')
 
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
@@ -32,9 +32,22 @@ android {
     }
 }
 
+repositories {
+    google()
+    mavenLocal()
+    jcenter()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.facebook.react:react-native:+'
+    implementation('com.facebook.react:react-native:+') {
+        exclude group: 'com.android.support'
+    }
+    implementation "com.android.support:appcompat-v7:${safeExtGet('supportLibVersion', '27.0.0')}"
     implementation "com.google.android.gms:play-services-auth:${safeExtGet('authVersion', '+')}"
     implementation "com.google.android.gms:play-services-fitness:${safeExtGet('fitnessVersion', '+')}"
 }

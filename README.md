@@ -321,7 +321,34 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
-11. Other methods:
+11. Retrieve Daily Nutrition Data for Period:
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+      };
+
+      GoogleFit.getDailyNutritionSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "nutrients":{"sugar":14,"sodium":1,"calories":105,"potassium":422},
+        "date":"2019-07-02"
+      },
+      {
+        "nutrients":{"sugar":36,"iron":0,"fat.saturated":3.6000001430511475,"sodium":0.13500000536441803,"fat.total":6,"calories":225,"fat.polyunsaturated":0,"carbs.total":36,"potassium":0.21000000834465027,"cholesterol":0.029999999329447746,"protein":9.299999237060547},
+        "date":"2019-07-25"
+      }
+    ]
+    ```
+
+12. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
