@@ -150,6 +150,23 @@ class RNGoogleFit {
   }
 
   /**
+   * Get the total steps per day over a specified date range.
+   * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @param {Function} callback The function will be called with an array of elements.
+   */
+
+  getUserInputSteps = (options, callback) => {
+    const startDate = !isNil(options.startDate) ? Date.parse(options.startDate) : (new Date()).setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate) ? Date.parse(options.endDate) : (new Date()).valueOf()
+    googleFit.getUserInputSteps(startDate, endDate,
+      (msg) => callback(msg, false),
+      (res) => {
+        callback(null, res);
+      }
+    )
+  }
+
+  /**
    * Get the total distance per day over a specified date range.
    * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
    * @param {function} callback The function will be called with an array of elements.

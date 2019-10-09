@@ -59,6 +59,38 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
+    public void getUserInputSteps(long startTime, long endTime, final Callback successCallback) {
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        final DataReadRequest readRequest = new DataReadRequest.Builder()
+            .read(DataType.TYPE_STEP_COUNT_DELTA)
+            .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+            .build();
+
+        DataReadResult dataReadResult =
+            Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        DataSet stepData = dataReadResult.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
+    
+        int userInputSteps = 0;
+
+        for (DataPoint dp : stepData.getDataPoints()) {
+            for(Field field : dp.getDataType().getFields()) {
+                if("user_input".equals(dp.getOriginalDataSource().getStreamName())){
+                    int steps = dp.getValue(field).asInt();
+                    userInputSteps += steps;
+                }
+            }
+        }
+      
+        successCallback.invoke(userInputSteps);
+    }
+
     public void aggregateDataByDate(long startTime, long endTime, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
