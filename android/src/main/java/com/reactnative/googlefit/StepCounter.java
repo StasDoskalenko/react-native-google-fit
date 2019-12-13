@@ -113,7 +113,7 @@ public class StepCounter implements OnDataPointListener {
                 }
             });*/
 
-            if(type.equals(DataType.TYPE_STEP_COUNT_CUMULATIVE)) {
+            if(type.equals(DataType.TYPE_STEP_COUNT_DELTA)) {
                 WritableMap map = Arguments.createMap();
                 map.putDouble("steps", value.asInt());
                 sendEvent(this.mReactContext, "StepChangedEvent", map);
