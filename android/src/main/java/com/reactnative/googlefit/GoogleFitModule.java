@@ -359,12 +359,25 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getBloodPressureSamples(double startDate,
                                         double endDate,
-                                        Callback errorCallback,
-                                        Callback successCallback) {
+                                 Callback errorCallback,
+                                 Callback successCallback) {
         try {
-            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
-            heartrateHistory.setDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE);
-            successCallback.invoke(heartrateHistory.getHistory((long)startDate, (long)endDate));
+            BloodPressureHistory bloodPressureHistory = mGoogleFitManager.getBloodPressureHistory();
+            ReadableArray result = bloodPressureHistory.getHistory((long)startDate, (long)endDate);
+            successCallback.invoke(result);
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+
+    @ReactMethod
+    public void saveBloodPressure(ReadableMap bloodSample,
+                                  Callback errorCallback,
+                                  Callback successCallback) {
+        try {
+            BloodPressureHistory bodyHistory = mGoogleFitManager.getBloodPressureHistory();
+            successCallback.invoke(bodyHistory.save(bloodSample));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
