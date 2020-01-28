@@ -492,6 +492,23 @@ class RNGoogleFit {
       }
     )
   }
+  
+  saveBloodPressure({ date, ...options }, callback) {
+    googleFit.saveBloodPressure({
+        ...options,
+        date: Date.parse(date)
+      },
+      (msg) => {
+        callback(msg, false)
+      },
+      (res) => {
+        if (res.length > 0) {
+          callback(false, prepareResponse(res, 'value'))
+        } else {
+          callback('There is no any heart rate data for this period', false)
+        }
+      })
+  }
 }
 
 export default new RNGoogleFit()

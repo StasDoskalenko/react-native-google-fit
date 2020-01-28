@@ -24,53 +24,41 @@ import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.HealthDataTypes;
 import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.data.HealthDataTypes;
-import com.google.android.gms.fitness.data.HealthFields;
 
 import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC;
+import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC;
 
-public class HeartrateHistory {
+
+public class BloodPressureHistory {
 
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
     private DataSet Dataset;
-    private DataType dataType;
+    private final DataType dataType = HealthDataTypes.TYPE_BLOOD_PRESSURE;
 
     private static final String TAG = "Weights History";
 
-    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
+    public BloodPressureHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
-        this.dataType = dataType;
     }
 
-    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
-        this(reactContext, googleFitManager, DataType.TYPE_WEIGHT);
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
 
     public ReadableArray getHistory(long startTime, long endTime) {
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
-
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .read(this.dataType)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
-        readRequestBuilder.setLimit(5); // need only one height, since it's unchangable
+        readRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
+
         DataReadRequest readRequest = readRequestBuilder.build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
@@ -97,12 +85,12 @@ public class HeartrateHistory {
 
     public boolean save(ReadableMap sample) {
         this.Dataset = createDataForRequest(
-                this.dataType,    // for height, it would be DataType.TYPE_HEIGHT
+                this.dataType,
                 DataSource.TYPE_RAW,
-                sample.getDouble("value"),                  // weight in kgs, height in metrs
-                (long)sample.getDouble("date"),              // start time
-                (long)sample.getDouble("date"),                // end time
-                TimeUnit.MILLISECONDS                // Time Unit, for example, TimeUnit.MILLISECONDS
+                (float) sample.getDouble("systolic"),
+                (float)sample.getDouble("diastolic"),
+                (long)sample.getDouble("date"),
+                TimeUnit.MILLISECONDS
         );
         new InsertAndVerifyDataTask(this.Dataset).execute();
 
@@ -150,8 +138,6 @@ public class HeartrateHistory {
         }
     }
 
-
-    //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
 
         private DataSet Dataset;
@@ -161,43 +147,20 @@ public class HeartrateHistory {
         }
 
         protected Void doInBackground(Void... params) {
-            // Create a new dataset and insertion request.
             DataSet dataSet = this.Dataset;
-
-            // [START insert_dataset]
-            // Then, invoke the History API to insert the data and await the result, which is
-            // possible here because of the {@link AsyncTask}. Always include a timeout when calling
-            // await() to prevent hanging that can occur from the service being shutdown because
-            // of low memory or other conditions.
-            //Log.i(TAG, "Inserting the dataset in the History API.");
             com.google.android.gms.common.api.Status insertStatus =
                     Fitness.HistoryApi.insertData(googleFitManager.getGoogleApiClient(), dataSet)
                             .await(1, TimeUnit.MINUTES);
 
-            // Before querying the data, check to see if the insertion succeeded.
             if (!insertStatus.isSuccess()) {
-                //Log.i(TAG, "There was a problem inserting the dataset.");
                 return null;
             }
-
-            //Log.i(TAG, "Data insert was successful!");
-
             return null;
         }
     }
 
-    /**
-     * This method creates a dataset object to be able to insert data in google fit
-     * @param dataType DataType Fitness Data Type object
-     * @param dataSourceType int Data Source Id. For example, DataSource.TYPE_RAW
-     * @param value Object Values for the fitness data. They must be int or float
-     * @param startTime long Time when the fitness activity started
-     * @param endTime long Time when the fitness activity finished
-     * @param timeUnit TimeUnit Time unit in which period is expressed
-     * @return
-     */
-    private DataSet createDataForRequest(DataType dataType, int dataSourceType, Double value,
-                                         long startTime, long endTime, TimeUnit timeUnit) {
+    private DataSet createDataForRequest(DataType dataType, int dataSourceType, float systolic,
+                                         float diastolic, long date, TimeUnit timeUnit) {
         DataSource dataSource = new DataSource.Builder()
                 .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
                 .setDataType(dataType)
@@ -205,38 +168,31 @@ public class HeartrateHistory {
                 .build();
 
         DataSet dataSet = DataSet.create(dataSource);
-        DataPoint dataPoint = dataSet.createDataPoint().setTimeInterval(startTime, endTime, timeUnit);
+        DataPoint bloodPressure = DataPoint.create(dataSource);
+        bloodPressure.setTimestamp(date, timeUnit);
+        bloodPressure.getValue(FIELD_BLOOD_PRESSURE_SYSTOLIC).setFloat(systolic);
+        bloodPressure.getValue(FIELD_BLOOD_PRESSURE_DIASTOLIC).setFloat(diastolic);
 
-        float f1 = Float.valueOf(value.toString());
-        dataPoint = dataPoint.setFloatValues(f1);
-
-        dataSet.add(dataPoint);
+        dataSet.add(bloodPressure);
 
         return dataSet;
     }
 
     private void processDataSet(DataSet dataSet, WritableArray map) {
-
-        //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
-        Format formatter = new SimpleDateFormat("EEE");
-//        WritableMap stepMap = Arguments.createMap();
-
         for (DataPoint dp : dataSet.getDataPoints()) {
             WritableMap stepMap = Arguments.createMap();
-            String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            int i = 0;
 
-            for(Field field : dp.getDataType().getFields()) {
-                i++;
-                if (i > 1) continue;
-                stepMap.putString("day", day);
-                stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("value", dp.getValue(field).asFloat());
+            stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
 
 
-                map.pushMap(stepMap);
-            }
+            WritableArray measurement = Arguments.createArray();
+            measurement.pushDouble(dp.getValue(FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
+            measurement.pushDouble(dp.getValue(FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
+
+            stepMap.putArray("value", measurement);
+
+            map.pushMap(stepMap);
         }
     }
 
