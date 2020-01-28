@@ -2,8 +2,11 @@
 declare module 'react-native-google-fit' {
   export interface GoogleFit {
     eventListeners: any[]
+    isAuthorized: boolean
 
     authorize(options?: AuthorizeOptions): Promise<any> | void
+
+    checkIsAuthorized: () => Promise<void>
 
     disconnect(): void
 
