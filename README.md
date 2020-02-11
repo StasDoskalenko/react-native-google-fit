@@ -116,12 +116,14 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     [
       {
+        "addedBy": "app_package_name",
         "value":72,
         "endDate":"2019-06-29T15:02:23.413Z",
         "startDate":"2019-06-29T15:02:23.413Z",
         "day":"Sat"
       },
       {
+        "addedBy": "app_package_name",
         "value":72.4000015258789,
         "endDate":"2019-07-26T08:06:42.903Z",
         "startDate":"2019-07-26T08:06:42.903Z",
@@ -148,6 +150,7 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     [
       {
+        "addedBy": "app_package_name",
         "value":1.7699999809265137,
         "endDate":"2019-06-29T15:02:23.409Z",
         "startDate":"2019-06-29T15:02:23.409Z",
@@ -348,7 +351,71 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
-12. Other methods:
+12. Retrieve Hydration
+
+    ```javascript
+    const startDate = '2020-01-05T00:00:17.971Z'; // required
+    const endDate = new Date().toISOString(); // required
+
+    oogleFit.getHydrationSamples(startDate, endDate, (err, res) => {
+      console.log(res);
+    });
+    ```
+
+    **Response:**
+
+    ```javascript
+    [
+      {
+        "addedBy": "app_package_name",
+        "date": "2020-02-01T00:00:00.000Z",
+        "waterConsumed": "0.225"
+      },
+      {
+        "addedBy": "app_package_name",
+        "date": "2020-02-02T00:00:00.000Z",
+        "waterConsumed": "0.325"
+      },
+    ]
+    ```
+
+13. Save Hydration
+    This method can update hydration data.
+    An app cannot update data inserted by other apps.
+
+    ```javascript
+    const hydrationArray = [
+      {
+        date: Date.parse('2020-02-01'), // timestamp, required
+        waterConsumed: 0.225, // hydration data for a 0.225 liter drink of water, required
+      },
+      {
+        date: Date.parse('2020-02-02'),
+        waterConsumed: 0.325,
+      },
+    ];
+
+    GoogleFit.saveHydration(hydrationArray, (err, res) => {
+      if (err) throw "Cant save data to the Google Fit";
+    });
+    ```
+
+14. Delete Hydration
+    An app cannot delete data inserted by other apps.
+    startDate and endDate MUST not be the same.
+
+    ```javascript
+    const options = {
+      startDate: '2020-01-01T12:33:18.873Z', // required
+      endDate: new Date().toISOString(), // required
+    };
+
+    GoogleFit.deleteHydration(options, (err, res) => {
+      console.log(res);
+    });
+    ```
+
+15. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
@@ -359,15 +426,13 @@ A React Native bridge module for interacting with Google Fit
     
     isEnabled(callback); // Checks is permissions granted
     
-    deleteWeight(options, callback); // method to delete weights by options (same as in save weights)
+    deleteWeight(options, callback); // method to delete weights by options (same as in delete hydration)
  
     openFit(); //method to open google fit app
     
     saveHeight(options, callback);
  
-    deleteHeight(options, callback);
- 
-    deleteWeight(options, callback);
+    deleteHeight(options, callback); // method to delete heights by options (same as in delete hydration)
  
     disconnect(); // Closes the connection to Google Play services.
     ```

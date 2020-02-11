@@ -1,6 +1,9 @@
 ### Changelog:
 
 ```
+0.10.0  + Implement hydration
+        ~ Fix weight and height deletion
+
 0.9.17  ~ observeSteps fix (kudos to @nojas01)
         ~ Fix disconnect method (kudos to @AylanBoscarino)
         ~ better React Native 0.60 support (kudos to @spacekadet)

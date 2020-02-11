@@ -26,7 +26,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.LifecycleEventListener;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.HealthDataTypes;
@@ -380,6 +379,39 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
             heartrateHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
             successCallback.invoke(heartrateHistory.getHistory((long)startDate, (long)endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void getHydrationSamples(double startDate,
+                                    double endDate,
+                                    Callback errorCallback,
+                                    Callback successCallback) {
+        try {
+            successCallback.invoke(mGoogleFitManager.getHydrationHistory().getHistory((long) startDate, (long) endDate));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    @ReactMethod
+    public void saveHydration(ReadableArray hydrationArray,
+                           Callback errorCallback,
+                           Callback successCallback) {
+        try {
+            HydrationHistory hydrationHistory = mGoogleFitManager.getHydrationHistory();
+            successCallback.invoke(hydrationHistory.save(hydrationArray));
+        } catch (IllegalViewOperationException e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+    @ReactMethod
+    public void deleteHydration(ReadableMap options, Callback errorCallback, Callback successCallback) {
+        try {
+            HydrationHistory hydrationHistory = mGoogleFitManager.getHydrationHistory();
+            successCallback.invoke(hydrationHistory.delete(options));
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }

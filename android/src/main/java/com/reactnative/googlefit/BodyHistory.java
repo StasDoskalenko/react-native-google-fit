@@ -25,11 +25,8 @@ import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.request.DataDeleteRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.data.HealthDataTypes;
-import com.google.android.gms.fitness.data.HealthFields;
 
 import java.text.DateFormat;
 import java.text.Format;
@@ -70,17 +67,17 @@ public class BodyHistory {
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
         if (this.dataType == DataType.TYPE_WEIGHT) {
-            // In general here we want to set the bucket size to the smallest possible allowed, in case the 
+            // In general here we want to set the bucket size to the smallest possible allowed, in case the
             // user weighs themselves in a short interval (e.g. before and after a meal)
             //
-            // The Google Fit API seems to have a limit of around 3,000 as the maximum number of buckets that 
-            // can be returned in an aggregated query - anything more than this and the fitness API takes 
+            // The Google Fit API seems to have a limit of around 3,000 as the maximum number of buckets that
+            // can be returned in an aggregated query - anything more than this and the fitness API takes
             // ages to respond and/or no response at all on both Galaxy S5 (6.0.1) and Huawei P9 Lite (7.0)
             //
             // So, divide the time range by 2,000 to be on the safe side
             long bucketSizeMillis = (endTime - startTime) / 2000;
 
-            // We don't need any finer granularity than 1 minute, so make buckets at least this size to keep 
+            // We don't need any finer granularity than 1 minute, so make buckets at least this size to keep
             // the number of buckets low if not much time has elapsed since the last query
             bucketSizeMillis = Math.max(bucketSizeMillis, 60 * 1000);
 
@@ -131,46 +128,11 @@ public class BodyHistory {
     }
 
     public boolean delete(ReadableMap sample) {
-        long endTime = (long) sample.getDouble("endTime");
-        long startTime = (long) sample.getDouble("startTime");
-        new DeleteDataTask(startTime, endTime, this.dataType).execute();
+        long endTime = (long) sample.getDouble("endDate");
+        long startTime = (long) sample.getDouble("startDate");
+        new DeleteDataHelper(startTime, endTime, this.dataType, googleFitManager).execute();
         return true;
     }
-
-    //Async fit data delete
-    private class DeleteDataTask extends AsyncTask<Void, Void, Void> {
-
-        long startTime;
-        long endTime;
-        DataType dataType;
-
-        DeleteDataTask(long startTime, long endTime, DataType dataType) {
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            DataDeleteRequest request = new DataDeleteRequest.Builder()
-                    .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
-                    .addDataType(this.dataType)
-                    .build();
-
-            com.google.android.gms.common.api.Status insertStatus =
-                    Fitness.HistoryApi.deleteData(googleFitManager.getGoogleApiClient(), request)
-                            .await(1, TimeUnit.MINUTES);
-
-            if (insertStatus.isSuccess()) {
-                Log.w("myLog", "+Successfully deleted data.");
-            } else {
-                Log.w("myLog", "+Failed to delete data.");
-            }
-
-            return null;
-        }
-    }
-
 
     //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
@@ -240,14 +202,15 @@ public class BodyHistory {
         //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         Format formatter = new SimpleDateFormat("EEE");
 
-        WritableMap stepMap = Arguments.createMap();
+        WritableMap bodyMap = Arguments.createMap();
 
         for (DataPoint dp : dataSet.getDataPoints()) {
             String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
 
-            stepMap.putString("day", day);
-            stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-            stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+            bodyMap.putString("day", day);
+            bodyMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
+            bodyMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
+            bodyMap.putString("addedBy", dp.getOriginalDataSource().getAppPackageName());
 
             // When there is a short interval between weight readings (< 1 hour or so), some phones e.g.
             // Galaxy S5 use the average of the readings, whereas other phones e.g. Huawei P9 Lite use the
@@ -258,12 +221,12 @@ public class BodyHistory {
             // most recent sample is not an option), so use average value to maximise the match between values
             // returned here and values as reported by Google Fit app
             if (this.dataType == DataType.TYPE_WEIGHT) {
-                stepMap.putDouble("value", dp.getValue(Field.FIELD_AVERAGE).asFloat());
+                bodyMap.putDouble("value", dp.getValue(Field.FIELD_AVERAGE).asFloat());
             } else {
-                stepMap.putDouble("value", dp.getValue(Field.FIELD_HEIGHT).asFloat());
+                bodyMap.putDouble("value", dp.getValue(Field.FIELD_HEIGHT).asFloat());
             }
         }
-        map.pushMap(stepMap);
+        map.pushMap(bodyMap);
     }
 
 }

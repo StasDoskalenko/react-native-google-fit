@@ -2,7 +2,14 @@
 import { DeviceEventEmitter, NativeModules } from 'react-native';
 
 import PossibleScopes from './src/scopes';
-import { buildDailySteps, isNil, KgToLbs, lbsAndOzToK, prepareDailyResponse, prepareResponse } from './src/utils';
+import {
+  buildDailySteps,
+  isNil, KgToLbs,
+  lbsAndOzToK,
+  prepareDailyResponse,
+  prepareResponse,
+  prepareHydrationResponse,
+} from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
 
@@ -365,7 +372,8 @@ class RNGoogleFit {
     if (options.unit === 'pound') {
       options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
     }
-    options.date = Date.parse(options.date)
+    options.startDate = Date.parse(options.startDate)
+    options.endDate = Date.parse(options.endDate)
     googleFit.deleteWeight(
       options,
       msg => {
@@ -378,7 +386,8 @@ class RNGoogleFit {
   }
 
   deleteHeight = (options, callback) => {
-    options.date = Date.parse(options.date)
+    options.startDate = Date.parse(options.startDate)
+    options.endDate = Date.parse(options.endDate)
     googleFit.deleteWeight(
       options,
       msg => {
@@ -489,6 +498,56 @@ class RNGoogleFit {
         } else {
           callback('There is no any heart rate data for this period', false)
         }
+      }
+    )
+  }
+
+  getHydrationSamples = (startDate, endDate, callback) => {
+    startDate = !isNil(startDate)
+      ? Date.parse(startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    endDate = !isNil(endDate)
+      ? Date.parse(endDate)
+      : new Date().valueOf()
+    googleFit.getHydrationSamples(
+      startDate,
+      endDate,
+      msg => callback(msg, false),
+      res => {
+        if (res.length > 0) {
+          callback(
+            false,
+            prepareHydrationResponse(res)
+          )
+        } else {
+          callback('There is no any hydration data for this period', false)
+        }
+      }
+    )
+  }
+
+  saveHydration(hydrationArray, callback) {
+    googleFit.saveHydration(
+      hydrationArray,
+      msg => {
+        callback(msg, false)
+      },
+      res => {
+        callback(false, res)
+      }
+    )
+  }
+
+  deleteHydration = (options, callback) => {
+    options.startDate = Date.parse(options.startDate)
+    options.endDate = Date.parse(options.endDate)
+    googleFit.deleteHydration(
+      options,
+      msg => {
+        callback(msg, false)
+      },
+      res => {
+        callback(false, res)
       }
     )
   }
