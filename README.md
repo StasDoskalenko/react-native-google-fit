@@ -352,6 +352,7 @@ A React Native bridge module for interacting with Google Fit
     ```
 
 12. Retrieve Hydration
+
     You need to add `FITNESS_NUTRITION_READ_WRITE` scope to your authorization to work with hydration.
     ```javascript
     const startDate = '2020-01-05T00:00:17.971Z'; // required
@@ -380,6 +381,7 @@ A React Native bridge module for interacting with Google Fit
     ```
 
 13. Save Hydration
+
     This method can update hydration data.
     An app cannot update data inserted by other apps.
 
@@ -401,6 +403,7 @@ A React Native bridge module for interacting with Google Fit
     ```
 
 14. Delete Hydration
+
     An app cannot delete data inserted by other apps.
     startDate and endDate MUST not be the same.
 
