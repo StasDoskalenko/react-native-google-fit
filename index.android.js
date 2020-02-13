@@ -511,14 +511,10 @@ class RNGoogleFit {
       endDate,
       msg => callback(true, msg),
       res => {
-        if (res.length > 0) {
-          callback(
-            false,
-            prepareHydrationResponse(res)
-          )
-        } else {
-          callback(true, 'There is no any hydration data for this period')
-        }
+        callback(
+          false,
+          prepareHydrationResponse(res)
+        )
       }
     )
   }
