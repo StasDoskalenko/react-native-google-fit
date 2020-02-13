@@ -409,8 +409,8 @@ A React Native bridge module for interacting with Google Fit
 
     ```javascript
     const options = {
-      startDate: '2020-01-01T12:33:18.873Z', // required
-      endDate: new Date().toISOString(), // required
+      startDate: '2020-01-01T12:33:18.873Z', // required, timestamp or ISO8601 string
+      endDate: new Date().toISOString(), // required, timestamp or ISO8601 string
     };
 
     GoogleFit.deleteHydration(options, (err, res) => {
