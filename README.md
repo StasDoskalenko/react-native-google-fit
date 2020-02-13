@@ -388,8 +388,8 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     const hydrationArray = [
       {
-        date: Date.parse('2020-02-01'), // timestamp, required
-        waterConsumed: 0.225, // hydration data for a 0.225 liter drink of water, required
+        date: Date.parse('2020-02-01'), // required, timestamp
+        waterConsumed: 0.225, // required, hydration data for a 0.225 liter drink of water
       },
       {
         date: Date.parse('2020-02-02'),
