@@ -25,6 +25,7 @@ public class HydrationHistory {
   private GoogleFitManager googleFitManager;
 
   private static final String TAG = "HydrationHistory";
+  private static final int MAX_DATAPOINTS_PER_SINGLE_REQUEST = 900;
   private DataType dataType = DataType.TYPE_HYDRATION;
 
   public HydrationHistory(ReactContext reactContext, GoogleFitManager googleFitManager) {
@@ -87,7 +88,7 @@ public class HydrationHistory {
           .setField(Field.FIELD_VOLUME, (float) hydrationSample.getDouble("waterConsumed"))
           .build());
       }
-      if (dataPoints.size() % 900 == 0) {
+      if (dataPoints.size() % MAX_DATAPOINTS_PER_SINGLE_REQUEST == 0) {
         // Be sure to limit each individual request to 1000 datapoints. Exceeding this limit could result in an error.
         // https://developers.google.com/fit/android/history#insert_data
         dataSets.add(DataSet.builder(hydrationSource).addAll(dataPoints).build());
