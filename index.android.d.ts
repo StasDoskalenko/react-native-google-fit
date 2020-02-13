@@ -205,8 +205,8 @@ declare module 'react-native-google-fit' {
   }
 
   export interface DeleteOptions {
-    startDate: string
-    endDate: string
+    startDate: string | number
+    endDate: string | number
   }
 
   export enum MealType {

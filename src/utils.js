@@ -65,3 +65,11 @@ function getFormattedDate(date) {
   const year = date.getFullYear()
   return year + '-' + month + '-' + day
 }
+
+export function prepareDeleteOptions(options) {
+  return {
+    ...options,
+    startDate: typeof options.startDate !== 'number' ? Date.parse(options.startDate) : options.startDate,
+    endDate: typeof options.endDate !== 'number' ? Date.parse(options.endDate) : options.endDate,
+  }
+}

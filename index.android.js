@@ -9,6 +9,7 @@ import {
   prepareDailyResponse,
   prepareResponse,
   prepareHydrationResponse,
+  prepareDeleteOptions,
 } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
@@ -372,10 +373,8 @@ class RNGoogleFit {
     if (options.unit === 'pound') {
       options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
     }
-    options.startDate = Date.parse(options.startDate)
-    options.endDate = Date.parse(options.endDate)
     googleFit.deleteWeight(
-      options,
+      prepareDeleteOptions(options),
       msg => {
         callback(msg, false)
       },
@@ -386,10 +385,8 @@ class RNGoogleFit {
   }
 
   deleteHeight = (options, callback) => {
-    options.startDate = Date.parse(options.startDate)
-    options.endDate = Date.parse(options.endDate)
     googleFit.deleteWeight(
-      options,
+      prepareDeleteOptions(options),
       msg => {
         callback(msg, false)
       },
@@ -512,7 +509,7 @@ class RNGoogleFit {
     googleFit.getHydrationSamples(
       startDate,
       endDate,
-      msg => callback(msg, false),
+      msg => callback(true, msg),
       res => {
         if (res.length > 0) {
           callback(
@@ -520,7 +517,7 @@ class RNGoogleFit {
             prepareHydrationResponse(res)
           )
         } else {
-          callback('There is no any hydration data for this period', false)
+          callback(true, 'There is no any hydration data for this period')
         }
       }
     )
@@ -530,7 +527,7 @@ class RNGoogleFit {
     googleFit.saveHydration(
       hydrationArray,
       msg => {
-        callback(msg, false)
+        callback(true, msg)
       },
       res => {
         callback(false, res)
@@ -539,10 +536,8 @@ class RNGoogleFit {
   }
 
   deleteHydration = (options, callback) => {
-    options.startDate = Date.parse(options.startDate)
-    options.endDate = Date.parse(options.endDate)
     googleFit.deleteHydration(
-      options,
+      prepareDeleteOptions(options),
       msg => {
         callback(msg, false)
       },
