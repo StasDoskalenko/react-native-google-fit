@@ -4,7 +4,8 @@ import { DeviceEventEmitter, NativeModules } from 'react-native';
 import PossibleScopes from './src/scopes';
 import {
   buildDailySteps,
-  isNil, KgToLbs,
+  isNil,
+  KgToLbs,
   lbsAndOzToK,
   prepareDailyResponse,
   prepareResponse,
