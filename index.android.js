@@ -71,7 +71,7 @@ class RNGoogleFit {
    * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
    * and check for {recording: true} as the event data
    */
-  startRecording = (callback, dataTypes = ['step', 'distance']) => {
+  startRecording = (callback, dataTypes = ['step']) => {
     googleFit.startFitnessRecording(dataTypes)
 
     const eventListeners = dataTypes.map(dataTypeName => {
