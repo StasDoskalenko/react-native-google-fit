@@ -4,7 +4,7 @@ declare module 'react-native-google-fit' {
     eventListeners: any[]
     isAuthorized: boolean
 
-    authorize(options?: AuthorizeOptions): Promise<any> | void
+    authorize(options?: AuthorizeOptions): Promise<any>
 
     checkIsAuthorized: () => Promise<void>
 
@@ -126,7 +126,28 @@ declare module 'react-native-google-fit' {
     ) => void
 
     deleteWeight: (
-      options: any,
+      options: DeleteOptions,
+      callback: (isError: boolean, result: any) => void
+    ) => void
+
+    deleteHeight: (
+      options: DeleteOptions,
+      callback: (isError: boolean, result: any) => void
+    ) => void
+
+    getHydrationSamples: (
+      startDate: string,
+      endDate: string,
+      callback: (isError: boolean, result: HydrationSample[] | string) => void
+    ) => void
+
+    saveHydration: (
+      hydrationArray: Hydration[],
+      callback: (isError: boolean, result: any) => void
+    ) => void
+
+    deleteHydration: (
+      options: DeleteOptions,
       callback: (isError: boolean, result: any) => void
     ) => void
 
@@ -154,10 +175,17 @@ declare module 'react-native-google-fit' {
   }
 
   export interface WeightSample {
+    addedBy: string
     day: string
     value: number
     startDate: string
     endDate: string
+  }
+
+  export interface HydrationSample {
+    addedBy: string
+    waterConsumed: number
+    date: string
   }
 
   export interface FoodIntake {
@@ -169,6 +197,16 @@ declare module 'react-native-google-fit' {
 
   export interface AuthorizeOptions {
     scopes: Array<Scopes>
+  }
+
+  export interface Hydration {
+    date: number
+    waterConsumed: number
+  }
+
+  export interface DeleteOptions {
+    startDate: string | number
+    endDate: string | number
   }
 
   export enum MealType {

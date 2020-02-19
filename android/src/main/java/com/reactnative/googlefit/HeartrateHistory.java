@@ -116,44 +116,9 @@ public class HeartrateHistory {
     public boolean delete(ReadableMap sample) {
         long endTime = (long) sample.getDouble("endTime");
         long startTime = (long) sample.getDouble("startTime");
-        new DeleteDataTask(startTime, endTime, this.dataType).execute();
+        new DeleteDataHelper(startTime, endTime, this.dataType, googleFitManager).execute();
         return true;
     }
-
-    //Async fit data delete
-    private class DeleteDataTask extends AsyncTask<Void, Void, Void> {
-
-        long startTime;
-        long endTime;
-        DataType dataType;
-
-        DeleteDataTask(long startTime, long endTime, DataType dataType) {
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            DataDeleteRequest request = new DataDeleteRequest.Builder()
-                    .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
-                    .addDataType(this.dataType)
-                    .build();
-
-            com.google.android.gms.common.api.Status insertStatus =
-                    Fitness.HistoryApi.deleteData(googleFitManager.getGoogleApiClient(), request)
-                            .await(1, TimeUnit.MINUTES);
-
-            if (insertStatus.isSuccess()) {
-                Log.w("myLog", "+Successfully deleted data.");
-            } else {
-                Log.w("myLog", "+Failed to delete data.");
-            }
-
-            return null;
-        }
-    }
-
 
     //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {

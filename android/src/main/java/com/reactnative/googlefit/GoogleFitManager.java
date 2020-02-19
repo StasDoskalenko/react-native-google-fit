@@ -59,6 +59,7 @@ public class GoogleFitManager implements
     private StepSensor stepSensor;
     private RecordingApi recordingApi;
     private ActivityHistory activityHistory;
+    private HydrationHistory hydrationHistory;
 
     private static final String TAG = "RNGoogleFit";
 
@@ -79,6 +80,7 @@ public class GoogleFitManager implements
         this.nutritionHistory = new NutritionHistory(mReactContext, this);
         this.recordingApi = new RecordingApi(mReactContext, this);
         this.activityHistory = new ActivityHistory(mReactContext, this);
+        this.hydrationHistory = new HydrationHistory(mReactContext, this);
         //        this.stepSensor = new StepSensor(mReactContext, activity);
     }
 
@@ -120,6 +122,8 @@ public class GoogleFitManager implements
     public CalorieHistory getCalorieHistory() { return calorieHistory; }
 
     public NutritionHistory getNutritionHistory() { return nutritionHistory; }
+
+    public HydrationHistory getHydrationHistory() { return hydrationHistory; }
 
     public void authorize(ArrayList<String> userScopes) {
         final ReactContext mReactContext = this.mReactContext;

@@ -51,9 +51,25 @@ export function prepareDailyResponse(response) {
   })
 }
 
+export function prepareHydrationResponse(response) {
+  return response.map(el => {
+    el.date = new Date(el.date).toISOString()
+    el.waterConsumed = Number(el.waterConsumed).toFixed(3)
+    return el
+  })
+}
+
 function getFormattedDate(date) {
   const day = ('0' + date.getDate()).slice(-2)
   const month = ('0' + (date.getMonth() + 1)).slice(-2)
   const year = date.getFullYear()
   return year + '-' + month + '-' + day
+}
+
+export function prepareDeleteOptions(options) {
+  return {
+    ...options,
+    startDate: typeof options.startDate !== 'number' ? Date.parse(options.startDate) : options.startDate,
+    endDate: typeof options.endDate !== 'number' ? Date.parse(options.endDate) : options.endDate,
+  }
 }
