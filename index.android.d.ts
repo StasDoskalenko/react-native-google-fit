@@ -138,7 +138,7 @@ declare module 'react-native-google-fit' {
     getHydrationSamples: (
       startDate: string,
       endDate: string,
-      callback: (isError: boolean, result: HydrationSample[]) => void
+      callback: (isError: boolean, result: HydrationSample[] | string) => void
     ) => void
 
     saveHydration: (
