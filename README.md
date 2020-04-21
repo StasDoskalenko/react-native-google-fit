@@ -4,85 +4,61 @@
 
 A React Native bridge module for interacting with Google Fit
 
-### Getting started
+# Quick Links
+- [Installation](/docs/INSTALLATION.md)
+- [Changelog](/docs/CHANGELOG.md)
+- [Example app](https://github.com/StasDoskalenko/react-native-google-fit-example)
+- [F.A.Q.](/docs/FAQ.md)
 
-`$ npm install react-native-google-fit --save`
-
-### Enable Google Fitness API for your application
-
-In order for your app to communicate properly with the Google Fitness API you need to enable Google Fit API in your Google API Console.
-Also you need to generate new client ID for your app and provide both debug and release SHA keys.
-Another step is to configure the consent screen, etc.
-
-More detailed info available at
-https://developers.google.com/fit/android/get-api-key
-
-```
-1. In order for the library to work correctly, you'll need following SDK setups:
-   
-   Android Support Repository
-   Android Support Library
-   Google Play services
-   Google Repository
-   Google Play APK Expansion Library
-   
-2. In order for your app to communicate properly with the Google Fitness API,
-   you need to provide the SHA1 sum of the certificate used for signing your
-   application to Google. This will enable the GoogleFit plugin to communicate
-   with the Fit application in each smartphone where the application is installed.
-   https://developers.google.com/fit/android/get-api-key
-```
-
-### Mostly Automatic installation
-
-`$ react-native link react-native-google-fit`
-
-then pass your package name to the module in MainApplication.java (google fit requires package name to save data)
-
-`new GoogleFitPackage(BuildConfig.APPLICATION_ID)`
-_**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
-
-### Manual installation
-
-1. Open up `android/app/src/main/java/[...]/MainApplication.java`
-
-    * Add `import com.reactnative.googlefit.GoogleFitPackage;` to the imports at the top of the file
-    * Add `new GoogleFitPackage(BuildConfig.APPLICATION_ID),` to the list returned by the `getPackages()` method.
-    _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
-
-2. Append the following lines to `android/settings.gradle`:
-   ```
-   include ':react-native-google-fit'
-   project(':react-native-google-fit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-google-fit/android')
-   ```
-3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-
-   ```
-     compile project(':react-native-google-fit')
-   ```
 
 ### USAGE
 
-1. `import GoogleFit from 'react-native-google-fit';`
+1. `import GoogleFit, { Scopes } from 'react-native-google-fit'`
 
 2. Authorize:
 
+    To check whethere GoogleFit is already authorized, simply use a function
+    ```
+        GoogleFit.checkIsAuthorized()
+    ```
+    Then you can simply refer to `GoogleFit.isAuthorized` boolean.
+    
     ```javascript
-    GoogleFit.onAuthorize(() => {
-      dispatch('AUTH SUCCESS');
-    });
-    
-    GoogleFit.onAuthorizeFailure(() => {
-      dispatch('AUTH ERROR');
-    });
-    
-    GoogleFit.authorize();
+    // The list of available scopes inside of src/scopes.js file
+    const options = {
+      scopes: [
+        Scopes.FITNESS_ACTIVITY_READ_WRITE,
+        Scopes.FITNESS_BODY_READ_WRITE,
+      ],
+    }
+    GoogleFit.authorize(options)
+      .then(authResult => {
+        if (authResult.success) {
+          dispatch("AUTH_SUCCESS");
+        } else {
+          dispatch("AUTH_DENIED", authResult.message);
+        }
+      })
+      .catch(() => {
+        dispatch("AUTH_ERROR");
+      })
     
     // ...
     // Call when authorized
     GoogleFit.startRecording((callback) => {
       // Process data from Google Fit Recording API (no google fit app needed)
     });
+    ```
+    
+    Alternatively you can use event listeners (deprecated)
+    ```javascript
+     GoogleFit.onAuthorize(() => {
+       dispatch('AUTH SUCCESS')
+     })
+         
+     GoogleFit.onAuthorizeFailure(() => {
+       dispatch('AUTH ERROR')
+     })
     ```
 
 3. Retrieve Steps For Period
@@ -93,24 +69,38 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
       endDate: new Date().toISOString() // required ISO8601Timestamp
     };
     
-    GoogleFit.getDailyStepCountSamples(options, (err, res) => {
-      if (err) {
-        throw err;
-      }
-    
-      console.log("Daily steps >>>", res);
-    });
+    GoogleFit.getDailyStepCountSamples(options)
+     .then((res) => {
+         console.log('Daily steps >>> ', res)
+     })
+     .catch((err) => {console.warn(err)})
     ```
 
-**Response:**
-
-```javascript
-[
-  { source: "com.google.android.gms:estimated_steps", steps: [] },
-  { source: "com.google.android.gms:merge_step_deltas", steps: [] },
-  { source: "com.xiaomi.hm.health", steps: [] }
-];
-```
+    **Response:**
+    
+    ```javascript
+    [
+      { source: "com.google.android.gms:estimated_steps", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.google.android.gms:merge_step_deltas", steps: [
+        {
+          "date":"2019-06-29","value":2328
+        },
+        {
+          "date":"2019-06-30","value":8010
+          }
+        ]
+      },
+      { source: "com.xiaomi.hm.health", steps: [] }
+    ];
+    ```
 
 4. Retrieve Weights
 
@@ -126,7 +116,28 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
       console.log(res);
     });
     ```
+
+    **Response:**
     
+    ```javascript
+    [
+      {
+        "addedBy": "app_package_name",
+        "value":72,
+        "endDate":"2019-06-29T15:02:23.413Z",
+        "startDate":"2019-06-29T15:02:23.413Z",
+        "day":"Sat"
+      },
+      {
+        "addedBy": "app_package_name",
+        "value":72.4000015258789,
+        "endDate":"2019-07-26T08:06:42.903Z",
+        "startDate":"2019-07-26T08:06:42.903Z",
+        "day":"Fri"
+      }
+    ]
+    ```
+
 5. Retrieve Heights
 
     ```javascript
@@ -138,6 +149,20 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
     GoogleFit.getHeightSamples(opt, (err, res) => {
       console.log(res);
     });
+    ```
+
+    **Response:**
+
+    ```javascript
+    [
+      {
+        "addedBy": "app_package_name",
+        "value":1.7699999809265137,
+        "endDate":"2019-06-29T15:02:23.409Z",
+        "startDate":"2019-06-29T15:02:23.409Z",
+        "day":"Sat"
+      }
+    ]
     ```
 
 6. Save Weights
@@ -154,7 +179,46 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
     });
     ```
     
-7. Get all activities
+7. Blood pressure and Heart rate methods (since version 0.8)
+    ```javascript
+    const options = {
+      startDate: "2017-01-01T00:00:17.971Z", // required
+      endDate: new Date().toISOString(), // required
+    }
+    const callback = ((error, response) => {
+      console.log(error, response)
+    });
+
+    GoogleFit.getHeartRateSamples(options, callback)
+    GoogleFit.getBloodPressureSamples(options, callback)
+    ```
+
+    **Response:**
+
+    ```javascript
+    // heart rate
+    [
+      {
+        "value":80,
+        "endDate":"2019-07-26T10:19:21.348Z",
+        "startDate":"2019-07-26T10:19:21.348Z",
+        "day":"Fri"
+      }
+    ]
+
+    // blood pressure
+    [
+      {
+        "value":120,
+        "value2":80,
+        "endDate":"2019-07-26T08:39:28.493Z",
+        "startDate":"1970-01-01T00:00:00.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
+8. Get all activities
     ```javascript
       let options = {
         startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
@@ -164,7 +228,9 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
         console.log(err, res)
       });
     ```
-    response:
+
+      **Response:**
+    
     ```javascript
      [ { 
       sourceName: 'Android',
@@ -201,92 +267,184 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
     Note that optional parametrs are not presented in all activities - only where google fit return some results for this field.
     Like no distance for still activity. 
 
-8. Other methods:
+9. Retrieve Calories For Period
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+        basalCalculation: true, // optional, to calculate or not basalAVG over the week
+      };
+
+      GoogleFit.getDailyCalorieSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "calorie":1721.948974609375,
+        "endDate":"2019-06-27T15:13:27.000Z",
+        "startDate":"2019-06-27T15:02:23.409Z",
+        "day":"Thu"
+      },
+      {
+        "calorie":1598.25,
+        "endDate":"2019-06-28T15:13:27.000Z",
+        "startDate":"2019-06-27T15:13:27.000Z",
+        "day":"Thu"
+      }
+    ]
+    ```
+
+10. Retrieve Distance For Period:
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+      };
+
+      GoogleFit.getDailyDistanceSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "distance":2254.958251953125,
+        "endDate":"2019-06-30T15:45:32.987Z",
+        "startDate":"2019-06-29T16:57:01.047Z",
+        "day":"Sat"
+      },
+      {
+        "distance":3020.439453125,
+        "endDate":"2019-07-01T13:08:31.332Z",
+        "startDate":"2019-06-30T16:58:44.818Z",
+        "day":"Sun"
+      }
+    ]
+    ```
+
+11. Retrieve Daily Nutrition Data for Period:
+    ```javascript
+      const opt = {
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+      };
+
+      GoogleFit.getDailyNutritionSamples(opt, (err, res) => {
+        console.log(res);
+      });
+    ```
+
+    **Response:**
+    
+    ```javascript
+    [
+      {
+        "nutrients":{"sugar":14,"sodium":1,"calories":105,"potassium":422},
+        "date":"2019-07-02"
+      },
+      {
+        "nutrients":{"sugar":36,"iron":0,"fat.saturated":3.6000001430511475,"sodium":0.13500000536441803,"fat.total":6,"calories":225,"fat.polyunsaturated":0,"carbs.total":36,"potassium":0.21000000834465027,"cholesterol":0.029999999329447746,"protein":9.299999237060547},
+        "date":"2019-07-25"
+      }
+    ]
+    ```
+
+12. Retrieve Hydration
+
+    You need to add `FITNESS_NUTRITION_READ_WRITE` scope to your authorization to work with hydration.
+    ```javascript
+    const startDate = '2020-01-05T00:00:17.971Z'; // required
+    const endDate = new Date().toISOString(); // required
+
+    oogleFit.getHydrationSamples(startDate, endDate, (err, res) => {
+      console.log(res);
+    });
+    ```
+
+    **Response:**
+
+    ```javascript
+    [
+      {
+        "addedBy": "app_package_name",
+        "date": "2020-02-01T00:00:00.000Z",
+        "waterConsumed": "0.225"
+      },
+      {
+        "addedBy": "app_package_name",
+        "date": "2020-02-02T00:00:00.000Z",
+        "waterConsumed": "0.325"
+      },
+    ]
+    ```
+
+13. Save Hydration
+
+    This method can update hydration data.
+    An app cannot update data inserted by other apps.
+
+    ```javascript
+    const hydrationArray = [
+      {
+        date: Date.parse('2020-02-01'), // required, timestamp
+        waterConsumed: 0.225, // required, hydration data for a 0.225 liter drink of water
+      },
+      {
+        date: Date.parse('2020-02-02'),
+        waterConsumed: 0.325,
+      },
+    ];
+
+    GoogleFit.saveHydration(hydrationArray, (err, res) => {
+      if (err) throw "Cant save data to the Google Fit";
+    });
+    ```
+
+14. Delete Hydration
+
+    An app cannot delete data inserted by other apps.
+    startDate and endDate MUST not be the same.
+
+    ```javascript
+    const options = {
+      startDate: '2020-01-01T12:33:18.873Z', // required, timestamp or ISO8601 string
+      endDate: new Date().toISOString(), // required, timestamp or ISO8601 string
+    };
+
+    GoogleFit.deleteHydration(options, (err, res) => {
+      console.log(res);
+    });
+    ```
+
+15. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
-    
+
     unsubscribeListeners(); // Put into componentWillUnmount() method to prevent leaks
-    
-    getDailyCalorieSamples(options, callback); // method to get calories per day
-    
-    getDailyDistanceSamples(options, callback); // method to get daily distance
-    
+
     isAvailable(callback); // Checks is GoogleFit available for current account / installed on device
     
     isEnabled(callback); // Checks is permissions granted
     
-    deleteWeight(options, callback); // method to delete weights by options (same as in save weights)
+    deleteWeight(options, callback); // method to delete weights by options (same as in delete hydration)
  
     openFit(); //method to open google fit app
     
     saveHeight(options, callback);
  
-    deleteHeight(options, callback);
- 
-    deleteWeight(options, callback);
+    deleteHeight(options, callback); // method to delete heights by options (same as in delete hydration)
  
     disconnect(); // Closes the connection to Google Play services.
     ```
-
-### Changelog:
-
-```
-0.7.1   - Fix for disconnect() (@dmitriys-lits thanks for the PR)
-0.7     - Retrieve Heights, open fit activity, unified body method (@EJohnF thanks for the PR!)
-
-0.6     - RN 0.56+ support (@skb1129 thanks for the PR)
-        - nutrition scenario (@13thdeus thanks for the PR)
-        
-0.5     - New auth process (@priezz thanks for PR)
-        - Fix unsubscribe listeners
-        - Readme refactoring
-        
-0.4.0-beta
-        - Recording API implemetation (@reboss thanks for PR)
-        - Just use startRecording(callback) function which listens
-        to STEPS and DISTANCE (for now) activities from Google Fitness
-        API (no need to install Google fit app)
-
-0.3.5   - Fix Error: Fragments should be static
-        - Updated readme
-
-0.3.4   - Burned Calories History (getDailyCalorieSamples)
-
-0.3.2
-        - React Native 0.46 Support
-
-0.3.1-beta
-        - better cancel/deny support
-
-0.3.0-beta (@firodj thanks for this PR!)
-        - steps adapter to avoid errors;
-        - authorize: allow cancel;
-        - authorize: using callback instead event;
-        - strict dataSource;
-        - xiaomi support;
-
-0.2.0   - getDailyDistanceSamples();
-        - isAvailable();
-        - isEnabled();
-        - deleteWeight();
-0.1.1-beta
-        - getDailyStepCountSamples method compatible with Apple Healthkit module
-        - started to implement JSDoc documentation
-
-0.1.0
-        - getting activity within module itself
-        - fixed package name dependency
-        - provided more detailed documentation
-
-0.0.9   - Weights Save Support
-        - Refactor methods to be compatible with react-native-apple-healthkit module
-        - Remove 'moment.js' dependency
-
-0.0.8   - Weights Samples support
-
-0.0.1   - 0.0.7 Initial builds
-```
 
 ### PLANS / TODO
 
