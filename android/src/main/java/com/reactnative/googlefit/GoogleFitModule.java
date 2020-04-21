@@ -250,35 +250,29 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void saveFood(ReadableMap foodSample,
-                         Callback errorCallback,
-                         Callback successCallback) {
+    public void saveFood(ReadableMap foodSample, Promise promise) {
         try {
-            successCallback.invoke(mGoogleFitManager.getCalorieHistory().saveFood(foodSample));
+            mGoogleFitManager.getCalorieHistory().saveFood(foodSample, promise);
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 
     @ReactMethod
-    public void updateFood(ReadableMap foodSample,
-                           Callback errorCallback,
-                           Callback successCallback) {
+    public void updateFood(ReadableMap foodSample, Promise promise) {
         try {
-            successCallback.invoke(mGoogleFitManager.getCalorieHistory().updateFood(foodSample));
-        } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            mGoogleFitManager.getCalorieHistory().updateFood(foodSample, promise);
+        } catch (Exception e) {
+            promise.resolve(e);
         }
     }
 
     @ReactMethod
-    public void deleteFood(ReadableMap options,
-                           Callback errorCallback,
-                           Callback successCallback) {
+    public void deleteFood(ReadableMap options, Promise promise) {
         try {
-            successCallback.invoke(mGoogleFitManager.getCalorieHistory().deleteFood(foodSample));
-        } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            mGoogleFitManager.getCalorieHistory().deleteFood(options, promise);
+        } catch (Exception e) {
+            promise.reject(e);
         }
     }
 

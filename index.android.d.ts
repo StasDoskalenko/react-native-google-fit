@@ -76,7 +76,7 @@ declare module 'react-native-google-fit' {
       callback: (isError: boolean, result: any) => void
     ): void
 
-    saveFood(options: FoodIntake, callback: (isError: boolean, result: any) => void): void
+    saveFood(options: FoodIntake, callback: ((isError: boolean, result: any) => void)): void
     updateFood(options: FoodIntake, callback: ((isError: boolean, result: any) => void)): void
     deleteFood(options: FoodDeletion, callback: ((isError: boolean, result: any) => void)): void
 

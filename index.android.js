@@ -270,44 +270,41 @@ class RNGoogleFit {
   }
 
   saveFood(options, callback) {
-    options.date = Date.parse(options.date)
-    googleFit.saveFood(
-      options,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        callback(false, res)
-      }
-    )
-  }
+        options.date = Date.parse(options.date);
+        const promise = googleFit.saveFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason) => {callback(reason, false)});
+        } else {
+            return promise;
+        }
+    }
 
     updateFood(options, callback) {
-        options.date = Date.parse(options.date)
-        googleFit.updateFood(
-          options,
-          msg => {
-            callback(msg, false)
-          },
-          res => {
-            callback(false, res)
-          }
-        )
-
+        options.date = Date.parse(options.date);
+        const promise = googleFit.updateFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason)=> {callback(reason, false)});
+        } else {
+            return promise;
+        }
     }
 
     deleteFood(options, callback) {
-        options.startDate = Date.parse(options.startDate)
-        options.endDate = Date.parse(options.endDate)
-        googleFit.deleteFood(
-          options,
-          msg => {
-            callback(msg, false)
-          },
-          res => {
-            callback(false, res)
-          }
-        )
+        options.startDate = Date.parse(options.startDate);
+        options.endDate = Date.parse(options.endDate);
+
+        const promise = googleFit.deleteFood(options);
+        if (callback) {
+            promise
+                .then((result) => {callback(false, result)})
+                .catch((reason) => {callback(reason, false)});
+        } else {
+            return promise;
+        }
     }
 
   /**
