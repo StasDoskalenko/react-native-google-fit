@@ -416,4 +416,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             errorCallback.invoke(e.getMessage());
         }
     }
+
+    @ReactMethod
+    public void getSleepData(double startDate, double endDate, Callback errorCallback, Callback successCallback) {
+        try {
+           mGoogleFitManager.getSleepHistory().getSleepData((long)startDate, (long)endDate, errorCallback, successCallback);
+        } catch (Error e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
 }
