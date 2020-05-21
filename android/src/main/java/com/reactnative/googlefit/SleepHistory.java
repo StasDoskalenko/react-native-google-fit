@@ -25,8 +25,11 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
@@ -66,7 +69,7 @@ public class SleepHistory {
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
 
-    private static final String TAG = "RNGoogleFit";
+    private static final String TAG = "RNGoogleFit-Sleep";
 
     public SleepHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this.mReactContext = reactContext;
@@ -81,7 +84,8 @@ public class SleepHistory {
                 .setTimeInterval((long) startDate, (long) endDate, TimeUnit.MILLISECONDS)
                 .build();
 
-        Fitness.getSessionsClient(this.mReactContext, GoogleSignIn.getLastSignedInAccount(this.mReactContext))
+        GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
+        Fitness.getSessionsClient(this.mReactContext, gsa)
                 .readSession(request)
                 .addOnSuccessListener(new OnSuccessListener<SessionReadResponse>() {
                     @Override
@@ -91,6 +95,7 @@ public class SleepHistory {
                             .filter(new Predicate<Session>() {
                                 @Override
                                 public boolean test(Session s) {
+                                    Log.i(TAG, "Activity found: " + s.getActivity());
                                     return s.getActivity().equals(FitnessActivities.SLEEP);
                                 }
                             })
