@@ -1,5 +1,7 @@
 # react-native-google-fit
 
+[Gitter Group](https://gitter.im/React-native-google-fit/community) - ask questions, answer questions!
+
 [![npm version](https://badge.fury.io/js/react-native-google-fit.svg)](https://badge.fury.io/js/react-native-google-fit) ![Downloads](https://img.shields.io/npm/dm/react-native-google-fit.svg)
 
 A React Native bridge module for interacting with Google Fit
