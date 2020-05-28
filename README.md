@@ -452,7 +452,7 @@ A React Native bridge module for interacting with Google Fit
 
 * code refactoring
 * optimization
-This is forked from React-native-google-fit.
+
 Copyright (c) 2017-present, Stanislav Doskalenko
 doskalenko.s@gmail.com
 
