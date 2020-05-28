@@ -1,5 +1,5 @@
 'use strict'
-import { DeviceEventEmitter, NativeModules } from 'react-native';
+import { DeviceEventEmitter, NativeModules, PermissionsAndroid } from 'react-native';
 
 import PossibleScopes from './src/scopes';
 import {
@@ -68,6 +68,47 @@ class RNGoogleFit {
     this.eventListeners = []
   }
 
+
+  // recommend to refactor both permission to allow other permission options besides PERMISSONS.ACCESS_FINE_LOCATION
+  // check permissions
+  checkPermissionAndroid = async () => {
+    const response = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+    return response === true;
+  }
+
+  // request permissions
+  requestPermissionAndroid = async (dataTypes) => {
+
+    const check = await this.checkPermissionAndroid();
+
+    if (dataTypes.includes('distance') && !check) {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Access Location Permisson",
+            message:
+              "Enable location access for Google Fit Api. " +
+              "Cancel may cause inaccuray result",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+
+        // this need to be changed in the future if we want to use RecordingAPI for more sensitive permissions
+        if( granted === PermissionsAndroid.RESULTS.GRANTED ) {
+          // we don't do anything here since the permissons are granted
+        } else {
+          // remove distance from array to avoid crash,
+          return dataTypes.filter(data => data !== 'distance');
+        }
+      } catch (err) {
+        console.warn(err);
+      };
+    }
+    return dataTypes;
+  }
+
   /**
    * Start recording fitness data
    *
@@ -81,15 +122,18 @@ class RNGoogleFit {
    * and check for {recording: true} as the event data
    */
   startRecording = (callback, dataTypes = ['step']) => {
-    googleFit.startFitnessRecording(dataTypes)
 
-    const eventListeners = dataTypes.map(dataTypeName => {
-      const eventName = `${dataTypeName.toUpperCase()}_RECORDING`
+    this.requestPermissionAndroid(dataTypes).then((dataTypes) => {
+      googleFit.startFitnessRecording(dataTypes)
 
-      return DeviceEventEmitter.addListener(eventName, event => callback(event))
+      const eventListeners = dataTypes.map(dataTypeName => {
+        const eventName = `${dataTypeName.toUpperCase()}_RECORDING`
+
+        return DeviceEventEmitter.addListener(eventName, event => callback(event))
+      })
+
+      this.eventListeners.push(...eventListeners)
     })
-
-    this.eventListeners.push(...eventListeners)
   }
 
   // Will be deprecated in future releases
