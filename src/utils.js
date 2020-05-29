@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export function buildDailySteps(steps) {
   const results = {}
   for (const step of steps) {
@@ -36,8 +38,13 @@ export function prepareResponse(response, byKey = 'value') {
   return response
     .map(el => {
       if (!isNil(el[byKey])) {
-        el.startDate = new Date(el.startDate).toISOString()
-        el.endDate = new Date(el.endDate).toISOString()
+        // Android is returning a date format from Fit that new Date() can't parse, e.g.: 2020-05-21T06:06:05.871-0400
+        // Note the time offset at the end rather is non-standard compared to ISO which new Date expects. This works in
+        // the Chrome V8 debugger, but not on device. Using momentJS here to get around this issue.
+        // el.startDate = new Date(el.startDate).toISOString()
+        // el.endDate = new Date(el.endDate).toISOString()
+        el.startDate = moment(el.startDate).toISOString()
+        el.endDate = moment(el.endDate).toISOString()
         return el
       }
     })
