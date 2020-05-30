@@ -5,7 +5,7 @@ export function buildDailySteps(steps) {
       continue
     }
 
-    const dateFormatted = getFormattedDate(new Date(step.startDate))
+    const dateFormatted = getFormattedDate(new Date(step.endDate))
 
     if (!(dateFormatted in results)) {
       results[dateFormatted] = 0

@@ -18,7 +18,7 @@ declare module 'react-native-google-fit' {
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording: (callback: (param: any) => void) => void
+    startRecording: (callback: (param: any) => void, dataTypes: Array<string>) => void
 
     getSteps(dayStart: Date | string, dayEnd: Date | string): any
 
