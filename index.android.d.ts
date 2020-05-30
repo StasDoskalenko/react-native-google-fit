@@ -151,6 +151,18 @@ declare module 'react-native-google-fit' {
       callback: (isError: boolean, result: any) => void
     ) => void
 
+    /**
+     * Get the sleep sessions over a specified date range.
+     * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Function} callback The function will be called with an array of elements.
+     */
+    getSleepData: (
+      options: any,
+      callback?: (isError: boolean, result: any) => void
+    ) => Promise<any> | void
+
+
+
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void

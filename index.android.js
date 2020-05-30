@@ -587,6 +587,35 @@ class RNGoogleFit {
       }
     )
   }
+
+  /**
+   * Get the sleep sessions over a specified date range.
+   * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @param {Function} callback The function will be called with an array of elements.
+   */
+
+  getSleepData = (options, callback) => {
+    const startDate = !isNil(options.startDate)
+      ? Date.parse(options.startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate)
+      ? Date.parse(options.endDate)
+      : new Date().valueOf()
+    
+    googleFit.getSleepData(
+      startDate,
+      endDate,
+      msg => callback(true, msg),
+      res => {
+        if (res.length > 0) {
+          callback(false, prepareResponse(res, 'value'))
+        } else {
+          callback('There is no sleep data for this period.', false)
+        }
+      }
+    )
+  }
+
 }
 
 export default new RNGoogleFit()
