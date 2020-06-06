@@ -11,6 +11,7 @@ import {
   prepareResponse,
   prepareHydrationResponse,
   prepareDeleteOptions,
+  getWeekBoundary,
 } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
@@ -136,14 +137,31 @@ class RNGoogleFit {
     })
   }
 
-  // Will be deprecated in future releases
-  getSteps(dayStart, dayEnd) {
-    googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd))
+
+  /**
+   * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new Date() will be used if date is not provided
+   */
+  getDailySteps(date = new Date()) {
+    const options = {
+      startDate: new Date(date.setHours(0,0,0,0)).toISOString(), // required ISO8601Timestamp
+      endDate: new Date(date.setHours(23,59,59,999)).toISOString(), // required ISO8601Timestamp
+    };
+    return this.getDailyStepCountSamples(options);
   }
 
-  // Will be deprecated in future releases
-  getWeeklySteps(startDate) {
-    googleFit.getWeeklySteps(Date.parse(startDate), Date.now())
+  /**
+   * A shortcut to get the weekly steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new Date() will be used if date is not provided
+   * @param {number} adjustment, use to adjust the default start day of week, 0 = Sunday, 1 = Monday, etc.
+   */
+  getWeeklySteps(date=new Date(), adjustment=0) {
+    const [startDate, endDate] = getWeekBoundary(date, adjustment);
+    const options = {
+      startDate: startDate,
+      endDate: endDate,
+    }
+    return this.getDailyStepCountSamples(options);
   }
 
   _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
@@ -601,7 +619,7 @@ class RNGoogleFit {
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
       : new Date().valueOf()
-    
+
     googleFit.getSleepData(
       startDate,
       endDate,

@@ -20,9 +20,18 @@ declare module 'react-native-google-fit' {
      */
     startRecording: (callback: (param: any) => void, dataTypes: Array<string>) => void
 
-    getSteps(dayStart: Date | string, dayEnd: Date | string): any
+    /**
+     * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
+     * @param {Date} date optional param, new Date() will be used if date is not provided
+     */
+    getDailySteps: (date?: Date) => Promise<any>
 
-    getWeeklySteps(startDate: Date | string): any
+    /**
+     * A shortcut to get the weekly steps of a given day by using getDailyStepCountSamples
+     * @param {Date} date optional param, new Date() will be used if date is not provided
+     * @param {number} adjustment, optional param, use to adjust the default start day of week, 0 = Sunday, 1 = Monday, etc.
+     */
+    getWeeklySteps: (date?: Date, adjustment?: number) => Promise<any>
 
     /**
      * Get the total steps per day over a specified date range.
@@ -32,7 +41,7 @@ declare module 'react-native-google-fit' {
     getDailyStepCountSamples: (
       options: any,
       callback?: (isError: boolean, result: any) => void
-    ) => Promise<any> | void
+    ) => Promise<any>
 
     buildDailySteps(steps: any): { date: any; value: any }[]
 
@@ -41,6 +50,14 @@ declare module 'react-native-google-fit' {
      * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      * @callback {Function} callback The function will be called with an array of elements.
      */
+
+
+ /**
+ * a exampleFunction description.
+ * @param {string} input
+ */
+ exampleFunction(input?: string) : void
+
     getDailyDistanceSamples(
       options: any,
       callback: (isError: boolean, result: any) => void
