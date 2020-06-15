@@ -619,6 +619,7 @@ class RNGoogleFit {
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
       : new Date().valueOf()
+
     googleFit.getSleepData(
       startDate,
       endDate,
