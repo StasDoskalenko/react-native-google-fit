@@ -43,7 +43,6 @@
     "eslint-plugin-react": "7.12.4",
     "eslint-plugin-standard": "4.0.0",
     "eslint-config-standard-react": "7.0.2",
-    "moment": "2.20.1",
     "react-native": "0.58.6"
   }
 }
