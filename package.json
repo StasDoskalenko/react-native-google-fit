@@ -1,6 +1,6 @@
 {
   "name": "react-native-google-fit",
-  "version": "0.10.0",
+  "version": "0.12.1",
   "description": "A React Native bridge module for interacting with Google Fit",
   "main": "index.android.js",
   "scripts": {
@@ -27,6 +27,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/StasDoskalenko/react-native-google-fit.git"
+  },
+  "dependencies": {
+    "moment": "2.20.1"
   },
   "devDependencies": {
     "babel-eslint": "10.0.1",

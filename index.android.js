@@ -1,5 +1,5 @@
 'use strict'
-import { DeviceEventEmitter, NativeModules } from 'react-native';
+import { DeviceEventEmitter, NativeModules, PermissionsAndroid } from 'react-native';
 
 import PossibleScopes from './src/scopes';
 import {
@@ -11,6 +11,7 @@ import {
   prepareResponse,
   prepareHydrationResponse,
   prepareDeleteOptions,
+  getWeekBoundary,
 } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
@@ -68,6 +69,47 @@ class RNGoogleFit {
     this.eventListeners = []
   }
 
+
+  // recommend to refactor both permission to allow other permission options besides PERMISSONS.ACCESS_FINE_LOCATION
+  // check permissions
+  checkPermissionAndroid = async () => {
+    const response = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+    return response === true;
+  }
+
+  // request permissions
+  requestPermissionAndroid = async (dataTypes) => {
+
+    const check = await this.checkPermissionAndroid();
+
+    if (dataTypes.includes('distance') && !check) {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: "Access Location Permisson",
+            message:
+              "Enable location access for Google Fit Api. " +
+              "Cancel may cause inaccuray result",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK"
+          }
+        );
+
+        // this need to be changed in the future if we want to use RecordingAPI for more sensitive permissions
+        if( granted === PermissionsAndroid.RESULTS.GRANTED ) {
+          // we don't do anything here since the permissons are granted
+        } else {
+          // remove distance from array to avoid crash,
+          return dataTypes.filter(data => data !== 'distance');
+        }
+      } catch (err) {
+        console.warn(err);
+      };
+    }
+    return dataTypes;
+  }
+
   /**
    * Start recording fitness data
    *
@@ -80,26 +122,46 @@ class RNGoogleFit {
    * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
    * and check for {recording: true} as the event data
    */
-  startRecording = (callback, dataTypes = ['step', 'distance']) => {
-    googleFit.startFitnessRecording(dataTypes)
+  startRecording = (callback, dataTypes = ['step']) => {
 
-    const eventListeners = dataTypes.map(dataTypeName => {
-      const eventName = `${dataTypeName.toUpperCase()}_RECORDING`
+    this.requestPermissionAndroid(dataTypes).then((dataTypes) => {
+      googleFit.startFitnessRecording(dataTypes)
 
-      return DeviceEventEmitter.addListener(eventName, event => callback(event))
+      const eventListeners = dataTypes.map(dataTypeName => {
+        const eventName = `${dataTypeName.toUpperCase()}_RECORDING`
+
+        return DeviceEventEmitter.addListener(eventName, event => callback(event))
+      })
+
+      this.eventListeners.push(...eventListeners)
     })
-
-    this.eventListeners.push(...eventListeners)
   }
 
-  // Will be deprecated in future releases
-  getSteps(dayStart, dayEnd) {
-    googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd))
+
+  /**
+   * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new Date() will be used if date is not provided
+   */
+  getDailySteps(date = new Date()) {
+    const options = {
+      startDate: new Date(date.setHours(0,0,0,0)).toISOString(), // required ISO8601Timestamp
+      endDate: new Date(date.setHours(23,59,59,999)).toISOString(), // required ISO8601Timestamp
+    };
+    return this.getDailyStepCountSamples(options);
   }
 
-  // Will be deprecated in future releases
-  getWeeklySteps(startDate) {
-    googleFit.getWeeklySteps(Date.parse(startDate), Date.now())
+  /**
+   * A shortcut to get the weekly steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new Date() will be used if date is not provided
+   * @param {number} adjustment, use to adjust the default start day of week, 0 = Sunday, 1 = Monday, etc.
+   */
+  getWeeklySteps(date=new Date(), adjustment=0) {
+    const [startDate, endDate] = getWeekBoundary(date, adjustment);
+    const options = {
+      startDate: startDate,
+      endDate: endDate,
+    }
+    return this.getDailyStepCountSamples(options);
   }
 
   _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
@@ -557,7 +619,6 @@ class RNGoogleFit {
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
       : new Date().valueOf()
-    
     googleFit.getSleepData(
       startDate,
       endDate,

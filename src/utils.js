@@ -7,7 +7,7 @@ export function buildDailySteps(steps) {
       continue
     }
 
-    const dateFormatted = getFormattedDate(new Date(step.startDate))
+    const dateFormatted = getFormattedDate(new Date(step.endDate))
 
     if (!(dateFormatted in results)) {
       results[dateFormatted] = 0
@@ -71,6 +71,18 @@ function getFormattedDate(date) {
   const month = ('0' + (date.getMonth() + 1)).slice(-2)
   const year = date.getFullYear()
   return year + '-' + month + '-' + day
+}
+
+/***
+* avoid month boundary issue by using millisecond calculation
+* moment.js can be used as easy alternative
+*/
+export function getWeekBoundary(date, adjustment) {
+  const dayMilliseconds = 24 * 60 * 60 * 1000;
+  const currentWeekDay = date.getDay() - adjustment % 7;
+  const startDate = new Date(date.setHours(0,0,0,0) - dayMilliseconds * currentWeekDay);
+  const endDate = new Date(startDate.getTime() + dayMilliseconds * 7 -1);
+  return [startDate, endDate];
 }
 
 export function prepareDeleteOptions(options) {

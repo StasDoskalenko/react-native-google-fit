@@ -1,5 +1,7 @@
 # react-native-google-fit
 
+[Gitter Group](https://gitter.im/React-native-google-fit/community) - ask questions, answer questions!
+
 [![npm version](https://badge.fury.io/js/react-native-google-fit.svg)](https://badge.fury.io/js/react-native-google-fit) ![Downloads](https://img.shields.io/npm/dm/react-native-google-fit.svg)
 
 A React Native bridge module for interacting with Google Fit
@@ -74,6 +76,14 @@ A React Native bridge module for interacting with Google Fit
          console.log('Daily steps >>> ', res)
      })
      .catch((err) => {console.warn(err)})
+    
+    // shortcut functions, 
+    // return weekly or daily steps of given date
+    // all params are optional, using new Date() without given date, 
+    // adjustment is 0 by default, determine the first day of week, 0 == Sunday, 1==Monday, etc.
+    GoogleFit.getDailySteps(date).then.catch()
+    GoogleFit.getWeeklySteps(date, adjustment).then().catch()
+     
     ```
 
     **Response:**
