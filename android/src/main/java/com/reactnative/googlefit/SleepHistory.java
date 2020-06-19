@@ -53,7 +53,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
@@ -117,6 +116,7 @@ public class SleepHistory {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        Log.i(TAG, "Failure: " + e.getMessage());
                         errorCallback.invoke(e.getMessage());
                     }
                 });
@@ -126,9 +126,8 @@ public class SleepHistory {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
 
-        WritableMap sleepMap = Arguments.createMap();
-
         for (DataPoint dp : dataSet.getDataPoints()) {
+            WritableMap sleepMap = Arguments.createMap();
             sleepMap.putString("value", dp.getValue(Field.FIELD_ACTIVITY).asActivity());
             sleepMap.putString("startDate", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
             sleepMap.putString("endDate", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
