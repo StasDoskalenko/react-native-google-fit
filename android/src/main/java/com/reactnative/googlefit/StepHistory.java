@@ -11,8 +11,8 @@
 
 package com.reactnative.googlefit;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -21,26 +21,30 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.DataSource;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.google.android.gms.fitness.data.Device;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
@@ -76,7 +80,7 @@ public class StepHistory {
             Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
 
         DataSet stepData = dataReadResult.getDataSet(DataType.TYPE_STEP_COUNT_DELTA);
-    
+
         int userInputSteps = 0;
 
         for (DataPoint dp : stepData.getDataPoints()) {
@@ -87,7 +91,7 @@ public class StepHistory {
                 }
             }
         }
-      
+
         successCallback.invoke(userInputSteps);
     }
 
@@ -221,41 +225,58 @@ public class StepHistory {
                         .build();
             }
 
-            PendingResult<DataReadResult> readPendingResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest);
-            readPendingResult.setResultCallback(new ResultCallback<DataReadResult>() {
-                @Override
-                public void onResult(@NonNull DataReadResult dataReadResult) {
-                    WritableArray steps = Arguments.createArray();
+            GoogleSignInOptionsExtension fitnessOptions =
+                    FitnessOptions.builder()
+                            .addDataType(DataType.TYPE_STEP_COUNT_DELTA, FitnessOptions.ACCESS_READ)
+                            .build();
 
-                    //Used for aggregated data
-                    if (dataReadResult.getBuckets().size() > 0) {
-                        Log.i(TAG, "  +++ Number of buckets: " + dataReadResult.getBuckets().size());
-                        for (Bucket bucket : dataReadResult.getBuckets()) {
-                            List<DataSet> dataSets = bucket.getDataSets();
-                            for (DataSet dataSet : dataSets) {
-                                processDataSet(dataSet, steps);
+            GoogleSignInAccount googleSignInAccount =
+                    GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions);
+
+            Fitness.getHistoryClient(this.mReactContext, googleSignInAccount)
+                .readData(readRequest)
+                    .addOnSuccessListener(new OnSuccessListener<DataReadResponse>() {
+                        @Override
+                        public void onSuccess(DataReadResponse dataReadResponse) {
+                            Log.i(TAG, "onSuccess()");
+                            WritableArray steps = Arguments.createArray();
+
+                            //Used for aggregated data
+                            if (dataReadResponse.getBuckets().size() > 0) {
+                                Log.i(TAG, "  +++ Number of buckets: " + dataReadResponse.getBuckets().size());
+                                for (Bucket bucket : dataReadResponse.getBuckets()) {
+                                    List<DataSet> dataSets = bucket.getDataSets();
+                                    for (DataSet dataSet : dataSets) {
+                                        processDataSet(dataSet, steps);
+                                    }
+                                }
+                            }
+
+                            //Used for non-aggregated data
+                            if (dataReadResponse.getDataSets().size() > 0) {
+                                Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResponse.getDataSets().size());
+                                for (DataSet dataSet : dataReadResponse.getDataSets()) {
+                                    processDataSet(dataSet, steps);
+                                }
+                            }
+
+                            WritableMap map = Arguments.createMap();
+                            map.putMap("source", source);
+                            map.putArray("steps", steps);
+                            results.pushMap(map);
+
+                            if (dataSourcesToLoad.decrementAndGet() <= 0) {
+                                successCallback.invoke(results);
                             }
                         }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.i(TAG, "onFailure()");
+                            Log.i(TAG, "Error" + e);
                     }
+            });
 
-                    //Used for non-aggregated data
-                    if (dataReadResult.getDataSets().size() > 0) {
-                        Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResult.getDataSets().size());
-                        for (DataSet dataSet : dataReadResult.getDataSets()) {
-                            processDataSet(dataSet, steps);
-                        }
-                    }
-
-                    WritableMap map = Arguments.createMap();
-                    map.putMap("source", source);
-                    map.putArray("steps", steps);
-                    results.pushMap(map);
-
-                    if (dataSourcesToLoad.decrementAndGet() <= 0) {
-                        successCallback.invoke(results);
-                    }
-                }
-            }, 1, TimeUnit.MINUTES);
         }
     }
 
