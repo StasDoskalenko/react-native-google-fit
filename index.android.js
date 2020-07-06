@@ -1,5 +1,6 @@
 'use strict'
 import { DeviceEventEmitter, NativeModules, PermissionsAndroid } from 'react-native';
+import moment from 'moment';
 
 import PossibleScopes from './src/scopes';
 import {
@@ -140,12 +141,12 @@ class RNGoogleFit {
 
   /**
    * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
-   * @param {Date} date optional param, new Date() will be used if date is not provided
+   * @param {Date} date optional param, new moment() will be used if date is not provided
    */
-  getDailySteps(date = new Date()) {
+  getDailySteps(date = moment()) {
     const options = {
-      startDate: new Date(date.setHours(0,0,0,0)).toISOString(), // required ISO8601Timestamp
-      endDate: new Date(date.setHours(23,59,59,999)).toISOString(), // required ISO8601Timestamp
+      startDate: moment(date).startOf('day'),
+      endDate: moment(date).endOf('day'),
     };
     return this.getDailyStepCountSamples(options);
   }
