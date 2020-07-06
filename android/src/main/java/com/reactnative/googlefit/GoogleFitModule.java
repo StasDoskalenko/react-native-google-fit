@@ -12,9 +12,12 @@ package com.reactnative.googlefit;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
 import java.util.ArrayList;
 import android.content.Intent;
+
+import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -129,23 +132,14 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void getDailySteps(double startDay, double endDay) {
-        mGoogleFitManager.getStepHistory().displayLastWeeksData((long) startDay, (long) endDay);
-    }
-
-    @ReactMethod
-    public void getWeeklySteps(double startDate, double endDate) {
-        mGoogleFitManager.getStepHistory().displayLastWeeksData((long) startDate, (long) endDate);
-    }
-
-    @ReactMethod
     public void getDailyStepCountSamples(double startDate,
                                          double endDate,
+                                         ReadableMap configs,
                                          Callback errorCallback,
                                          Callback successCallback) {
 
         try {
-            mGoogleFitManager.getStepHistory().aggregateDataByDate((long) startDate, (long) endDate, successCallback);
+            mGoogleFitManager.getStepHistory().aggregateDataByDate((long) startDate, (long) endDate, configs, successCallback);
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -417,6 +411,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
     public void getSleepData(double startDate, double endDate, Callback errorCallback, Callback successCallback) {
         try {

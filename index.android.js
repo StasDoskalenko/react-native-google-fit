@@ -165,10 +165,16 @@ class RNGoogleFit {
     return this.getDailyStepCountSamples(options);
   }
 
-  _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
+  isConfigsEmpty(obj) {
+    for(var prop in obj) return false;
+    return true;
+  }
+
+  _retrieveDailyStepCountSamples = (startDate, endDate, options, callback) => {
     googleFit.getDailyStepCountSamples(
       startDate,
       endDate,
+      options.configs,
       msg => callback(msg, false),
       res => {
         if (res.length > 0) {
@@ -180,6 +186,7 @@ class RNGoogleFit {
                 dev.source.appPackage +
                 (dev.source.stream ? ':' + dev.source.stream : '')
               obj.steps = buildDailySteps(dev.steps)
+              obj.rawSteps = this.isConfigsEmpty(options.configs) ? [] : dev.steps
               return obj
             }, this)
           )
@@ -208,6 +215,7 @@ class RNGoogleFit {
         this._retrieveDailyStepCountSamples(
           startDate,
           endDate,
+          options,
           (error, result) => {
             if (!error) {
               resolve(result)
@@ -218,7 +226,7 @@ class RNGoogleFit {
         )
       })
     }
-    this._retrieveDailyStepCountSamples(startDate, endDate, callback)
+    this._retrieveDailyStepCountSamples(startDate, endDate, options, callback)
   }
 
   /**

@@ -18,6 +18,8 @@ import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -63,6 +65,32 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
+    public TimeUnit processBucketUnit(String buckUnit) {
+        switch (buckUnit){
+            case "DAY": return TimeUnit.DAYS;
+            case "HOUR": return TimeUnit.HOURS;
+            case "MINUTE": return TimeUnit.MINUTES;
+            case "SECOND": return TimeUnit.SECONDS;
+        }
+        return TimeUnit.HOURS;
+    }
+
+    public int getBucketTime(ReadableMap configs) {
+        int bucketTime = 12;
+        if (null != configs && configs.hasKey("bucketTime")) {
+            bucketTime = configs.getInt("bucketTime");
+        }
+        return bucketTime;
+    }
+
+    public TimeUnit getBucketUnit(ReadableMap configs) {
+        TimeUnit bucketUnit = TimeUnit.HOURS;
+        if(null != configs && configs.hasKey("bucketUnit")) {
+            bucketUnit = this.processBucketUnit(configs.getString("bucketUnit"));
+        }
+        return bucketUnit;
+    }
+
     public void getUserInputSteps(long startTime, long endTime, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -95,10 +123,20 @@ public class StepHistory {
         successCallback.invoke(userInputSteps);
     }
 
-    public void aggregateDataByDate(long startTime, long endTime, final Callback successCallback) {
+    public void aggregateDataByDate(long startTime, long endTime, ReadableMap configs, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
+
+        //default bucket configs,
+        // Half-day resolution
+        int bucketTime = 12;
+        TimeUnit bucketUnit = TimeUnit.HOURS;
+
+        if(null != configs) {
+            bucketTime = this.getBucketTime(configs);
+            bucketUnit = this.getBucketUnit(configs);
+        }
 
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
@@ -214,7 +252,7 @@ public class StepHistory {
                             ,
                             //DataType.AGGREGATE_STEP_COUNT_DELTA
                             aggregateType)
-                        .bucketByTime(12, TimeUnit.HOURS) // Half-day resolution
+                        .bucketByTime(bucketTime, bucketUnit)
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build();
             } else {
@@ -278,44 +316,6 @@ public class StepHistory {
             });
 
         }
-    }
-
-    //Will be deprecated in future releases
-    public void displayLastWeeksData(long startTime, long endTime) {
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        //Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
-        //Log.i(TAG, "Range End: " + dateFormat.format(endTime));
-
-        //Check how many steps were walked and recorded in the last 7 days
-        DataReadRequest readRequest = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .bucketByTime(1, TimeUnit.DAYS)
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .build();
-
-        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
-
-        WritableArray map = Arguments.createArray();
-
-        //Used for aggregated data
-        if (dataReadResult.getBuckets().size() > 0) {
-            Log.i(TAG, "Number of buckets: " + dataReadResult.getBuckets().size());
-            for (Bucket bucket : dataReadResult.getBuckets()) {
-                List<DataSet> dataSets = bucket.getDataSets();
-                for (DataSet dataSet : dataSets) {
-                    processDataSet(dataSet, map);
-                }
-            }
-        }
-        //Used for non-aggregated data
-        else if (dataReadResult.getDataSets().size() > 0) {
-            Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
-            for (DataSet dataSet : dataReadResult.getDataSets()) {
-                processDataSet(dataSet, map);
-            }
-        }
-
-        sendEvent(this.mReactContext, "StepHistoryChangedEvent", map);
     }
 
     private void processDataSet(DataSet dataSet, WritableArray map) {
