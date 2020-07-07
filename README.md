@@ -112,7 +112,7 @@ A React Native bridge module for interacting with Google Fit
     ];
     ```
     Step also support a optional config to get rawStep Data for detail usage.
-    ```
+    ```javascript
     const dailyOptions = {
         startDate: "2020-07-06T00:00:00.000Z",
         endDate:  "2020-07-06T23:59:00.000Z",
@@ -124,7 +124,7 @@ A React Native bridge module for interacting with Google Fit
     }
    ```
    **Response:**
-   ```
+   ```javascript
    // {bucketTime: 15, bucketUnit: 'MINUTE'}
    [
       { source: "com.google.android.gms:estimated_steps", 
