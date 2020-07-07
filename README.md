@@ -111,6 +111,48 @@ A React Native bridge module for interacting with Google Fit
       { source: "com.xiaomi.hm.health", steps: [] }
     ];
     ```
+    Step also support a optional config to get rawStep Data for detail usage.
+    ```
+    const dailyOptions = {
+        startDate: "2020-07-06T00:00:00.000Z",
+        endDate:  "2020-07-06T23:59:00.000Z",
+        // optional
+        configs:{
+        bucketTime: 15,
+        bucketUnit: 'MINUTE' | 'HOUR' | 'SECOND' | 'DAY'  // must all CAPITALIZE
+        }
+    }
+   ```
+   **Response:**
+   ```
+   // {bucketTime: 15, bucketUnit: 'MINUTE'}
+   [
+      { source: "com.google.android.gms:estimated_steps", 
+        steps: [
+        {
+          "date":"2019-07-06","value": 135
+        },
+        ],
+        rawSteps: [
+          {"endDate": 1594012101944, "startDate": 1594012041944, "steps": 13}, 
+          {"endDate": 1594020600000, "startDate": 1594020596034, "steps": 0}, 
+          {"endDate": 1594020693175, "startDate": 1594020600000, "steps": 24}, 
+          {"endDate": 1594068898912, "startDate": 1594068777409, "steps": 53}, 
+          {"endDate": 1594073158830, "startDate": 1594073066166, "steps": 45}
+        ]
+      },
+    ]
+    
+    // {bucketTime: 1, bucketUnit: 'DAY'}
+    [
+        { source: "com.google.android.gms:estimated_steps",
+            ...
+          rawSteps: [
+           {"endDate": 1594073158830, "startDate": 1594012041944, "steps": 135}
+          ]
+        }
+    ]
+    ```
 
 4. Retrieve Weights
 
