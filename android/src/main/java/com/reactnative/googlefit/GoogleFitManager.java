@@ -286,6 +286,9 @@ public class GoogleFitManager implements
         Bundle args = new Bundle();
         args.putInt(AUTH_PENDING, errorCode);
         dialogFragment.setArguments(args);
-        dialogFragment.show(mActivity.getFragmentManager(), "errordialog");
+
+        mActivity.getFragmentManager().beginTransaction()
+                .add(dialogFragment, "errordialog")
+                .commitAllowingStateLoss();
     }
 }
