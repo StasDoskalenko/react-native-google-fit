@@ -185,7 +185,9 @@ declare module 'react-native-google-fit' {
     unsubscribeListeners: () => void
 
   }
+
   type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+
   export type WeightSample = {
     addedBy: string
     day: string
