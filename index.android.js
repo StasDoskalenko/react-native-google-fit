@@ -442,9 +442,6 @@ class RNGoogleFit {
   }
 
   deleteWeight = (options, callback) => {
-    if (options.unit === 'pound') {
-      options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
-    }
     googleFit.deleteWeight(
       prepareDeleteOptions(options),
       msg => {
@@ -457,7 +454,7 @@ class RNGoogleFit {
   }
 
   deleteHeight = (options, callback) => {
-    googleFit.deleteWeight(
+    googleFit.deleteHeight(
       prepareDeleteOptions(options),
       msg => {
         callback(msg, false)
