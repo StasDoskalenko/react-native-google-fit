@@ -67,7 +67,7 @@ declare module 'react-native-google-fit' {
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getActivitySamples(
-      options: NumericalStartAndEndDate,
+      options: StartAndEndDate,
       callback: (isError: boolean, result: ActivitySampleResponse[]) => void
     ): void
 
@@ -83,7 +83,7 @@ declare module 'react-native-google-fit' {
 
     getDailyNutritionSamples(
       options: StartAndEndDate,
-      callback: (isError: boolean, result: NutrientResponse[]) => void
+      callback: (isError: boolean, result: getDailyNutritionSamples[]) => void
     ): void
 
     /**
@@ -224,11 +224,6 @@ declare module 'react-native-google-fit' {
   export type StartAndEndDate = {
     startDate: string,
     endDate: string,
-  };
-
-  export type NumericalStartAndEndDate = {
-    startDate: number,
-    endDate: number,
   };
 
   export type StepsResponse = {
