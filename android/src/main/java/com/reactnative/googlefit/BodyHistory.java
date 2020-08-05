@@ -60,7 +60,6 @@ public class BodyHistory {
     }
 
     public ReadableArray getHistory(long startTime, long endTime) {
-        DateFormat dateFormat = DateFormat.getDateInstance();
         // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
         startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
