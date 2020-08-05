@@ -39,9 +39,10 @@ declare module 'react-native-google-fit' {
      * @param {Function} callback The function will be called with an array of elements.
      */
     getDailyStepCountSamples: (
-      options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: StepsResponse[]) => void
+      options: Partial<StartAndEndDate>
     ) => Promise<StepsResponse[]>
+    
+    getDailyStepCountSamples: (options: Partial<StartAndEndDate>, callback: (isError: boolean, result: StepsResponse[]) => void) => void;
 
     /**
      * Get the total distance per day over a specified date range.
@@ -50,9 +51,13 @@ declare module 'react-native-google-fit' {
      */
 
     getDailyDistanceSamples(
+      options: Partial<StartAndEndDate & BucketOptions>
+    ): Promise< DistanceResponse[]>;
+
+    getDailyDistanceSamples(
       options: Partial<StartAndEndDate & BucketOptions>,
       callback: (isError: boolean, result: DistanceResponse[]) => void
-    ): void
+    ): void;
 
     /**
      * Get the total steps per day over a specified date range.
@@ -60,6 +65,7 @@ declare module 'react-native-google-fit' {
       * @param {Function} callback The function will be called with an array of elements.
       */
     getUserInputSteps: (options: Partial<StartAndEndDate>, callback: (isError?: boolean, result?: number)=> void ) => void;
+    getUserInputSteps: (options: Partial<StartAndEndDate>) => Promise<number>;
 
     /**
      * Get the total distance per day over a specified date range.
@@ -69,7 +75,11 @@ declare module 'react-native-google-fit' {
     getActivitySamples(
       options: NumericalStartAndEndDate,
       callback: (isError: boolean, result: ActivitySampleResponse[]) => void
-    ): void
+    ): void;
+
+    getActivitySamples(
+      options: NumericalStartAndEndDate
+    ): Promise<ActivitySampleResponse[]>;
 
     /**
      * Get the total calories per day over a specified date range.
@@ -79,12 +89,18 @@ declare module 'react-native-google-fit' {
     getDailyCalorieSamples(
       options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>,
       callback: (isError: boolean, result: CalorieReponse[]) => void
-    ): void
+    ): void;
+    getDailyCalorieSamples(
+      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>,
+    ): Promise<CalorieReponse[]>;
 
     getDailyNutritionSamples(
       options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: NutrientResponse[]) => void
-    ): void
+    ): void;
+    getDailyNutritionSamples(
+      options: StartAndEndDate & Partial<BucketOptions>
+    ): Promise<NutrientResponse[]>;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
@@ -95,7 +111,10 @@ declare module 'react-native-google-fit' {
     getWeightSamples: (
       options: Partial<StartAndEndDate>,
       callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+    ) => void;
+    getWeightSamples: (
+      options: Partial<StartAndEndDate>
+    ) => Promise<WeightSample[]>;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
@@ -106,53 +125,84 @@ declare module 'react-native-google-fit' {
     getHeightSamples: (
       options: StartAndEndDate,
       callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+    ) => void;
+    getHeightSamples: (
+      options: StartAndEndDate
+    ) => Promise<WeightSample[]>;
 
     getHeartRateSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+    ) => void;
+    getHeartRateSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<DateValueResponse[]>;
 
     getBloodPressureSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+    ) => void;
+    getBloodPressureSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<DateValueResponse[]>;
 
     saveWeight: (
       options: WeightData,
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    saveWeight: (
+      options: WeightData
+    ) => Promise<true>;
 
     saveHeight: (
       options: { date: string, value: number },
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    saveHeight: (
+      options: { date: string, value: number }
+    ) => Promise<true>;
 
     deleteWeight: (
       options: DeleteOptions,
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    deleteWeight: (
+      options: DeleteOptions
+    ) => Promise<true>;
 
     deleteHeight: (
       options: DeleteOptions,
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    deleteHeight: (
+      options: DeleteOptions
+    ) => Promise<true>;
 
     getHydrationSamples: (
       startDate: string,
       endDate: string,
       callback: (isError: boolean, result: HydrationSample[] | string) => void
-    ) => void
+    ) => void;
+    getHydrationSamples: (
+      startDate: string,
+      endDate: string
+    ) => Promise<HydrationSample[]>;
 
     saveHydration: (
       hydrationArray: Hydration[],
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    saveHydration: (
+      hydrationArray: Hydration[]
+    ) => Promise<true>;
 
     deleteHydration: (
       options: DeleteOptions,
       callback: (isError: boolean, result: true) => void
-    ) => void
+    ) => void;
+    deleteHydration: (
+      options: DeleteOptions
+    ) => Promise<true>;
 
     /**
      * Get the sleep sessions over a specified date range.
@@ -161,14 +211,19 @@ declare module 'react-native-google-fit' {
      */
     getSleepData: (
       options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: any) => void
-    ) => Promise<any> | void
+      callback: (isError: boolean, result: any) => void
+    ) => void;
+    getSleepData: (
+      options: Partial<StartAndEndDate>
+    ) => Promise<any>;
 
 
 
-    isAvailable(callback: (isError: boolean, result: boolean) => void): void
+    isAvailable(callback: (isError: boolean, result: boolean) => void): void;
+    isAvailable(): Promise<boolean>;
 
-    isEnabled(callback: (isError: boolean, result: boolean) => void): void
+    isEnabled(callback: (isError: boolean, result: boolean) => void): void;
+    isEnabled(): Promise<boolean>;
 
     openFit(): void
 
