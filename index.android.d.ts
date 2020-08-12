@@ -4,7 +4,7 @@ declare module 'react-native-google-fit' {
     eventListeners: any[]
     isAuthorized: boolean
 
-    authorize(options?: AuthorizeOptions): Promise<any>
+    authorize(options?: AuthorizeOptions): Promise<AuthorizeResponse>
 
     checkIsAuthorized: () => Promise<void>
 
@@ -18,60 +18,48 @@ declare module 'react-native-google-fit' {
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording: (callback: (param: any) => void, dataTypes: Array<string>) => void
+    startRecording: (callback: (param: any) => void, dataTypes: Array<'step' | 'distance' | 'activity'>) => void
 
     /**
      * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
      * @param {Date} date optional param, new Date() will be used if date is not provided
      */
-    getDailySteps: (date?: Date) => Promise<any>
+    getDailySteps: (date?: Date) => Promise<StepsResponse[]>
 
     /**
      * A shortcut to get the weekly steps of a given day by using getDailyStepCountSamples
      * @param {Date} date optional param, new Date() will be used if date is not provided
      * @param {number} adjustment, optional param, use to adjust the default start day of week, 0 = Sunday, 1 = Monday, etc.
      */
-    getWeeklySteps: (date?: Date, adjustment?: number) => Promise<any>
+    getWeeklySteps: (date?: Date, adjustment?: number) => Promise<StepsResponse[]>
 
     /**
      * Get the total steps per day over a specified date range.
-     * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Object} options getDailyStepCountSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      * @param {Function} callback The function will be called with an array of elements.
      */
     getDailyStepCountSamples: (
-      options: any,
-      callback?: (isError: boolean, result: any) => void
-    ) => Promise<any>
-
-    buildDailySteps(steps: any): { date: any; value: any }[]
+      options: Partial<StartAndEndDate>,
+      callback?: (isError: boolean, result: StepsResponse[]) => void
+    ) => Promise<StepsResponse[]>
 
     /**
      * Get the total distance per day over a specified date range.
-     * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Object} options getDailyDistanceSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      * @callback {Function} callback The function will be called with an array of elements.
      */
 
-
- /**
- * a exampleFunction description.
- * @param {string} input
- */
- exampleFunction(input?: string) : void
-
     getDailyDistanceSamples(
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: Partial<StartAndEndDate>,
+      callback: (isError: boolean, result: DistanceResponse[]) => void
     ): void
 
     /**
      * Get the total steps per day over a specified date range.
-      * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+      * @param {Object} options getUserInputSteps accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
       * @param {Function} callback The function will be called with an array of elements.
       */
-    getUserInputSteps: (options: {
-        startDate: string,
-        endDate: string,
-    }, callback: (isError?: boolean, result?: number)=> void ) => void;
+    getUserInputSteps: (options: Partial<StartAndEndDate>, callback: (isError?: boolean, result?: number)=> void ) => void;
 
     /**
      * Get the total distance per day over a specified date range.
@@ -79,25 +67,23 @@ declare module 'react-native-google-fit' {
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getActivitySamples(
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: StartAndEndDate,
+      callback: (isError: boolean, result: ActivitySampleResponse[]) => void
     ): void
 
     /**
      * Get the total calories per day over a specified date range.
-     * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp. optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getDailyCalorieSamples(
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: StartAndEndDate & { basalCalculation?: boolean },
+      callback: (isError: boolean, result: CalorieReponse[]) => void
     ): void
 
-    saveFood(options: FoodIntake, callback: (isError: boolean) => void): void
-
     getDailyNutritionSamples(
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: StartAndEndDate,
+      callback: (isError: boolean, result: getDailyNutritionSamples[]) => void
     ): void
 
     /**
@@ -107,7 +93,7 @@ declare module 'react-native-google-fit' {
      * @callback callback The function will be called with an array of elements.
      */
     getWeightSamples: (
-      options: any,
+      options: Partial<StartAndEndDate>,
       callback: (isError: boolean, result: WeightSample[]) => void
     ) => void
 
@@ -118,38 +104,38 @@ declare module 'react-native-google-fit' {
      * @callback callback The function will be called with an array of elements.
      */
     getHeightSamples: (
-      options: any,
+      options: StartAndEndDate,
       callback: (isError: boolean, result: WeightSample[]) => void
     ) => void
 
     getHeartRateSamples: (
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: StartAndEndDate,
+      callback: (isError: boolean, result: DateValueResponse[]) => void
     ) => void
 
     getBloodPressureSamples: (
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: StartAndEndDate,
+      callback: (isError: boolean, result: DateValueResponse[]) => void
     ) => void
 
     saveWeight: (
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: WeightData,
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     saveHeight: (
-      options: any,
-      callback: (isError: boolean, result: any) => void
+      options: { date: string, value: number },
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     deleteWeight: (
       options: DeleteOptions,
-      callback: (isError: boolean, result: any) => void
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     deleteHeight: (
       options: DeleteOptions,
-      callback: (isError: boolean, result: any) => void
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     getHydrationSamples: (
@@ -160,12 +146,12 @@ declare module 'react-native-google-fit' {
 
     saveHydration: (
       hydrationArray: Hydration[],
-      callback: (isError: boolean, result: any) => void
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     deleteHydration: (
       options: DeleteOptions,
-      callback: (isError: boolean, result: any) => void
+      callback: (isError: boolean, result: true) => void
     ) => void
 
     /**
@@ -174,7 +160,7 @@ declare module 'react-native-google-fit' {
      * @param {Function} callback The function will be called with an array of elements.
      */
     getSleepData: (
-      options: any,
+      options: Partial<StartAndEndDate>,
       callback?: (isError: boolean, result: any) => void
     ) => Promise<any> | void
 
@@ -198,45 +184,106 @@ declare module 'react-native-google-fit' {
 
     unsubscribeListeners: () => void
 
-    lbsAndOzToK(imperial: any): any
-
-    KgToLbs(metric: any): any
   }
-
-  export interface WeightSample {
+  type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  export type WeightSample = {
     addedBy: string
     day: string
     value: number
     startDate: string
     endDate: string
-  }
+  };
 
-  export interface HydrationSample {
+  export type HydrationSample = {
     addedBy: string
     waterConsumed: number
     date: string
-  }
+  };
 
-  export interface FoodIntake {
+  export type FoodIntake = {
     mealType: MealType
     foodName: string
     nutrients: Object
     date: string
-  }
+  };
 
-  export interface AuthorizeOptions {
+  export type AuthorizeOptions = {
     scopes: Array<Scopes>
-  }
+  };
 
-  export interface Hydration {
+  export type Hydration = {
     date: number
     waterConsumed: number
-  }
+  };
 
-  export interface DeleteOptions {
+  export type DeleteOptions = {
     startDate: string | number
     endDate: string | number
+  };
+
+  export type StartAndEndDate = {
+    startDate: string,
+    endDate: string,
+  };
+
+  export type StepsResponse = {
+    source: string,
+    steps: Array<{date: string, value: number }>
+  };
+
+  export type CalorieReponse = {
+    calorie: number,
+    endDate: string,
+    startDate: string,
+    day: Day
+  };
+
+  export type DistanceResponse = {
+    distance: number,
+    endDate: string,
+    startDate: string,
+    day: Day
+  };
+
+  export type WeightData = { date: string } & ({ unit: 'pound', value: number } | {});
+
+  export type AuthorizeResponse = { success: true} | {success: false, message: string };
+
+  export type DateValueResponse = {
+    value: number,
+    endDate:string,
+    startDate:string,
+    day: Day
   }
+
+  export type ActivitySampleResponse = {
+    sourceName: string,
+    device: string,
+    sourceId: string,
+    tracked: boolean,
+    activityName: string,
+    end: number,
+    start: number 
+    calories?: number,
+    quantity?: number,
+    distance?: number
+  }
+
+  export type NutrientResponse = {
+    nutrients: {
+      sugar: number,
+      iron: number,
+      sodium: number, 
+      calories: number,
+      "fat.polyunsaturated": number,
+      "carbs.total": number,
+      potassium: number,
+      cholesterol: number,
+      protein: number,
+      "fat.saturated": number,
+      "fat.total": number},
+    date: string
+  };
 
   export enum MealType {
     UNKNOWN = 0,
