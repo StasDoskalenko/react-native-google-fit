@@ -4,7 +4,7 @@ declare module 'react-native-google-fit' {
     eventListeners: any[]
     isAuthorized: boolean
 
-    authorize(options?: AuthorizeOptions): Promise<AuthorizeResponse>
+    authorize(options?: AuthorizeOptions, initializeOnly: boolean): Promise<AuthorizeResponse>
 
     checkIsAuthorized: () => Promise<void>
 

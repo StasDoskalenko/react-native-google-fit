@@ -21,7 +21,7 @@ class RNGoogleFit {
   eventListeners = []
   isAuthorized = false
 
-  authorize = async (options = {}) => {
+  authorize = async (options = {}, initializeOnly) => {
     const successResponse = { success: true }
     try {
       await this.checkIsAuthorized()
@@ -46,6 +46,7 @@ class RNGoogleFit {
 
         googleFit.authorize({
           scopes: (options && options.scopes) || defaultScopes,
+          initializeOnly
         })
       })
       return authResult
