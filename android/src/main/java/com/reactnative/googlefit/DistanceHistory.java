@@ -49,7 +49,7 @@ public class DistanceHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime) {
+    public ReadableArray aggregateDataByDate(long startTime, long endTime, int bucketInterval, String bucketUnit) {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -58,7 +58,7 @@ public class DistanceHistory {
         //Check how much distance were walked and recorded in specified days
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                .bucketByTime(1, TimeUnit.DAYS)
+                .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 

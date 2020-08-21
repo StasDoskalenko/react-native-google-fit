@@ -62,14 +62,12 @@ public class HeartrateHistory {
         this.dataType = dataType;
     }
 
-    public ReadableArray getHistory(long startTime, long endTime) {
-        DateFormat dateFormat = DateFormat.getDateInstance();
-
+    public ReadableArray getHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .read(this.dataType)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
         if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
-            readRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
+            readRequestBuilder.bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit));
         }
 
         DataReadRequest readRequest = readRequestBuilder.build();
