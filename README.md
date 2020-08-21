@@ -114,6 +114,7 @@ A React Native bridge module for interacting with Google Fit
     ];
     ```
    **Note:** bucket Config for step reflects on `rawStep` entity.
+   
    **Response:**
    ```javascript
    // {bucketInterval: 15, bucketUnit: 'MINUTE'}
