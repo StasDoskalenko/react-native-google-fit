@@ -475,8 +475,15 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
+    
+15. Retrieve Sleep 
+    ```javascript
+        GoogleFit.getSleepData(options, (err, res) => {
+      console.log(res)
+    });
+    ```
 
-15. Other methods:
+16. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
