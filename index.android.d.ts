@@ -67,7 +67,7 @@ declare module 'react-native-google-fit' {
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getActivitySamples(
-      options: StartAndEndDate,
+      options: NumericalStartAndEndDate,
       callback: (isError: boolean, result: ActivitySampleResponse[]) => void
     ): void
 
@@ -185,10 +185,11 @@ declare module 'react-native-google-fit' {
     unsubscribeListeners: () => void
 
   }
+
   type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 
   type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
-  
+
   export type WeightSample = {
     addedBy: string
     day: string
@@ -227,6 +228,12 @@ declare module 'react-native-google-fit' {
   export type StartAndEndDate = {
     startDate: string,
     endDate: string,
+  };
+
+
+  export type NumericalStartAndEndDate = {
+    startDate: number,
+    endDate: number
   };
 
   export type BucketOptions = {
