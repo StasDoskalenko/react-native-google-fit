@@ -68,7 +68,9 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     const options = {
       startDate: "2017-01-01T00:00:17.971Z", // required ISO8601Timestamp
-      endDate: new Date().toISOString() // required ISO8601Timestamp
+      endDate: new Date().toISOString(), // required ISO8601Timestamp
+      bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+      bucketInterval: 1, // optional - default 1. 
     };
     
     GoogleFit.getDailyStepCountSamples(options)
@@ -111,21 +113,11 @@ A React Native bridge module for interacting with Google Fit
       { source: "com.xiaomi.hm.health", steps: [] }
     ];
     ```
-    Step also support a optional config to get rawStep Data for detail usage.
-    ```javascript
-    const dailyOptions = {
-        startDate: "2020-07-06T00:00:00.000Z",
-        endDate:  "2020-07-06T23:59:00.000Z",
-        // optional
-        configs:{
-        bucketTime: 15,
-        bucketUnit: 'MINUTE' | 'HOUR' | 'SECOND' | 'DAY'  // must all CAPITALIZE
-        }
-    }
-   ```
+   **Note:** bucket Config for step reflects on `rawStep` entity.
+   
    **Response:**
    ```javascript
-   // {bucketTime: 15, bucketUnit: 'MINUTE'}
+   // {bucketInterval: 15, bucketUnit: 'MINUTE'}
    [
       { source: "com.google.android.gms:estimated_steps", 
         steps: [
@@ -143,7 +135,7 @@ A React Native bridge module for interacting with Google Fit
       },
     ]
     
-    // {bucketTime: 1, bucketUnit: 'DAY'}
+    // {bucketInterval: 1, bucketUnit: 'DAY'}
     [
         { source: "com.google.android.gms:estimated_steps",
             ...
@@ -236,6 +228,8 @@ A React Native bridge module for interacting with Google Fit
     const options = {
       startDate: "2017-01-01T00:00:17.971Z", // required
       endDate: new Date().toISOString(), // required
+      bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+      bucketInterval: 1, // optional - default 1. 
     }
     const callback = ((error, response) => {
       console.log(error, response)
@@ -325,6 +319,8 @@ A React Native bridge module for interacting with Google Fit
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
         basalCalculation: true, // optional, to calculate or not basalAVG over the week
+        bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+        bucketInterval: 1, // optional - default 1. 
       };
 
       GoogleFit.getDailyCalorieSamples(opt, (err, res) => {
@@ -356,6 +352,8 @@ A React Native bridge module for interacting with Google Fit
       const opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
+        bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+        bucketInterval: 1, // optional - default 1. 
       };
 
       GoogleFit.getDailyDistanceSamples(opt, (err, res) => {
@@ -387,6 +385,8 @@ A React Native bridge module for interacting with Google Fit
       const opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
+        bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+        bucketInterval: 1, // optional - default 1. 
       };
 
       GoogleFit.getDailyNutritionSamples(opt, (err, res) => {
@@ -475,8 +475,15 @@ A React Native bridge module for interacting with Google Fit
       console.log(res);
     });
     ```
+    
+15. Retrieve Sleep 
+    ```javascript
+        GoogleFit.getSleepData(options, (err, res) => {
+      console.log(res)
+    });
+    ```
 
-15. Other methods:
+16. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event

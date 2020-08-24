@@ -64,7 +64,7 @@ public class NutritionHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime) {
+    public ReadableArray aggregateDataByDate(long startTime, long endTime, int bucketInterval, String bucketUnit) {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -72,7 +72,7 @@ public class NutritionHistory {
 
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_NUTRITION, DataType.AGGREGATE_NUTRITION_SUMMARY)
-                .bucketByTime(1, TimeUnit.DAYS)
+                .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS).build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest)

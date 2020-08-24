@@ -65,16 +65,6 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public TimeUnit processBucketUnit(String buckUnit) {
-        switch (buckUnit){
-            case "DAY": return TimeUnit.DAYS;
-            case "HOUR": return TimeUnit.HOURS;
-            case "MINUTE": return TimeUnit.MINUTES;
-            case "SECOND": return TimeUnit.SECONDS;
-        }
-        return TimeUnit.HOURS;
-    }
-
     public int getBucketTime(ReadableMap configs) {
         int bucketTime = 12;
         if (null != configs && configs.hasKey("bucketTime")) {
@@ -86,7 +76,7 @@ public class StepHistory {
     public TimeUnit getBucketUnit(ReadableMap configs) {
         TimeUnit bucketUnit = TimeUnit.HOURS;
         if(null != configs && configs.hasKey("bucketUnit")) {
-            bucketUnit = this.processBucketUnit(configs.getString("bucketUnit"));
+            bucketUnit = HelperUtil.processBucketUnit(configs.getString("bucketUnit"));
         }
         return bucketUnit;
     }
@@ -206,12 +196,6 @@ public class StepHistory {
                 source.putString("appPackage", dataSource.getAppPackageName());
             } else {
                 source.putNull("appPackage");
-            }
-
-            if (dataSource.getName() != null) {
-                source.putString("name", dataSource.getName());
-            } else {
-                source.putNull("name");
             }
 
             if (dataSource.getStreamName() != null) {

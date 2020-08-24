@@ -50,7 +50,7 @@ declare module 'react-native-google-fit' {
      */
 
     getDailyDistanceSamples(
-      options: Partial<StartAndEndDate>,
+      options: Partial<StartAndEndDate & BucketOptions>,
       callback: (isError: boolean, result: DistanceResponse[]) => void
     ): void
 
@@ -77,12 +77,12 @@ declare module 'react-native-google-fit' {
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getDailyCalorieSamples(
-      options: StartAndEndDate & { basalCalculation?: boolean },
+      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>,
       callback: (isError: boolean, result: CalorieReponse[]) => void
     ): void
 
     getDailyNutritionSamples(
-      options: StartAndEndDate,
+      options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: NutrientResponse[]) => void
     ): void
 
@@ -109,12 +109,12 @@ declare module 'react-native-google-fit' {
     ) => void
 
     getHeartRateSamples: (
-      options: StartAndEndDate,
+      options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: DateValueResponse[]) => void
     ) => void
 
     getBloodPressureSamples: (
-      options: StartAndEndDate,
+      options: StartAndEndDate & Partial<BucketOptions>,
       callback: (isError: boolean, result: DateValueResponse[]) => void
     ) => void
 
@@ -188,6 +188,8 @@ declare module 'react-native-google-fit' {
 
   type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 
+  type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
+
   export type WeightSample = {
     addedBy: string
     day: string
@@ -228,9 +230,15 @@ declare module 'react-native-google-fit' {
     endDate: string,
   };
 
+
   export type NumericalStartAndEndDate = {
     startDate: number,
-    endDate: number,
+    endDate: number
+  };
+
+  export type BucketOptions = {
+    bucketInterval: number,
+    bucketUnit: BucketUnit
   };
 
   export type StepsResponse = {
