@@ -71,7 +71,7 @@ public class SleepHistory {
 
     private static final String TAG = "RNGoogleFit-Sleep";
     private static final String sleepPermissionsError = "4: The user must be signed in to make this API call.";
-    private static final Int sleepErrorCode = 4;
+    private static final int sleepErrorCode = 4;
     public SleepHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
@@ -85,7 +85,7 @@ public class SleepHistory {
                 .setTimeInterval((long) startDate, (long) endDate, TimeUnit.MILLISECONDS)
                 .build();
 
-        GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
+        final GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
         Fitness.getSessionsClient(this.mReactContext, gsa)
                 .readSession(request)
                 .addOnSuccessListener(new OnSuccessListener<SessionReadResponse>() {
