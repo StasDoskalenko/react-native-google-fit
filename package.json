@@ -1,6 +1,6 @@
 {
   "name": "react-native-google-fit",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "A React Native bridge module for interacting with Google Fit",
   "main": "index.android.js",
   "scripts": {
