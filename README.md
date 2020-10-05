@@ -21,9 +21,11 @@ A React Native bridge module for interacting with Google Fit
 
     To check whethere GoogleFit is already authorized, simply use a function
     ```
-        GoogleFit.checkIsAuthorized()
+        GoogleFit.checkIsAuthorized().then(() => {
+            console.log(GoogleFit.isAuthorized) // Then you can simply refer to `GoogleFit.isAuthorized` boolean.
+        })
     ```
-    Then you can simply refer to `GoogleFit.isAuthorized` boolean.
+   
     
     ```javascript
     // The list of available scopes inside of src/scopes.js file
