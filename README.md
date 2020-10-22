@@ -85,13 +85,19 @@ A React Native bridge module for interacting with Google Fit
      .then((res) => {
          console.log('Daily steps >>> ', res)
      })
-     .catch((err) => {console.warn(err)})
+     .catch((err) => {console.warn(err)});
+
+    // or with async/await syntax
+    async function fetchData() {
+      const data = await GoogleFit.getDailyStepCountSamples(options)；
+      console.log(data);
+    }
     
     // shortcut functions, 
     // return weekly or daily steps of given date
     // all params are optional, using new Date() without given date, 
     // adjustment is 0 by default, determine the first day of week, 0 == Sunday, 1==Monday, etc.
-    GoogleFit.getDailySteps(date).then.catch()
+    GoogleFit.getDailySteps(date).then().catch()
     GoogleFit.getWeeklySteps(date, adjustment).then().catch()
      
     ```

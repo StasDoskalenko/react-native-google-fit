@@ -165,68 +165,45 @@ class RNGoogleFit {
     return this.getDailyStepCountSamples(options);
   }
 
-  isConfigsEmpty(obj) {
-    for(var prop in obj) return false;
-    return true;
-  }
-
-  _retrieveDailyStepCountSamples = (startDate, endDate, options, callback) => {
-    googleFit.getDailyStepCountSamples(
-      startDate,
-      endDate,
-      options.configs,
-      msg => callback(msg, false),
-      res => {
-        if (res.length > 0) {
-          callback(
-            false,
-            res.map(function(dev) {
-              const obj = {}
-              obj.source =
-                dev.source.appPackage +
-                (dev.source.stream ? ':' + dev.source.stream : '')
-              obj.steps = buildDailySteps(dev.steps)
-              obj.rawSteps = this.isConfigsEmpty(options.configs) ? [] : dev.steps
-              return obj
-            }, this)
-          )
-        } else {
-          callback('There is no any steps data for this period', false)
-        }
-      }
-    )
-  }
-
   /**
    * Get the total steps per day over a specified date range.
    * @param {Object} options getDailyStepCountSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * @param {Function} callback The function will be called with an array of elements.
    */
 
-  getDailyStepCountSamples = (options, callback) => {
+  getDailyStepCountSamples = async (options) => {
     const startDate = !isNil(options.startDate)
       ? Date.parse(options.startDate)
       : new Date().setHours(0, 0, 0, 0)
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
       : new Date().valueOf()
-    if (!callback || typeof callback !== 'function') {
-      return new Promise((resolve, reject) => {
-        this._retrieveDailyStepCountSamples(
-          startDate,
-          endDate,
-          options,
-          (error, result) => {
-            if (!error) {
-              resolve(result)
-            } else {
-              reject(error)
-            }
-          }
-        )
-      })
+    const bucketInterval = options.bucketInterval || 1;
+    const bucketUnit = options.bucketUnit || "DAY";
+
+    const data = await googleFit.getDailyStepCountSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit,
+    );
+
+    var result;
+    if(data.length > 0) {
+      result = data.map(function(dev) {
+        const obj = {}
+        obj.source =
+          dev.source.appPackage +
+          (dev.source.stream ? ':' + dev.source.stream : '')
+        obj.steps = buildDailySteps(dev.steps)
+        obj.rawSteps = dev.steps
+        return obj
+      }, this); 
+    }else{
+      //simply return raw result for better debugging;
+      return data;
     }
-    this._retrieveDailyStepCountSamples(startDate, endDate, options, callback)
+
+    return result;
   }
 
   /**

@@ -132,16 +132,21 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void getDailyStepCountSamples(double startDate,
+    public void getDailyStepCountSamples(double startDate, 
                                          double endDate,
-                                         ReadableMap configs,
-                                         Callback errorCallback,
-                                         Callback successCallback) {
+                                         int bucketInterval,
+                                         String bucketUnit,
+                                         Promise promise
+    ) {
 
         try {
-            mGoogleFitManager.getStepHistory().aggregateDataByDate((long) startDate, (long) endDate, configs, successCallback);
-        } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            mGoogleFitManager.getStepHistory().aggregateDataByDate((long) startDate, (long) endDate,
+                    bucketInterval,
+                    bucketUnit,
+                    promise
+            );
+        } catch (Error e) {
+            promise.reject(e);
         }
     }
 
