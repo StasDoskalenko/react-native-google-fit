@@ -36,11 +36,9 @@ declare module 'react-native-google-fit' {
     /**
      * Get the total steps per day over a specified date range.
      * @param {Object} options getDailyStepCountSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @param {Function} callback The function will be called with an array of elements.
      */
     getDailyStepCountSamples: (
-      options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: StepsResponse[]) => void
+      options: Partial<StartAndEndDate & BucketOptions>
     ) => Promise<StepsResponse[]>
 
     /**
@@ -186,9 +184,9 @@ declare module 'react-native-google-fit' {
 
   }
 
-  type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  export type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 
-  type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
+  export type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
 
   export type WeightSample = {
     addedBy: string
@@ -241,9 +239,12 @@ declare module 'react-native-google-fit' {
     bucketUnit: BucketUnit
   };
 
+  type rawSteps = Array<{startDate: string, endDate: string, steps: number}>;
+  
   export type StepsResponse = {
     source: string,
-    steps: Array<{date: string, value: number }>
+    steps: Array<{date: string, value: number }>,
+    rawSteps: rawSteps
   };
 
   export type CalorieReponse = {
@@ -403,25 +404,25 @@ declare module 'react-native-google-fit' {
 
   export enum Scopes {
     FITNESS_ACTIVITY_READ = 'https://www.googleapis.com/auth/fitness.activity.read',
-    FITNESS_ACTIVITY_READ_WRITE = 'https://www.googleapis.com/auth/fitness.activity.write',
+    FITNESS_ACTIVITY_WRITE = 'https://www.googleapis.com/auth/fitness.activity.write',
     FITNESS_LOCATION_READ = 'https://www.googleapis.com/auth/fitness.location.read',
-    FITNESS_LOCATION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.location.write',
+    FITNESS_LOCATION_WRITE = 'https://www.googleapis.com/auth/fitness.location.write',
     FITNESS_BODY_READ = 'https://www.googleapis.com/auth/fitness.body.read',
-    FITNESS_BODY_READ_WRITE = 'https://www.googleapis.com/auth/fitness.body.write',
+    FITNESS_BODY_WRITE = 'https://www.googleapis.com/auth/fitness.body.write',
     FITNESS_NUTRITION_READ = 'https://www.googleapis.com/auth/fitness.nutrition.read',
-    FITNESS_NUTRITION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.nutrition.write',
+    FITNESS_NUTRITION_WRITE = 'https://www.googleapis.com/auth/fitness.nutrition.write',
     FITNESS_BLOOD_PRESSURE_READ = 'https://www.googleapis.com/auth/fitness.blood_pressure.read',
-    FITNESS_BLOOD_PRESSURE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.blood_pressure.write',
+    FITNESS_BLOOD_PRESSURE_WRITE = 'https://www.googleapis.com/auth/fitness.blood_pressure.write',
     FITNESS_BLOOD_GLUCOSE_READ = 'https://www.googleapis.com/auth/fitness.blood_glucose.read',
-    FITNESS_BLOOD_GLUCOSE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.blood_glucose.write',
+    FITNESS_BLOOD_GLUCOSE_WRITE = 'https://www.googleapis.com/auth/fitness.blood_glucose.write',
     FITNESS_OXYGEN_SATURATION_READ = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.read',
-    FITNESS_OXYGEN_SATURATION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.write',
+    FITNESS_OXYGEN_SATURATION_WRITE = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.write',
     FITNESS_BODY_TEMPERATURE_READ = 'https://www.googleapis.com/auth/fitness.body_temperature.read',
-    FITNESS_BODY_TEMPERATURE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.body_temperature.write',
+    FITNESS_BODY_TEMPERATURE_WRITE = 'https://www.googleapis.com/auth/fitness.body_temperature.write',
     FITNESS_REPRODUCTIVE_HEALTH_READ = 'https://www.googleapis.com/auth/fitness.reproductive_health.read',
-    FITNESS_REPRODUCTIVE_HEALTH_READ_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+    FITNESS_REPRODUCTIVE_HEALTH_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
   }
 
-  const googleFit: GoogleFit
-  export default googleFit
+  const googleFit: GoogleFit;
+  export default googleFit;
 }
