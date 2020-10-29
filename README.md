@@ -363,16 +363,22 @@ A React Native bridge module for interacting with Google Fit
 
 10. Retrieve Distance For Period:
     ```javascript
-      const opt = {
+      const options = {
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
         bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
         bucketInterval: 1, // optional - default 1. 
       };
 
-      GoogleFit.getDailyDistanceSamples(opt, (err, res) => {
+      GoogleFit.getDailyDistanceSamples(opt).then((res)=>{
         console.log(res);
       });
+      
+     // or with async/await syntax
+      async function fetchData() {
+        const data = await GoogleFit.getDailyDistanceSamples(options)；
+        console.log(data);
+      }
     ```
 
     **Response:**
