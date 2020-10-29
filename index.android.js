@@ -226,10 +226,9 @@ class RNGoogleFit {
   /**
    * Get the total distance per day over a specified date range.
    * @param {Object} options getDailyDistanceSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * @param {function} callback The function will be called with an array of elements.
    */
 
-  getDailyDistanceSamples(options, callback) {
+  getDailyDistanceSamples = async (options) => {
     const startDate = !isNil(options.startDate)
       ? Date.parse(options.startDate)
       : new Date().setHours(0, 0, 0, 0)
@@ -239,22 +238,19 @@ class RNGoogleFit {
     const bucketInterval = options.bucketInterval || 1;
     const bucketUnit = options.bucketUnit || "DAY";
 
-    googleFit.getDailyDistanceSamples(
+    const result = await googleFit.getDailyDistanceSamples(
       startDate,
       endDate,
       bucketInterval,
       bucketUnit,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'distance'))
-        } else {
-          callback('There is no any distance data for this period', false)
-        }
-      }
-    )
+    );
+
+    //construct dataset when callback is successful
+    if (result.length > 0) {
+      return prepareResponse(result, 'distance');
+    }
+    //else not either not data exist or something wrong;
+    return result;
   }
 
   getActivitySamples(options, callback) {
