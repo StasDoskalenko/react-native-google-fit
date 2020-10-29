@@ -44,13 +44,11 @@ declare module 'react-native-google-fit' {
     /**
      * Get the total distance per day over a specified date range.
      * @param {Object} options getDailyDistanceSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback {Function} callback The function will be called with an array of elements.
      */
 
-    getDailyDistanceSamples(
-      options: Partial<StartAndEndDate & BucketOptions>,
-      callback: (isError: boolean, result: DistanceResponse[]) => void
-    ): void
+    getDailyDistanceSamples: (
+      options: Partial<StartAndEndDate & BucketOptions>
+    ) => Promise<DistanceResponse[]>
 
     /**
      * Get the total steps per day over a specified date range.
