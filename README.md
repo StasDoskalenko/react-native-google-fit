@@ -281,12 +281,20 @@ A React Native bridge module for interacting with Google Fit
 8. Get all activities
     ```javascript
       let options = {
-        startDate: new Date(2018, 9, 17).valueOf(), // simply outputs the number of milliseconds since the Unix Epoch
-        endDate: new Date(2018, 9, 18).valueOf()
+        startDate: "2017-01-01T00:00:17.971Z", // required
+        endDate: new Date().toISOString(), // required
+        bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+        bucketInterval: 1, // optional - default 1. 
       };
-      GoogleFit.getActivitySamples(options, (err, res) => {
-        console.log(err, res)
+
+      GoogleFit.getActivitySamples(options).then((res)=> {
+        console.log(res)
       });
+      // or with async/await syntax
+      async function fetchData() {
+        const data = await GoogleFit.getActivitySamples(options)；
+        console.log(data);
+      }
     ```
 
       **Response:**

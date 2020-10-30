@@ -11,8 +11,6 @@
 
 package com.reactnative.googlefit;
 
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -20,33 +18,18 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.data.DataSource;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.result.DataSourcesResult;
-import com.google.android.gms.fitness.data.Device;
 
-import java.text.DateFormat;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-import java.util.ArrayList;
-
 
 import static com.google.android.gms.fitness.data.Device.TYPE_WATCH;
 
@@ -74,13 +57,13 @@ public class ActivityHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray getActivitySamples(long startTime, long endTime) {
+    public ReadableArray getActivitySamples(long startTime, long endTime, int bucketInterval, String bucketUnit) {
         WritableArray results = Arguments.createArray();
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                .bucketByActivitySegment(1, TimeUnit.SECONDS)
+                .bucketByActivitySegment(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 
