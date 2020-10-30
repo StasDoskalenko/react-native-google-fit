@@ -13,6 +13,7 @@ import {
   prepareHydrationResponse,
   prepareDeleteOptions,
   getWeekBoundary,
+  prepareInput,
 } from './src/utils';
 
 const googleFit = NativeModules.RNGoogleFit
@@ -171,14 +172,7 @@ class RNGoogleFit {
    */
 
   getDailyStepCountSamples = async (options) => {
-    const startDate = !isNil(options.startDate)
-      ? Date.parse(options.startDate)
-      : new Date().setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate)
-      ? Date.parse(options.endDate)
-      : new Date().valueOf()
-    const bucketInterval = options.bucketInterval || 1;
-    const bucketUnit = options.bucketUnit || "DAY";
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
     const data = await googleFit.getDailyStepCountSamples(
       startDate,
@@ -229,14 +223,7 @@ class RNGoogleFit {
    */
 
   getDailyDistanceSamples = async (options) => {
-    const startDate = !isNil(options.startDate)
-      ? Date.parse(options.startDate)
-      : new Date().setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate)
-      ? Date.parse(options.endDate)
-      : new Date().valueOf();
-    const bucketInterval = options.bucketInterval || 1;
-    const bucketUnit = options.bucketUnit || "DAY";
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
     const result = await googleFit.getDailyDistanceSamples(
       startDate,
@@ -253,21 +240,17 @@ class RNGoogleFit {
     return result;
   }
 
-  getActivitySamples(options, callback) {
-    googleFit.getActivitySamples(
-      options.startDate,
-      options.endDate,
-      error => {
-        callback(error, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, res)
-        } else {
-          callback('There is no any distance data for this period', false)
-        }
-      }
-    )
+  getActivitySamples = async (options) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+
+    const result = await googleFit.getActivitySamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    );
+    
+    return result;
   }
 
   /**

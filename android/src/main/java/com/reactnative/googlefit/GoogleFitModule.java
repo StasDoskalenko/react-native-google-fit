@@ -153,13 +153,14 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getActivitySamples(double startDate,
                                    double endDate,
-                                   Callback errorCallback,
-                                   Callback successCallback) {
-
+                                   int bucketInterval,
+                                   String bucketUnit,
+                                   Promise promise)
+    {
         try {
-            successCallback.invoke(mGoogleFitManager.getActivityHistory().getActivitySamples((long)startDate, (long)endDate));
+            promise.resolve(mGoogleFitManager.getActivityHistory().getActivitySamples((long)startDate, (long)endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 
