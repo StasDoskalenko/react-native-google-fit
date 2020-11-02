@@ -138,7 +138,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                          String bucketUnit,
                                          Promise promise
     ) {
-
         try {
             mGoogleFitManager.getStepHistory().aggregateDataByDate((long) startDate, (long) endDate,
                     bucketInterval,
@@ -169,7 +168,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                 double endDate,
                                 Callback errorCallback,
                                 Callback successCallback) {
-
         try {
             mGoogleFitManager.getStepHistory().getUserInputSteps((long) startDate, (long) endDate, successCallback);
         } catch (IllegalViewOperationException e) {
@@ -194,7 +192,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     public void getWeightSamples(double startDate,
                                  double endDate,
                                  Promise promise) {
-
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_WEIGHT);
@@ -207,15 +204,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getHeightSamples(double startDate,
                                  double endDate,
-                                 Callback errorCallback,
-                                 Callback successCallback) {
-
+                                 Promise promise) {
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_HEIGHT);
-            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
+            promise.resolve(bodyHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 
@@ -277,7 +272,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     public void saveWeight(ReadableMap weightSample,
                            Callback errorCallback,
                            Callback successCallback) {
-
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_WEIGHT);

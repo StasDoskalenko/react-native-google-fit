@@ -336,27 +336,21 @@ class RNGoogleFit {
 
       return result;
     }
-    
+
     return raw_result;
   }
 
-  getHeightSamples(options, callback) {
-    const startDate = Date.parse(options.startDate)
-    const endDate = Date.parse(options.endDate)
-    googleFit.getHeightSamples(
+  getHeightSamples = async (options) => {
+    const { startDate, endDate } = prepareInput(options);
+    const result = await googleFit.getHeightSamples(
       startDate,
       endDate,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'value'))
-        } else {
-          callback('There is no any height data for this period', false)
-        }
-      }
-    )
+    );
+    if (result.length > 0) {
+      return prepareResponse(result, 'value');
+    }
+
+    return result;
   }
 
   saveHeight(options, callback) {

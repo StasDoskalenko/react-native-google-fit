@@ -211,7 +211,7 @@ A React Native bridge module for interacting with Google Fit
       endDate: new Date().toISOString(), // required
     };
     
-    GoogleFit.getHeightSamples(opt, (err, res) => {
+    GoogleFit.getHeightSamples(opt).then((res)=> {
       console.log(res);
     });
     ```
@@ -222,7 +222,7 @@ A React Native bridge module for interacting with Google Fit
     [
       {
         "addedBy": "app_package_name",
-        "value":1.7699999809265137,
+        "value":1.7699999809265137, // Meter
         "endDate":"2019-06-29T15:02:23.409Z",
         "startDate":"2019-06-29T15:02:23.409Z",
         "day":"Sat"

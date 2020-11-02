@@ -88,19 +88,17 @@ declare module 'react-native-google-fit' {
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      */
     getWeightSamples: (
-      options: Partial<StartAndEndDate>
-    ) => Promise<WeightData[]>
+      options: StartAndEndDate & Partial<{ unit: string, ascending: boolean }>
+    ) => Promise<WeightResponse[]>;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getHeightSamples accepts an options object containing unit: "pound"/"kg",
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
      */
     getHeightSamples: (
-      options: StartAndEndDate,
-      callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+      options: StartAndEndDate
+    ) => Promise<HeightResponse[]>;
 
     getHeartRateSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
@@ -184,13 +182,15 @@ declare module 'react-native-google-fit' {
 
   export type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
 
-  export type WeightSample = {
+  export type WeightResponse = {
     addedBy: string
     day: string
     value: number
     startDate: string
     endDate: string
   };
+
+  export type HeightResponse = WeightResponse;
 
   export type HydrationSample = {
     addedBy: string
