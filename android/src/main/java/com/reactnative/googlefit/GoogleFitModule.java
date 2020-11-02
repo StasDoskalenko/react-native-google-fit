@@ -266,12 +266,11 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                          double endDate,
                                          int bucketInterval,
                                          String bucketUnit,
-                                         Callback errorCallback,
-                                         Callback successCallback) {
+                                         Promise promise) {
         try {
-            successCallback.invoke(mGoogleFitManager.getNutritionHistory().aggregateDataByDate((long) startDate, (long) endDate, bucketInterval, bucketUnit));
+            promise.resolve(mGoogleFitManager.getNutritionHistory().aggregateDataByDate((long) startDate, (long) endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 

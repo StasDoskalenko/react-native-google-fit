@@ -234,7 +234,7 @@ class RNGoogleFit {
     if (result.length > 0) {
       return prepareResponse(result, 'distance');
     }
-    //else not either not data exist or something wrong;
+    //else either no data exists or something wrong;
     return result;
   }
 
@@ -274,31 +274,24 @@ class RNGoogleFit {
     if (result.length > 0) {
       return prepareResponse(result, 'calorie');
     }
-    //else not either not data exist or something wrong;
+    //else either no data exists or something wrong;
     return result;
   }
 
-  getDailyNutritionSamples(options, callback) {
-    const startDate = Date.parse(options.startDate)
-    const endDate = Date.parse(options.endDate)
-    const bucketInterval = options.bucketInterval || 1
-    const bucketUnit = options.bucketUnit || "DAY"
-    googleFit.getDailyNutritionSamples(
+  getDailyNutritionSamples = async (options) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getDailyNutritionSamples(
       startDate,
       endDate,
       bucketInterval,
       bucketUnit,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareDailyResponse(res))
-        } else {
-          callback('There is no any nutrition data for this period', false)
-        }
-      }
-    )
+    );
+    //construct dataset when callback is successful
+    if (result.length > 0) {
+      return prepareDailyResponse(result);
+    }
+    //else either no data exists or something wrong;
+    return result;
   }
 
   saveFood(options, callback) {
