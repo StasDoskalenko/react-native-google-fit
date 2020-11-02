@@ -38,7 +38,7 @@ declare module 'react-native-google-fit' {
      * @param {Object} options getDailyStepCountSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      */
     getDailyStepCountSamples: (
-      options: Partial<StartAndEndDate & BucketOptions>
+      options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<StepsResponse[]>
 
     /**
@@ -47,7 +47,7 @@ declare module 'react-native-google-fit' {
      */
 
     getDailyDistanceSamples: (
-      options: Partial<StartAndEndDate & BucketOptions>
+      options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<DistanceResponse[]>
 
     /**
@@ -62,18 +62,16 @@ declare module 'react-native-google-fit' {
      * @param {Object} options getActivitySamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      */
     getActivitySamples: (
-      options: Partial<StartAndEndDate & BucketOptions>,
+      options: StartAndEndDate & Partial<BucketOptions>,
     ) => Promise<ActivitySampleResponse[]>;
 
     /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp. optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
-     * @callback {Function} callback The function will be called with an array of elements.
      */
-    getDailyCalorieSamples(
-      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>,
-      callback: (isError: boolean, result: CalorieReponse[]) => void
-    ): void
+    getDailyCalorieSamples: (
+      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>
+    ) => Promise<CalorieReponse[]>
 
     getDailyNutritionSamples(
       options: StartAndEndDate & Partial<BucketOptions>,

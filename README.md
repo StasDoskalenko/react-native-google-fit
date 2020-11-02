@@ -74,14 +74,14 @@ A React Native bridge module for interacting with Google Fit
 3. Retrieve Steps For Period
 
     ```javascript
-    const options = {
+    const opt = {
       startDate: "2017-01-01T00:00:17.971Z", // required ISO8601Timestamp
       endDate: new Date().toISOString(), // required ISO8601Timestamp
       bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
       bucketInterval: 1, // optional - default 1. 
     };
     
-    GoogleFit.getDailyStepCountSamples(options)
+    GoogleFit.getDailyStepCountSamples(opt)
      .then((res) => {
          console.log('Daily steps >>> ', res)
      })
@@ -89,8 +89,8 @@ A React Native bridge module for interacting with Google Fit
 
     // or with async/await syntax
     async function fetchData() {
-      const data = await GoogleFit.getDailyStepCountSamples(options)；
-      console.log(data);
+      const res = await GoogleFit.getDailyStepCountSamples(opt)；
+      console.log(res);
     }
     
     // shortcut functions, 
@@ -280,20 +280,20 @@ A React Native bridge module for interacting with Google Fit
 
 8. Get all activities
     ```javascript
-      let options = {
+      let opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
         bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
         bucketInterval: 1, // optional - default 1. 
       };
 
-      GoogleFit.getActivitySamples(options).then((res)=> {
+      GoogleFit.getActivitySamples(opt).then((res)=> {
         console.log(res)
       });
       // or with async/await syntax
       async function fetchData() {
-        const data = await GoogleFit.getActivitySamples(options)；
-        console.log(data);
+        const res = await GoogleFit.getActivitySamples(opt)；
+        console.log(res);
       }
     ```
 
@@ -345,7 +345,7 @@ A React Native bridge module for interacting with Google Fit
         bucketInterval: 1, // optional - default 1. 
       };
 
-      GoogleFit.getDailyCalorieSamples(opt, (err, res) => {
+      GoogleFit.getDailyCalorieSamples(opt).then((res) => {
         console.log(res);
       });
     ```
@@ -371,7 +371,7 @@ A React Native bridge module for interacting with Google Fit
 
 10. Retrieve Distance For Period:
     ```javascript
-      const options = {
+      const opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
         endDate: new Date().toISOString(), // required
         bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
@@ -384,8 +384,8 @@ A React Native bridge module for interacting with Google Fit
       
      // or with async/await syntax
       async function fetchData() {
-        const data = await GoogleFit.getDailyDistanceSamples(options)；
-        console.log(data);
+        const res = await GoogleFit.getDailyDistanceSamples(opt)；
+        console.log(res);
       }
     ```
 

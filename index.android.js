@@ -81,7 +81,6 @@ class RNGoogleFit {
 
   // request permissions
   requestPermissionAndroid = async (dataTypes) => {
-
     const check = await this.checkPermissionAndroid();
 
     if (dataTypes.includes('distance') && !check) {
@@ -125,7 +124,6 @@ class RNGoogleFit {
    * and check for {recording: true} as the event data
    */
   startRecording = (callback, dataTypes = ['step']) => {
-
     this.requestPermissionAndroid(dataTypes).then((dataTypes) => {
       googleFit.startFitnessRecording(dataTypes)
 
@@ -258,33 +256,26 @@ class RNGoogleFit {
    * @param {Object} options getDailyCalorieSamples accepts an options object containing:
    * required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp
    * optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
-   * @param {Function} callback The function will be called with an array of elements.
    */
 
-  getDailyCalorieSamples(options, callback) {
+  getDailyCalorieSamples = async (options) => {
     const basalCalculation = options.basalCalculation !== false
-    const startDate = Date.parse(options.startDate)
-    const endDate = Date.parse(options.endDate)
-    const bucketInterval = options.bucketInterval || 1
-    const bucketUnit = options.bucketUnit || "DAY"
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
-    googleFit.getDailyCalorieSamples(
+    const result = await googleFit.getDailyCalorieSamples(
       startDate,
       endDate,
       basalCalculation,
       bucketInterval,
       bucketUnit,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'calorie'))
-        } else {
-          callback('There is no any calorie data for this period', false)
-        }
-      }
-    )
+    );
+
+    //construct dataset when callback is successful
+    if (result.length > 0) {
+      return prepareResponse(result, 'calorie');
+    }
+    //else not either not data exist or something wrong;
+    return result;
   }
 
   getDailyNutritionSamples(options, callback) {

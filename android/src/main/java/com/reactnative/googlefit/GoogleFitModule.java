@@ -241,13 +241,12 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                        boolean basalCalculation,
                                        int bucketInterval,
                                        String bucketUnit,
-                                       Callback errorCallback,
-                                       Callback successCallback) {
+                                       Promise promise) {
 
         try {
-            successCallback.invoke(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate, basalCalculation, bucketInterval, bucketUnit));
+            promise.resolve(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate, basalCalculation, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 
