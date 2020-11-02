@@ -193,15 +193,14 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getWeightSamples(double startDate,
                                  double endDate,
-                                 Callback errorCallback,
-                                 Callback successCallback) {
+                                 Promise promise) {
 
         try {
             BodyHistory bodyHistory = mGoogleFitManager.getBodyHistory();
             bodyHistory.setDataType(DataType.TYPE_WEIGHT);
-            successCallback.invoke(bodyHistory.getHistory((long)startDate, (long)endDate));
+            promise.resolve(bodyHistory.getHistory((long)startDate, (long)endDate));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 

@@ -86,12 +86,10 @@ declare module 'react-native-google-fit' {
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getWeightSamples accepts an options object containing unit: "pound"/"kg",
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
      */
     getWeightSamples: (
-      options: Partial<StartAndEndDate>,
-      callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+      options: Partial<StartAndEndDate>
+    ) => Promise<WeightData[]>
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.

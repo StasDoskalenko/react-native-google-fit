@@ -172,9 +172,14 @@ A React Native bridge module for interacting with Google Fit
       ascending: false // optional; default false
     };
     
-    GoogleFit.getWeightSamples(opt, (err, res) => {
-      console.log(res);
+    GoogleFit.getWeightSamples(opt).then((res)=> {
+      console.log(res)
     });
+    // or with async/await syntax
+    async function fetchData() {
+      const res = await GoogleFit.getWeightSamples(opt)；
+      console.log(res);
+    }
     ```
 
     **Response:**

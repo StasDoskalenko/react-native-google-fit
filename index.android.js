@@ -314,37 +314,30 @@ class RNGoogleFit {
    * @callback callback The function will be called with an array of elements.
    */
 
-  getWeightSamples = (options, callback) => {
-    const startDate = !isNil(options.startDate)
-      ? Date.parse(options.startDate)
-      : new Date().setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate)
-      ? Date.parse(options.endDate)
-      : new Date().valueOf()
-    googleFit.getWeightSamples(
-      startDate,
-      endDate,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          res = res.map(el => {
-            if (el.value) {
-              if (options.unit === 'pound') {
-                el.value = KgToLbs(el.value) //convert back to pounds
-              }
-              el.startDate = new Date(el.startDate).toISOString()
-              el.endDate = new Date(el.endDate).toISOString()
-              return el
+  getWeightSamples = async (options) => {
+    const { startDate, endDate } = prepareInput(options);
+
+    const raw_result = await googleFit.getWeightSamples(startDate, endDate);
+
+    if (raw_result.length > 0) {
+      //remove empty object first and then parse fitness data
+      const result = raw_result
+        .filter(value => Object.keys(value).length !== 0)
+        .map(el => {
+          if (el.value) {
+            if (options.unit === 'pound') {
+              el.value = KgToLbs(el.value) //convert back to pounds
             }
-          })
-          callback(false, res.filter(day => !isNil(day)))
-        } else {
-          callback('There is no any weight data for this period', false)
-        }
-      }
-    )
+            el.startDate = new Date(el.startDate).toISOString()
+            el.endDate = new Date(el.endDate).toISOString()
+            return el
+          }
+        });
+
+      return result;
+    }
+    
+    return raw_result;
   }
 
   getHeightSamples(options, callback) {
