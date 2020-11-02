@@ -71,12 +71,16 @@ declare module 'react-native-google-fit' {
      */
     getDailyCalorieSamples: (
       options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>
-    ) => Promise<CalorieReponse[]>
+    ) => Promise<CalorieReponse[]>;
 
-    getDailyNutritionSamples(
+    getDailyNutritionSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: NutrientResponse[]) => void
-    ): void
+    ) => Promise<NutrientResponse[]>;
+
+    saveFood: (
+      options: FoodIntake,
+      callback: (isError: boolean, result: true) => void
+    ) => void;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
@@ -199,7 +203,7 @@ declare module 'react-native-google-fit' {
   export type FoodIntake = {
     mealType: MealType
     foodName: string
-    nutrients: Object
+    nutrients: Nutrients
     date: string
   };
 
@@ -280,18 +284,7 @@ declare module 'react-native-google-fit' {
   }
 
   export type NutrientResponse = {
-    nutrients: {
-      sugar: number,
-      iron: number,
-      sodium: number, 
-      calories: number,
-      "fat.polyunsaturated": number,
-      "carbs.total": number,
-      potassium: number,
-      cholesterol: number,
-      protein: number,
-      "fat.saturated": number,
-      "fat.total": number},
+    nutrients: Nutrients
     date: string
   };
 
@@ -303,7 +296,11 @@ declare module 'react-native-google-fit' {
     SNACK = 4,
   }
 
-  export enum Nutrient {
+  export type Nutrients = {
+    [ key in NutrientType ]?: number
+  }
+
+  export enum NutrientType {
     /**
      * Calories in kcal
      * @type {string}

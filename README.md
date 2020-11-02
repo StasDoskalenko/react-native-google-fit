@@ -37,8 +37,10 @@ A React Native bridge module for interacting with Google Fit
     // The list of available scopes inside of src/scopes.js file
     const options = {
       scopes: [
-        Scopes.FITNESS_ACTIVITY_READ_WRITE,
-        Scopes.FITNESS_BODY_READ_WRITE,
+        Scopes.FITNESS_ACTIVITY_READ,
+        Scopes.FITNESS_ACTIVITY_WRITE,
+        Scopes.FITNESS_BODY_READ,
+        Scopes.FITNESS_BODY_WRITE,
       ],
     }
     GoogleFit.authorize(options)
@@ -409,6 +411,7 @@ A React Native bridge module for interacting with Google Fit
     ```
 
 11. Retrieve Daily Nutrition Data for Period:
+    You need to add `FITNESS_NUTRITION_READ` scope to your authorization to work with nutrition.
     ```javascript
       const opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
@@ -437,9 +440,25 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
-12. Retrieve Hydration
+12. Save Food
+    You need to add `FITNESS_NUTRITION_WRITE` scope to your authorization to work with nutrition.
+    ```javascript
+    const opt: FoodIntake = {
+      mealType: MealType.DINNER, // check MealType in typscript file
+      foodName: "Beef",
+      date: new Date().toISOString(),
+      nutrients: {"sugar":14,"sodium":1,"calories":105,"potassium":422}
+    }
 
-    You need to add `FITNESS_NUTRITION_READ_WRITE` scope to your authorization to work with hydration.
+    GoogleFit.saveFood(opt, (err, res) => {
+      console.log(err, res);
+    })
+    ```
+
+
+13. Retrieve Hydration
+
+    You need to add `FITNESS_NUTRITION_WRITE` scope to your authorization to work with hydration.
     ```javascript
     const startDate = '2020-01-05T00:00:17.971Z'; // required
     const endDate = new Date().toISOString(); // required
@@ -466,7 +485,7 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
-13. Save Hydration
+14. Save Hydration
 
     This method can update hydration data.
     An app cannot update data inserted by other apps.
@@ -488,7 +507,7 @@ A React Native bridge module for interacting with Google Fit
     });
     ```
 
-14. Delete Hydration
+    Delete Hydration
 
     An app cannot delete data inserted by other apps.
     startDate and endDate MUST not be the same.
