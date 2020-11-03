@@ -453,12 +453,23 @@ A React Native bridge module for interacting with Google Fit
 12. Save Food
     You need to add `FITNESS_NUTRITION_WRITE` scope to your authorization to work with nutrition.
     ```javascript
-    const opt: FoodIntake = {
-      mealType: MealType.DINNER, // check MealType in typscript file
-      foodName: "Beef",
-      date: new Date().toISOString(),
-      nutrients: {"sugar":14,"sodium":1,"calories":105,"potassium":422}
-    }
+      const opt = {
+        mealType: MealType.BREAKFAST,
+        foodName: "banana",
+        date: moment().format(), //equals to new Date().toISOString()
+        nutrients: {
+            [Nutrient.TOTAL_FAT]: 0.4,
+            [Nutrient.SODIUM]: 1,
+            [Nutrient.SATURATED_FAT]: 0.1,
+            [Nutrient.PROTEIN]: 1.3,
+            [Nutrient.TOTAL_CARBS]: 27.0,
+            [Nutrient.CHOLESTEROL]: 0,
+            [Nutrient.CALORIES]: 105,
+            [Nutrient.SUGAR]: 14,
+            [Nutrient.DIETARY_FIBER]: 3.1,
+            [Nutrient.POTASSIUM]: 422,
+        }
+    } as FoodIntake;
 
     GoogleFit.saveFood(opt, (err, res) => {
       console.log(err, res);

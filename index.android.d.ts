@@ -308,10 +308,10 @@ declare module 'react-native-google-fit' {
   }
 
   export type Nutrients = {
-    [ key in NutrientType ]?: number
+    [ key in Nutrient ]?: number
   }
 
-  export enum NutrientType {
+  export enum Nutrient {
     /**
      * Calories in kcal
      * @type {string}
