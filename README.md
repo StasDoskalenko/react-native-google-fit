@@ -169,6 +169,8 @@ A React Native bridge module for interacting with Google Fit
       unit: "pound", // required; default 'kg'
       startDate: "2017-01-01T00:00:17.971Z", // required
       endDate: new Date().toISOString(), // required
+      bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+      bucketInterval: 1, // optional - default 1. 
       ascending: false // optional; default false
     };
     

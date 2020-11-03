@@ -311,13 +311,17 @@ class RNGoogleFit {
    * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
    * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
    *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * @callback callback The function will be called with an array of elements.
    */
 
   getWeightSamples = async (options) => {
-    const { startDate, endDate } = prepareInput(options);
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
-    const raw_result = await googleFit.getWeightSamples(startDate, endDate);
+    const raw_result = await googleFit.getWeightSamples(
+      startDate, 
+      endDate, 
+      bucketInterval, 
+      bucketUnit
+    );
 
     if (raw_result.length > 0) {
       //remove empty object first and then parse fitness data
@@ -340,11 +344,21 @@ class RNGoogleFit {
     return raw_result;
   }
 
+  /**
+   * Query for height samples. the options object is used to setup a query to retrieve relevant samples.
+   * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
+   *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * 
+   * Note: bucketInterval and bucketUnit have no effect at the result since GoogleFit only contains one height data.
+   */
+
   getHeightSamples = async (options) => {
-    const { startDate, endDate } = prepareInput(options);
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getHeightSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit
     );
     if (result.length > 0) {
       return prepareResponse(result, 'value');

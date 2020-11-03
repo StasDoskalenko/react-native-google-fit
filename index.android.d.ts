@@ -88,7 +88,7 @@ declare module 'react-native-google-fit' {
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
      */
     getWeightSamples: (
-      options: StartAndEndDate & Partial<{ unit: string, ascending: boolean }>
+      options: StartAndEndDate & Partial<{ unit: string, ascending: boolean } & BucketOptions>
     ) => Promise<WeightResponse[]>;
 
     /**
