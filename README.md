@@ -254,12 +254,15 @@ A React Native bridge module for interacting with Google Fit
       bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
       bucketInterval: 1, // optional - default 1. 
     }
-    const callback = ((error, response) => {
-      console.log(error, response)
-    });
 
-    GoogleFit.getHeartRateSamples(options, callback)
-    GoogleFit.getBloodPressureSamples(options, callback)
+    async function fetchData() {
+      const heartrate = await GoogleFit.getHeartRateSamples(opt)；
+      console.log(heartrate);
+
+      const bloodpressure = await GoogleFit.getBloodPressureSamples(opt)；
+      console.log(bloodpressure);
+    }
+
     ```
 
     **Response:**
