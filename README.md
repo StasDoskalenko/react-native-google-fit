@@ -281,8 +281,8 @@ A React Native bridge module for interacting with Google Fit
     // blood pressure
     [
       {
-        "value":120,
-        "value2":80,
+        "systolic":120,
+        "diastolic":80,
         "endDate":"2019-07-26T08:39:28.493Z",
         "startDate":"1970-01-01T00:00:00.000Z",
         "day":"Thu"
