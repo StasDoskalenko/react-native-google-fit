@@ -71,7 +71,7 @@ declare module 'react-native-google-fit' {
      */
     getDailyCalorieSamples: (
       options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>
-    ) => Promise<CalorieReponse[]>;
+    ) => Promise<CalorieResponse[]>;
 
     getDailyNutritionSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
@@ -101,14 +101,12 @@ declare module 'react-native-google-fit' {
     ) => Promise<HeightResponse[]>;
 
     getHeartRateSamples: (
-      options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<HeartRateResponse[]>;
 
     getBloodPressureSamples: (
-      options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<BloodPressureResponse[]>;
 
     saveWeight: (
       options: WeightData,
@@ -243,7 +241,7 @@ declare module 'react-native-google-fit' {
     rawSteps: rawSteps
   };
 
-  export type CalorieReponse = {
+  export type CalorieResponse = {
     calorie: number,
     endDate: string,
     startDate: string,
@@ -256,6 +254,21 @@ declare module 'react-native-google-fit' {
     startDate: string,
     day: Day
   };
+
+  export type HeartRateResponse = {
+    startDate: string,
+    endDate: string,
+    value: number,
+    day: Day
+  };
+
+  export type BloodPressureResponse = {
+    startDate: string,
+    endDate: string,
+    diastolic: number,
+    systolic: number,
+    day: Day
+  }
 
   export type WeightData = { date: string } & ({ unit: 'pound', value: number } | {});
 

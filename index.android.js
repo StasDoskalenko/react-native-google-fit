@@ -348,8 +348,7 @@ class RNGoogleFit {
    * Query for height samples. the options object is used to setup a query to retrieve relevant samples.
    * @param {Object} options  getDailyStepCountSamples accepts an options object containing unit: "pound"/"kg",
    *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * 
-   * Note: bucketInterval and bucketUnit have no effect at the result since GoogleFit only contains one height data.
+   * Note that bucketInterval and bucketUnit have no effect at the result since GoogleFit only contains one height data.
    */
 
   getHeightSamples = async (options) => {
@@ -485,50 +484,32 @@ class RNGoogleFit {
     this.removeListeners()
   }
 
-  getHeartRateSamples(options, callback) {
-    const startDate = Date.parse(options.startDate)
-    const endDate = Date.parse(options.endDate)
-    const bucketInterval = options.bucketInterval || 1
-    const bucketUnit = options.bucketUnit || "DAY"
-    googleFit.getHeartRateSamples(
+  getHeartRateSamples = async (options) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getHeartRateSamples(
       startDate,
       endDate,
       bucketInterval,
-      bucketUnit,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'value'))
-        } else {
-          callback('There is no any heart rate data for this period', false)
-        }
-      }
-    )
+      bucketUnit
+    );
+    if (result.length > 0) {
+      return prepareResponse(result, 'value');
+    }
+    return result;
   }
 
-  getBloodPressureSamples(options, callback) {
-    const startDate = Date.parse(options.startDate)
-    const endDate = Date.parse(options.endDate)
-    const bucketInterval = options.bucketInterval || 1
-    const bucketUnit = options.bucketUnit || "DAY"
-    googleFit.getBloodPressureSamples(
+  getBloodPressureSamples = async (options, callback) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getBloodPressureSamples(
       startDate,
       endDate,
       bucketInterval,
       bucketUnit,
-      msg => {
-        callback(msg, false)
-      },
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'value'))
-        } else {
-          callback('There is no any heart rate data for this period', false)
-        }
-      }
-    )
+    );
+    if (result.length > 0) {
+      return prepareResponse(result, 'systolic');
+    }
+    return result;
   }
 
   getHydrationSamples = (startDate, endDate, callback) => {
