@@ -512,24 +512,17 @@ class RNGoogleFit {
     return result;
   }
 
-  getHydrationSamples = (startDate, endDate, callback) => {
-    startDate = !isNil(startDate)
-      ? Date.parse(startDate)
-      : new Date().setHours(0, 0, 0, 0)
-    endDate = !isNil(endDate)
-      ? Date.parse(endDate)
-      : new Date().valueOf()
-    googleFit.getHydrationSamples(
+  getHydrationSamples = async (options) => {
+    const { startDate, endDate } = prepareInput(options);
+    const result = await googleFit.getHydrationSamples(
       startDate,
-      endDate,
-      msg => callback(true, msg),
-      res => {
-        callback(
-          false,
-          prepareHydrationResponse(res)
-        )
-      }
-    )
+      endDate
+    );
+
+    if (result.length > 0) {
+      return prepareHydrationResponse(result);
+    }
+    return result;
   }
 
   saveHydration(hydrationArray, callback) {

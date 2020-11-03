@@ -388,12 +388,11 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getHydrationSamples(double startDate,
                                     double endDate,
-                                    Callback errorCallback,
-                                    Callback successCallback) {
+                                    Promise promise) {
         try {
-            successCallback.invoke(mGoogleFitManager.getHydrationHistory().getHistory((long) startDate, (long) endDate));
+            promise.resolve(mGoogleFitManager.getHydrationHistory().getHistory((long) startDate, (long) endDate));
         } catch (IllegalViewOperationException e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 

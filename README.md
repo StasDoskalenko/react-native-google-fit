@@ -481,10 +481,12 @@ A React Native bridge module for interacting with Google Fit
 
     You need to add `FITNESS_NUTRITION_WRITE` scope to your authorization to work with hydration.
     ```javascript
-    const startDate = '2020-01-05T00:00:17.971Z'; // required
-    const endDate = new Date().toISOString(); // required
+      const opt = {
+        startDate: '2020-01-05T00:00:17.971Z', // required
+        endDate = new Date().toISOString() // required
+      };
 
-    oogleFit.getHydrationSamples(startDate, endDate, (err, res) => {
+    GoogleFit.getHydrationSamples(opt).then(res) => {
       console.log(res);
     });
     ```
@@ -514,7 +516,8 @@ A React Native bridge module for interacting with Google Fit
     ```javascript
     const hydrationArray = [
       {
-        date: Date.parse('2020-02-01'), // required, timestamp
+        // recommand use moment().valueOf() or other alternatives since Date.parse() without specification can generate wrong date.
+        date: Date.parse('2020-02-01'), // required, timestamp  
         waterConsumed: 0.225, // required, hydration data for a 0.225 liter drink of water
       },
       {

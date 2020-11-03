@@ -129,10 +129,8 @@ declare module 'react-native-google-fit' {
     ) => void
 
     getHydrationSamples: (
-      startDate: string,
-      endDate: string,
-      callback: (isError: boolean, result: HydrationSample[] | string) => void
-    ) => void
+      options: StartAndEndDate
+    ) => Promise<HydrationResponse[]>
 
     saveHydration: (
       hydrationArray: Hydration[],
@@ -190,7 +188,7 @@ declare module 'react-native-google-fit' {
 
   export type HeightResponse = WeightResponse;
 
-  export type HydrationSample = {
+  export type HydrationResponse = {
     addedBy: string
     waterConsumed: number
     date: string
