@@ -547,7 +547,9 @@ A React Native bridge module for interacting with Google Fit
     });
     ```
     
-15. Retrieve Sleep 
+15. Retrieve Sleep
+
+    You need to add `FITNESS_SLEEP_READ` scope to your authorization to work with sleep.
     ```javascript
     const opt = {
       startDate: '2020-01-01T12:33:18.873Z', // required, timestamp or ISO8601 string
