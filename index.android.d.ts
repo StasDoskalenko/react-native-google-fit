@@ -145,14 +145,10 @@ declare module 'react-native-google-fit' {
     /**
      * Get the sleep sessions over a specified date range.
      * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @param {Function} callback The function will be called with an array of elements.
      */
-    getSleepData: (
-      options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: any) => void
-    ) => Promise<any> | void
-
-
+    getSleepSamples: (
+      options: Partial<StartAndEndDate>
+    ) => Promise<SleepSampleResponse[]>
 
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
@@ -297,6 +293,19 @@ declare module 'react-native-google-fit' {
     date: string
   };
 
+  export type SleepSampleResponse = {
+    addedBy: string,
+    startDate: string,
+    endDate: string,
+    granularity: Granularity[]
+  }
+
+  export type Granularity = {
+    startDate: string,
+    endDate: string,
+    sleepStage: number,
+  }
+
   export enum MealType {
     UNKNOWN = 0,
     BREAKFAST = 1,
@@ -421,6 +430,8 @@ declare module 'react-native-google-fit' {
     FITNESS_BODY_TEMPERATURE_WRITE = 'https://www.googleapis.com/auth/fitness.body_temperature.write',
     FITNESS_REPRODUCTIVE_HEALTH_READ = 'https://www.googleapis.com/auth/fitness.reproductive_health.read',
     FITNESS_REPRODUCTIVE_HEALTH_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+    FITNESS_SLEEP_READ =  'https://www.googleapis.com/auth/fitness.sleep.read',
+    FITNESS_SLEEP_WRITE = 'https://www.googleapis.com/auth/fitness.sleep.write'
   }
 
   const googleFit: GoogleFit;

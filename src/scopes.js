@@ -7,8 +7,10 @@ const fitnessScopes = {
     'https://www.googleapis.com/auth/fitness.location.read',
   FITNESS_LOCATION_WRITE:
     'https://www.googleapis.com/auth/fitness.location.write',
-  FITNESS_BODY_READ: 'https://www.googleapis.com/auth/fitness.body.read',
-  FITNESS_BODY_WRITE: 'https://www.googleapis.com/auth/fitness.body.write',
+  FITNESS_BODY_READ: 
+    'https://www.googleapis.com/auth/fitness.body.read',
+  FITNESS_BODY_WRITE: 
+    'https://www.googleapis.com/auth/fitness.body.write',
   FITNESS_NUTRITION_READ:
     'https://www.googleapis.com/auth/fitness.nutrition.read',
   FITNESS_NUTRITION_WRITE:
@@ -32,7 +34,11 @@ const fitnessScopes = {
   FITNESS_REPRODUCTIVE_HEALTH_READ:
     'https://www.googleapis.com/auth/fitness.reproductive_health.read',
   FITNESS_REPRODUCTIVE_HEALTH_WRITE:
-    'https://www.googleapis.com/auth/fitness.reproductive_health.write'
+    'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+  FITNESS_SLEEP_READ:
+    'https://www.googleapis.com/auth/fitness.sleep.read',
+  FITNESS_SLEEP_WRITE:
+    'https://www.googleapis.com/auth/fitness.sleep.write',
 }
 
 export default fitnessScopes

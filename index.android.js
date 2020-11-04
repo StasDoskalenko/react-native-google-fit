@@ -552,31 +552,18 @@ class RNGoogleFit {
   /**
    * Get the sleep sessions over a specified date range.
    * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-   * @param {Function} callback The function will be called with an array of elements.
    */
 
-  getSleepData = (options, callback) => {
-    const startDate = !isNil(options.startDate)
-      ? Date.parse(options.startDate)
-      : new Date().setHours(0, 0, 0, 0)
-    const endDate = !isNil(options.endDate)
-      ? Date.parse(options.endDate)
-      : new Date().valueOf()
+  getSleepSamples = async (options) => {
+    const { startDate, endDate } = prepareInput(options);
 
-    googleFit.getSleepData(
+    const result = await googleFit.getSleepSamples(
       startDate,
-      endDate,
-      msg => callback(true, msg),
-      res => {
-        if (res.length > 0) {
-          callback(false, prepareResponse(res, 'value'))
-        } else {
-          callback('There is no sleep data for this period.', false)
-        }
-      }
-    )
-  }
+      endDate
+    );
 
+    return prepareResponse(result, "addedBy");
+  }
 }
 
 export default new RNGoogleFit()
@@ -592,6 +579,15 @@ export const MealType = Object.freeze({
   DINNER: 3,
   SNACK: 4,
 })
+
+export const SleepStage = Object.freeze({
+  AWAKE: 1,
+  SLEEP: 2,
+  OUT_OF_BED: 3,
+  LIGHT_SLEEP: 4,
+  DEEP_SLEEP: 5,
+  REM: 6
+});
 
 export const Nutrient = Object.freeze({
   /**

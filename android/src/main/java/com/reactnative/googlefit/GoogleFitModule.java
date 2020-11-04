@@ -419,11 +419,11 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
-    public void getSleepData(double startDate, double endDate, Callback errorCallback, Callback successCallback) {
+    public void getSleepSamples(double startDate, double endDate, Promise promise) {
         try {
-           mGoogleFitManager.getSleepHistory().getSleepData((long)startDate, (long)endDate, errorCallback, successCallback);
+           mGoogleFitManager.getSleepHistory().getSleepData((long)startDate, (long)endDate, promise);
         } catch (Error e) {
-            errorCallback.invoke(e.getMessage());
+            promise.reject(e);
         }
     }
 }
