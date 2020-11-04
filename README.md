@@ -549,9 +549,41 @@ A React Native bridge module for interacting with Google Fit
     
 15. Retrieve Sleep 
     ```javascript
-        GoogleFit.getSleepData(options, (err, res) => {
+    const opt = {
+      startDate: '2020-01-01T12:33:18.873Z', // required, timestamp or ISO8601 string
+      endDate: new Date().toISOString(), // required, timestamp or ISO8601 string
+    };
+
+    GoogleFit.getSleepSamples(opt).then((res) => {
       console.log(res)
     });
+    ```
+    **Response:**
+
+    ```javascript
+    [
+      { 
+        'addedBy': 'com.google.android.apps.fitness' 
+        'endDate': '2020-11-03T07:47:00.000Z',
+        'startDate': '2020-11-03T07:33:59.160Z',
+        // To understand what is granularity: https://developers.google.com/fit/scenarios/read-sleep-data
+        'granularity': [
+          {
+            'startDate': {
+              'sleepStage': 2,
+              'endDate': '2020-11-03T07:47:00.000Z',
+              'startDate': '2020-11-03T07:33:59.160Z',
+            }
+          }
+        ],
+      },
+      { 
+        'addedBy': 'com.google.android.apps.fitness',
+        'endDate': '2020-11-02T17:41:00.000Z',
+        'startDate': '2020-11-02T10:41:00.000Z',
+        'granularity': [],
+      },
+    ]
     ```
 
 16. Other methods:
