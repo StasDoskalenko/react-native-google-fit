@@ -12,55 +12,41 @@
 package com.reactnative.googlefit;
 
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessOptions;
-import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.Session;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
-import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.SessionReadRequest;
-import com.google.android.gms.fitness.result.DataReadResult;
-import com.google.android.gms.fitness.result.DataSourcesResult;
 import com.google.android.gms.fitness.result.SessionReadResponse;
-import com.google.android.gms.fitness.data.Device;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.SimpleDateFormat;
+
+import android.util.Log;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.text.SimpleDateFormat;
 import java.util.TimeZone;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -78,41 +64,48 @@ public class SleepHistory {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void getSleepData(double startDate, double endDate, final Callback errorCallback, final Callback successCallback) {
+    public void getSleepData(double startDate, double endDate, final Promise promise) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+
         SessionReadRequest request = new SessionReadRequest.Builder()
                 .readSessionsFromAllApps()
-                .read(DataType.TYPE_ACTIVITY_SEGMENT)
+                .includeSleepSessions()
+                .read(DataType.TYPE_SLEEP_SEGMENT)
                 .setTimeInterval((long) startDate, (long) endDate, TimeUnit.MILLISECONDS)
                 .build();
 
-        final GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_ACTIVITY_READ));
+        final GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_NUTRITION_READ));
         Fitness.getSessionsClient(this.mReactContext, gsa)
                 .readSession(request)
                 .addOnSuccessListener(new OnSuccessListener<SessionReadResponse>() {
                     @Override
                     public void onSuccess(SessionReadResponse response) {
-                        List<Object> sleepSessions = response.getSessions()
+                        List<Session> sleepSessions = response.getSessions()
                             .stream()
-                            .filter(new Predicate<Session>() {
-                                @Override
-                                public boolean test(Session s) {
-                                    Log.i(TAG, "Activity found: " + s.getActivity());
-                                    return s.getActivity().equals(FitnessActivities.SLEEP);
-                                }
-                            })
+                            .filter(s -> s.getActivity().equals(FitnessActivities.SLEEP))
                             .collect(Collectors.toList());
 
-                        WritableArray sleep = Arguments.createArray();
+                        WritableArray sleepSample = Arguments.createArray();
 
-                        for (Object session : sleepSessions) {
-                            List<DataSet> dataSets = response.getDataSet((Session) session);
+                        for (Session session : sleepSessions) {
+                            WritableMap sleepData = Arguments.createMap();
 
+                            sleepData.putString("addedBy", session.getAppPackageName());
+                            sleepData.putString("startDate", dateFormat.format(session.getStartTime(TimeUnit.MILLISECONDS)));
+                            sleepData.putString("endDate", dateFormat.format(session.getEndTime(TimeUnit.MILLISECONDS)));
+
+                            // If the sleep session has finer granularity sub-components, extract them:
+                            List<DataSet> dataSets = response.getDataSet(session);
+                            WritableArray granularity = Arguments.createArray();
                             for (DataSet dataSet : dataSets) {
-                                processDataSet(dataSet, (Session) session, sleep);
+                                processDataSet(dataSet, granularity);
                             }
-                        }
+                            sleepData.putArray("granularity", granularity);
 
-                        successCallback.invoke(sleep);
+                            sleepSample.pushMap(sleepData);
+                        }
+                        promise.resolve(sleepSample);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -121,9 +114,9 @@ public class SleepHistory {
                         Log.i(TAG, "Failure: " + e.getMessage());
                         if (sleepPermissionsError.equals(e.getMessage())) {
                             requestSleepPermissions(gsa);
-                            errorCallback.invoke(sleepPermissionsError);
+                            promise.reject(e);
                         } else {
-                            errorCallback.invoke(e.getMessage());
+                            promise.reject(e);
                         }
                     }
                 });
@@ -136,16 +129,17 @@ public class SleepHistory {
         GoogleSignIn.requestPermissions(this.mReactContext.getCurrentActivity(), sleepErrorCode, account, fitnessOptions);
     }
 
-    private void processDataSet(DataSet dataSet, Session session, WritableArray map) {
+    private void processDataSet(DataSet dataSet, WritableArray granularity) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
-
         for (DataPoint dp : dataSet.getDataPoints()) {
-            WritableMap sleepMap = Arguments.createMap();
-            sleepMap.putString("value", dp.getValue(Field.FIELD_ACTIVITY).asActivity());
-            sleepMap.putString("startDate", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            sleepMap.putString("endDate", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-            map.pushMap(sleepMap);
+            WritableMap sleepStage = Arguments.createMap();
+
+            sleepStage.putInt("sleepStage", dp.getValue(Field.FIELD_SLEEP_SEGMENT_TYPE).asInt());
+            sleepStage.putString("startDate", dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            sleepStage.putString("endDate", dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+
+            granularity.pushMap(sleepStage);
         }
     }
 

@@ -34,6 +34,20 @@ export function isNil(value) {
   return value == null
 }
 
+// parse the default config based on user input
+export function prepareInput(options) {
+  const startDate = !isNil(options.startDate)
+  ? Date.parse(options.startDate)
+  : new Date().setHours(0, 0, 0, 0)
+  const endDate = !isNil(options.endDate)
+    ? Date.parse(options.endDate)
+    : new Date().valueOf();
+  const bucketInterval = options.bucketInterval || 1;
+  const bucketUnit = options.bucketUnit || "DAY";
+
+  return { startDate, endDate, bucketInterval, bucketUnit };
+}
+
 export function prepareResponse(response, byKey = 'value') {
   return response
     .map(el => {

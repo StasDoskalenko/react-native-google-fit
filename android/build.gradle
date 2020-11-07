@@ -21,6 +21,11 @@ android {
     compileSdkVersion safeExtGet('compileSdkVersion', 27)
     // buildToolsVersion safeExtGet('buildToolsVersion', '27.0.3')
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
         targetSdkVersion safeExtGet('targetSdkVersion', 27)

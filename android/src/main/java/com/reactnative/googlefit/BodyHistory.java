@@ -59,13 +59,15 @@ public class BodyHistory {
         this.dataType = dataType;
     }
 
-    public ReadableArray getHistory(long startTime, long endTime) {
+    public ReadableArray getHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
         // for height we need to take time, since GoogleFit foundation - https://stackoverflow.com/questions/28482176/read-the-height-in-googlefit-in-android
         startTime = this.dataType == DataType.TYPE_WEIGHT ? startTime : 1401926400;
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
         if (this.dataType == DataType.TYPE_WEIGHT) {
+
+            // old method:
             // In general here we want to set the bucket size to the smallest possible allowed, in case the
             // user weighs themselves in a short interval (e.g. before and after a meal)
             //
@@ -74,15 +76,21 @@ public class BodyHistory {
             // ages to respond and/or no response at all on both Galaxy S5 (6.0.1) and Huawei P9 Lite (7.0)
             //
             // So, divide the time range by 2,000 to be on the safe side
-            long bucketSizeMillis = (endTime - startTime) / 2000;
+//            long bucketSizeMillis = (endTime - startTime) / 2000;
+//
+//            // We don't need any finer granularity than 1 minute, so make buckets at least this size to keep
+//            // the number of buckets low if not much time has elapsed since the last query
+//            bucketSizeMillis = Math.max(bucketSizeMillis, 60 * 1000);
 
-            // We don't need any finer granularity than 1 minute, so make buckets at least this size to keep
-            // the number of buckets low if not much time has elapsed since the last query
-            bucketSizeMillis = Math.max(bucketSizeMillis, 60 * 1000);
+
+            // new method:
+            // let users to provide their own bucket size, handle the limit risk by themselves so they are able to
+            // get the most accurate data for their own need.
 
             readRequestBuilder
-                .aggregate(DataType.TYPE_WEIGHT, DataType.AGGREGATE_WEIGHT_SUMMARY)
-                .bucketByTime((int)bucketSizeMillis, TimeUnit.MILLISECONDS);
+                .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
+                .aggregate(this.dataType, DataType.AGGREGATE_WEIGHT_SUMMARY);
+
         } else {
             readRequestBuilder.read(this.dataType);
             readRequestBuilder.setLimit(1); // need only one height, since it's unchangable

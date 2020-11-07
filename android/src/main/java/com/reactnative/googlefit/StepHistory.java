@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -65,22 +66,6 @@ public class StepHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public int getBucketTime(ReadableMap configs) {
-        int bucketTime = 12;
-        if (null != configs && configs.hasKey("bucketTime")) {
-            bucketTime = configs.getInt("bucketTime");
-        }
-        return bucketTime;
-    }
-
-    public TimeUnit getBucketUnit(ReadableMap configs) {
-        TimeUnit bucketUnit = TimeUnit.HOURS;
-        if(null != configs && configs.hasKey("bucketUnit")) {
-            bucketUnit = HelperUtil.processBucketUnit(configs.getString("bucketUnit"));
-        }
-        return bucketUnit;
-    }
-
     public void getUserInputSteps(long startTime, long endTime, final Callback successCallback) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -113,20 +98,12 @@ public class StepHistory {
         successCallback.invoke(userInputSteps);
     }
 
-    public void aggregateDataByDate(long startTime, long endTime, ReadableMap configs, final Callback successCallback) {
+    public void aggregateDataByDate(long startTime, long endTime, int bucketInterval,
+                                    String bucketUnit, final Promise promise) {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
 
-        //default bucket configs,
-        // Half-day resolution
-        int bucketTime = 12;
-        TimeUnit bucketUnit = TimeUnit.HOURS;
-
-        if(null != configs) {
-            bucketTime = this.getBucketTime(configs);
-            bucketUnit = this.getBucketUnit(configs);
-        }
 
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
         Log.i(TAG, "Range End: " + dateFormat.format(endTime));
@@ -164,20 +141,6 @@ public class StepHistory {
                 .setStreamName("")
                 .build()
         );
-
-        /*
-        DataSourcesRequest sourceRequest = new DataSourcesRequest.Builder()
-                .setDataTypes(DataType.TYPE_STEP_COUNT_DELTA,
-                    DataType.TYPE_STEP_COUNT_CUMULATIVE,
-                    DataType.AGGREGATE_STEP_COUNT_DELTA
-                    )
-                //.setDataSourceTypes(DataSource.TYPE_DERIVED)
-                .build();
-        DataSourcesResult dataSourcesResult =
-           Fitness.SensorsApi.findDataSources(googleFitManager.getGoogleApiClient(), sourceRequest).await(1, TimeUnit.MINUTES);
-
-        dataSources.addAll( dataSourcesResult.getDataSources() );
-        */
 
         final AtomicInteger dataSourcesToLoad = new AtomicInteger(dataSources.size());
 
@@ -236,7 +199,7 @@ public class StepHistory {
                             ,
                             //DataType.AGGREGATE_STEP_COUNT_DELTA
                             aggregateType)
-                        .bucketByTime(bucketTime, bucketUnit)
+                        .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build();
             } else {
@@ -288,7 +251,7 @@ public class StepHistory {
                             results.pushMap(map);
 
                             if (dataSourcesToLoad.decrementAndGet() <= 0) {
-                                successCallback.invoke(results);
+                                promise.resolve(results);
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -296,6 +259,7 @@ public class StepHistory {
                         public void onFailure(@NonNull Exception e) {
                             Log.i(TAG, "onFailure()");
                             Log.i(TAG, "Error" + e);
+                            promise.reject(e);
                     }
             });
 

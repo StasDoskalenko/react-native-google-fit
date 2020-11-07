@@ -36,23 +36,19 @@ declare module 'react-native-google-fit' {
     /**
      * Get the total steps per day over a specified date range.
      * @param {Object} options getDailyStepCountSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @param {Function} callback The function will be called with an array of elements.
      */
     getDailyStepCountSamples: (
-      options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: StepsResponse[]) => void
+      options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<StepsResponse[]>
 
     /**
      * Get the total distance per day over a specified date range.
      * @param {Object} options getDailyDistanceSamples accepts an options object containing optional startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback {Function} callback The function will be called with an array of elements.
      */
 
-    getDailyDistanceSamples(
-      options: Partial<StartAndEndDate & BucketOptions>,
-      callback: (isError: boolean, result: DistanceResponse[]) => void
-    ): void
+    getDailyDistanceSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<DistanceResponse[]>
 
     /**
      * Get the total steps per day over a specified date range.
@@ -64,59 +60,53 @@ declare module 'react-native-google-fit' {
     /**
      * Get the total distance per day over a specified date range.
      * @param {Object} options getActivitySamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback {Function} callback The function will be called with an array of elements.
      */
-    getActivitySamples(
-      options: NumericalStartAndEndDate,
-      callback: (isError: boolean, result: ActivitySampleResponse[]) => void
-    ): void
+    getActivitySamples: (
+      options: StartAndEndDate & Partial<BucketOptions>,
+    ) => Promise<ActivitySampleResponse[]>;
 
     /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp. optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
-     * @callback {Function} callback The function will be called with an array of elements.
      */
-    getDailyCalorieSamples(
-      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>,
-      callback: (isError: boolean, result: CalorieReponse[]) => void
-    ): void
+    getDailyCalorieSamples: (
+      options: StartAndEndDate & { basalCalculation?: boolean } & Partial<BucketOptions>
+    ) => Promise<CalorieResponse[]>;
 
-    getDailyNutritionSamples(
+    getDailyNutritionSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: NutrientResponse[]) => void
-    ): void
+    ) => Promise<NutrientResponse[]>;
+
+    saveFood: (
+      options: FoodIntake,
+      callback: (isError: boolean, result: true) => void
+    ) => void;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getWeightSamples accepts an options object containing unit: "pound"/"kg",
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
      */
     getWeightSamples: (
-      options: Partial<StartAndEndDate>,
-      callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+      options: StartAndEndDate & Partial<{ unit: string, ascending: boolean } & BucketOptions>
+    ) => Promise<WeightResponse[]>;
 
     /**
      * Query for weight samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getHeightSamples accepts an options object containing unit: "pound"/"kg",
      *                          startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @callback callback The function will be called with an array of elements.
      */
     getHeightSamples: (
-      options: StartAndEndDate,
-      callback: (isError: boolean, result: WeightSample[]) => void
-    ) => void
+      options: StartAndEndDate
+    ) => Promise<HeightResponse[]>;
 
     getHeartRateSamples: (
-      options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<HeartRateResponse[]>;
 
     getBloodPressureSamples: (
-      options: StartAndEndDate & Partial<BucketOptions>,
-      callback: (isError: boolean, result: DateValueResponse[]) => void
-    ) => void
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<BloodPressureResponse[]>;
 
     saveWeight: (
       options: WeightData,
@@ -139,10 +129,8 @@ declare module 'react-native-google-fit' {
     ) => void
 
     getHydrationSamples: (
-      startDate: string,
-      endDate: string,
-      callback: (isError: boolean, result: HydrationSample[] | string) => void
-    ) => void
+      options: StartAndEndDate
+    ) => Promise<HydrationResponse[]>
 
     saveHydration: (
       hydrationArray: Hydration[],
@@ -157,14 +145,10 @@ declare module 'react-native-google-fit' {
     /**
      * Get the sleep sessions over a specified date range.
      * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-     * @param {Function} callback The function will be called with an array of elements.
      */
-    getSleepData: (
-      options: Partial<StartAndEndDate>,
-      callback?: (isError: boolean, result: any) => void
-    ) => Promise<any> | void
-
-
+    getSleepSamples: (
+      options: Partial<StartAndEndDate>
+    ) => Promise<SleepSampleResponse[]>
 
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
@@ -186,11 +170,11 @@ declare module 'react-native-google-fit' {
 
   }
 
-  type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+  export type Day = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 
-  type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
+  export type BucketUnit = "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY";
 
-  export type WeightSample = {
+  export type WeightResponse = {
     addedBy: string
     day: string
     value: number
@@ -198,7 +182,9 @@ declare module 'react-native-google-fit' {
     endDate: string
   };
 
-  export type HydrationSample = {
+  export type HeightResponse = WeightResponse;
+
+  export type HydrationResponse = {
     addedBy: string
     waterConsumed: number
     date: string
@@ -207,7 +193,7 @@ declare module 'react-native-google-fit' {
   export type FoodIntake = {
     mealType: MealType
     foodName: string
-    nutrients: Object
+    nutrients: Nutrients
     date: string
   };
 
@@ -241,12 +227,15 @@ declare module 'react-native-google-fit' {
     bucketUnit: BucketUnit
   };
 
+  type rawSteps = Array<{startDate: string, endDate: string, steps: number}>;
+  
   export type StepsResponse = {
     source: string,
-    steps: Array<{date: string, value: number }>
+    steps: Array<{date: string, value: number }>,
+    rawSteps: rawSteps
   };
 
-  export type CalorieReponse = {
+  export type CalorieResponse = {
     calorie: number,
     endDate: string,
     startDate: string,
@@ -259,6 +248,21 @@ declare module 'react-native-google-fit' {
     startDate: string,
     day: Day
   };
+
+  export type HeartRateResponse = {
+    startDate: string,
+    endDate: string,
+    value: number,
+    day: Day
+  };
+
+  export type BloodPressureResponse = {
+    startDate: string,
+    endDate: string,
+    diastolic: number,
+    systolic: number,
+    day: Day
+  }
 
   export type WeightData = { date: string } & ({ unit: 'pound', value: number } | {});
 
@@ -285,20 +289,22 @@ declare module 'react-native-google-fit' {
   }
 
   export type NutrientResponse = {
-    nutrients: {
-      sugar: number,
-      iron: number,
-      sodium: number, 
-      calories: number,
-      "fat.polyunsaturated": number,
-      "carbs.total": number,
-      potassium: number,
-      cholesterol: number,
-      protein: number,
-      "fat.saturated": number,
-      "fat.total": number},
+    nutrients: Nutrients
     date: string
   };
+
+  export type SleepSampleResponse = {
+    addedBy: string,
+    startDate: string,
+    endDate: string,
+    granularity: Granularity[]
+  }
+
+  export type Granularity = {
+    startDate: string,
+    endDate: string,
+    sleepStage: number,
+  }
 
   export enum MealType {
     UNKNOWN = 0,
@@ -306,6 +312,10 @@ declare module 'react-native-google-fit' {
     LUNCH = 2,
     DINNER = 3,
     SNACK = 4,
+  }
+
+  export type Nutrients = {
+    [ key in Nutrient ]?: number
   }
 
   export enum Nutrient {
@@ -403,25 +413,27 @@ declare module 'react-native-google-fit' {
 
   export enum Scopes {
     FITNESS_ACTIVITY_READ = 'https://www.googleapis.com/auth/fitness.activity.read',
-    FITNESS_ACTIVITY_READ_WRITE = 'https://www.googleapis.com/auth/fitness.activity.write',
+    FITNESS_ACTIVITY_WRITE = 'https://www.googleapis.com/auth/fitness.activity.write',
     FITNESS_LOCATION_READ = 'https://www.googleapis.com/auth/fitness.location.read',
-    FITNESS_LOCATION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.location.write',
+    FITNESS_LOCATION_WRITE = 'https://www.googleapis.com/auth/fitness.location.write',
     FITNESS_BODY_READ = 'https://www.googleapis.com/auth/fitness.body.read',
-    FITNESS_BODY_READ_WRITE = 'https://www.googleapis.com/auth/fitness.body.write',
+    FITNESS_BODY_WRITE = 'https://www.googleapis.com/auth/fitness.body.write',
     FITNESS_NUTRITION_READ = 'https://www.googleapis.com/auth/fitness.nutrition.read',
-    FITNESS_NUTRITION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.nutrition.write',
+    FITNESS_NUTRITION_WRITE = 'https://www.googleapis.com/auth/fitness.nutrition.write',
     FITNESS_BLOOD_PRESSURE_READ = 'https://www.googleapis.com/auth/fitness.blood_pressure.read',
-    FITNESS_BLOOD_PRESSURE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.blood_pressure.write',
+    FITNESS_BLOOD_PRESSURE_WRITE = 'https://www.googleapis.com/auth/fitness.blood_pressure.write',
     FITNESS_BLOOD_GLUCOSE_READ = 'https://www.googleapis.com/auth/fitness.blood_glucose.read',
-    FITNESS_BLOOD_GLUCOSE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.blood_glucose.write',
+    FITNESS_BLOOD_GLUCOSE_WRITE = 'https://www.googleapis.com/auth/fitness.blood_glucose.write',
     FITNESS_OXYGEN_SATURATION_READ = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.read',
-    FITNESS_OXYGEN_SATURATION_READ_WRITE = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.write',
+    FITNESS_OXYGEN_SATURATION_WRITE = 'https://www.googleapis.com/auth/fitness.oxygen_saturation.write',
     FITNESS_BODY_TEMPERATURE_READ = 'https://www.googleapis.com/auth/fitness.body_temperature.read',
-    FITNESS_BODY_TEMPERATURE_READ_WRITE = 'https://www.googleapis.com/auth/fitness.body_temperature.write',
+    FITNESS_BODY_TEMPERATURE_WRITE = 'https://www.googleapis.com/auth/fitness.body_temperature.write',
     FITNESS_REPRODUCTIVE_HEALTH_READ = 'https://www.googleapis.com/auth/fitness.reproductive_health.read',
-    FITNESS_REPRODUCTIVE_HEALTH_READ_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+    FITNESS_REPRODUCTIVE_HEALTH_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+    FITNESS_SLEEP_READ =  'https://www.googleapis.com/auth/fitness.sleep.read',
+    FITNESS_SLEEP_WRITE = 'https://www.googleapis.com/auth/fitness.sleep.write'
   }
 
-  const googleFit: GoogleFit
-  export default googleFit
+  const googleFit: GoogleFit;
+  export default googleFit;
 }
