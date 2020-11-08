@@ -61,6 +61,9 @@ A React Native bridge module for interacting with Google Fit
       // Process data from Google Fit Recording API (no google fit app needed)
     });
     ```
+
+    **Note**: If you are using the recording API for location/ distance data, you have to [request](https://developer.android.com/training/location/permissions) the `location-permission` in your app's `AndroidManifest.xml`:
+    `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />`
     
     Alternatively you can use event listeners (deprecated)
     ```javascript
