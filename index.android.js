@@ -41,7 +41,7 @@ class RNGoogleFit {
 
         const defaultScopes = [
           Scopes.FITNESS_ACTIVITY_READ,
-          Scopes.FITNESS_BODY_READ_WRITE,
+          Scopes.FITNESS_BODY_WRITE,
           Scopes.FITNESS_LOCATION_READ,
         ]
 
@@ -189,7 +189,7 @@ class RNGoogleFit {
         obj.steps = buildDailySteps(dev.steps)
         obj.rawSteps = dev.steps
         return obj
-      }, this); 
+      }, this);
     }else{
       //simply return raw result for better debugging;
       return data;
@@ -247,7 +247,7 @@ class RNGoogleFit {
       bucketInterval,
       bucketUnit
     );
-    
+
     return result;
   }
 
@@ -317,9 +317,9 @@ class RNGoogleFit {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
     const raw_result = await googleFit.getWeightSamples(
-      startDate, 
-      endDate, 
-      bucketInterval, 
+      startDate,
+      endDate,
+      bucketInterval,
       bucketUnit
     );
 

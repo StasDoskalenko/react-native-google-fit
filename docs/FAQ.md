@@ -26,8 +26,8 @@ syntax and src/scopes.js or official Google Fit documentation with available sco
 // The list of available scopes inside of src/scopes.js file
 const options = {
   scopes: [
-    Scopes.FITNESS_ACTIVITY_READ_WRITE,
-    Scopes.FITNESS_BODY_READ_WRITE,
+    Scopes.FITNESS_ACTIVITY_WRITE,
+    Scopes.FITNESS_BODY_WRITE,
   ],
 }
 GoogleFit.authorize(options)
