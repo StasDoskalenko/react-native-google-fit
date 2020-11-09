@@ -11,6 +11,7 @@ Another step is to configure the consent screen, etc.
 More detailed info available at
 https://developers.google.com/fit/android/get-api-key
 
+
 ```
 1. In order for the library to work correctly, you'll need following SDK setups:
    
@@ -55,3 +56,6 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
      compile project(':react-native-google-fit')
    ```
 
+
+ **Note**: If you are using the recording API for location/ distance data, you have to [request](https://developer.android.com/training/location/permissions) the `location-permission` in your app's `AndroidManifest.xml`:
+ `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />`
