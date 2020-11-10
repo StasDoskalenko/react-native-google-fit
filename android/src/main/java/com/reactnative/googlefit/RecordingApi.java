@@ -11,29 +11,21 @@
 
 package com.reactnative.googlefit;
 
-import com.reactnative.googlefit.GoogleFitManager;
-
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.fitness.Fitness;
-import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.fitness.data.DataType;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
-
-import com.google.android.gms.fitness.result.ListSubscriptionsResult;
-import com.google.android.gms.fitness.data.Subscription;
-
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 

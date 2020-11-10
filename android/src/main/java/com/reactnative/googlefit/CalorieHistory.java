@@ -11,7 +11,6 @@
 package com.reactnative.googlefit;
 
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
