@@ -25,8 +25,7 @@ import com.facebook.react.bridge.WritableMap;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessOptions;
@@ -48,7 +47,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-
 
 public class SleepHistory {
 
@@ -75,7 +73,12 @@ public class SleepHistory {
                 .setTimeInterval((long) startDate, (long) endDate, TimeUnit.MILLISECONDS)
                 .build();
 
-        final GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(this.mReactContext, new Scope(Scopes.FITNESS_NUTRITION_READ));
+        GoogleSignInOptionsExtension fitnessOptions =
+                FitnessOptions.builder()
+                        .addDataType(DataType.TYPE_SLEEP_SEGMENT, FitnessOptions.ACCESS_READ)
+                        .build();
+        final  GoogleSignInAccount gsa = GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions);
+
         Fitness.getSessionsClient(this.mReactContext, gsa)
                 .readSession(request)
                 .addOnSuccessListener(new OnSuccessListener<SessionReadResponse>() {
@@ -111,22 +114,9 @@ public class SleepHistory {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "Failure: " + e.getMessage());
-                        if (sleepPermissionsError.equals(e.getMessage())) {
-                            requestSleepPermissions(gsa);
-                            promise.reject(e);
-                        } else {
-                            promise.reject(e);
-                        }
+                        promise.reject(e);
                     }
                 });
-    }
-
-    void requestSleepPermissions(GoogleSignInAccount account) {
-        FitnessOptions fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
-                .build();
-        GoogleSignIn.requestPermissions(this.mReactContext.getCurrentActivity(), sleepErrorCode, account, fitnessOptions);
     }
 
     private void processDataSet(DataSet dataSet, WritableArray granularity) {
