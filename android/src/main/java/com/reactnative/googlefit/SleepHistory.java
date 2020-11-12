@@ -20,6 +20,8 @@ import androidx.annotation.RequiresApi;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
@@ -31,9 +33,11 @@ import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
+import com.google.android.gms.fitness.request.SessionInsertRequest;
 import com.google.android.gms.fitness.request.SessionReadRequest;
 import com.google.android.gms.fitness.result.SessionReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,6 +47,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.TimeZone;
@@ -133,4 +139,58 @@ public class SleepHistory {
         }
     }
 
+    public void saveSleep(ReadableMap foodSample, final Promise promise) {
+        ReadableArray stageArr = foodSample.getArray("granularity");
+
+        //construct data
+        DataSource dataSource = new DataSource.Builder()
+                .setType(DataSource.TYPE_RAW)
+                .setDataType(DataType.TYPE_SLEEP_SEGMENT)
+                .setAppPackageName(this.mReactContext)
+                .build();
+
+        DataSet dataset = DataSet.builder(dataSource).build();
+
+        for(int i =0; i <  stageArr.size(); i++) {
+            final ReadableMap stage = stageArr.getMap(i);
+            dataset.add(
+                    DataPoint.builder(dataSource)
+                            .setTimeInterval(
+                                    (long)stage.getDouble("startDate"),
+                                    (long)stage.getDouble("endDate"),
+                                    TimeUnit.MILLISECONDS)
+                            .setField(Field.FIELD_SLEEP_SEGMENT_TYPE, stage.getInt("sleepStage"))
+                            .build()
+            );
+        }
+
+        //save data
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .accessSleepSessions(FitnessOptions.ACCESS_WRITE)
+                .addDataType(DataType.TYPE_SLEEP_SEGMENT, FitnessOptions.ACCESS_WRITE)
+                .build();
+
+        Session session = new Session.Builder()
+                .setName(foodSample.getString("sessionName"))
+                .setIdentifier(foodSample.getString("identifier"))
+                .setDescription(foodSample.getString("description"))
+                .setStartTime((long)foodSample.getDouble("startDate"), TimeUnit.MILLISECONDS) // From first segment
+                .setEndTime((long)foodSample.getDouble("endDate"), TimeUnit.MILLISECONDS)  // From last segment
+                .setActivity(FitnessActivities.SLEEP)
+                .build();
+
+        // Build the request to insert the session.
+        SessionInsertRequest request = new SessionInsertRequest.Builder()
+                .setSession(session)
+                .addDataSet(dataset)
+                .build();
+
+        Fitness.getSessionsClient(this.mReactContext, GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions))
+                .insertSession(request)
+                .addOnSuccessListener(
+                        unused -> promise.resolve(true)
+                )
+                .addOnFailureListener(
+                        e -> promise.resolve(e));
+    }
 }

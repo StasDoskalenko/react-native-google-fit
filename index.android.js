@@ -564,6 +564,11 @@ class RNGoogleFit {
 
     return prepareResponse(result, "addedBy");
   }
+
+  saveSleep = async (options) => {
+    const result = await googleFit.saveSleep(options);
+    return result;
+  }
 }
 
 export default new RNGoogleFit()
