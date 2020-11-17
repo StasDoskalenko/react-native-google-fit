@@ -150,6 +150,10 @@ declare module 'react-native-google-fit' {
       options: Partial<StartAndEndDate>
     ) => Promise<SleepSampleResponse[]>
 
+    saveSleep: (
+      options: SleepSample
+    ) => Promise<Boolean | undefined>
+
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
@@ -300,9 +304,18 @@ declare module 'react-native-google-fit' {
     granularity: Granularity[]
   }
 
+  export type SleepSample = {
+    startDate: number,
+    endDate: number,
+    sessionName: string,
+    identifier: string,
+    description: string,
+    granularity: Granularity[]
+  }
+
   export type Granularity = {
-    startDate: string,
-    endDate: string,
+    startDate: string | number,
+    endDate: string | number,
     sleepStage: number,
   }
 

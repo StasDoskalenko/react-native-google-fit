@@ -426,4 +426,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             promise.reject(e);
         }
     }
+
+    @ReactMethod
+    public void saveSleep(ReadableMap sleepSample, Promise promise) {
+        try {
+            mGoogleFitManager.getSleepHistory().saveSleep(sleepSample, promise);
+        } catch (Error e) {
+            promise.reject(e);
+        }
+    }
 }

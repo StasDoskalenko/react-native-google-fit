@@ -591,6 +591,39 @@ A React Native bridge module for interacting with Google Fit
     ]
     ```
 
+    Save Sleep
+
+    You need to add `FITNESS_SLEEP_READ` and `FITNESS_SLEEP_WRITE` scope to your authorization to save sleep.
+    To reduce the complexity of converting data type internally, 
+    `startDate` and `endDate` must be `number` in Epoch/Unix timestamp
+
+    Note: `identifier` must be a unique string
+    Read https://developers.google.com/fit/sessions, https://developer.android.com/training/articles/user-data-ids for more infos.
+
+    ```javascript
+      const opts: SleepSample = {
+        startDate: 1604052985000, 
+        endDate: 1604063785000, // or more general example parseInt(new Date().valueOf())
+        sessionName: "1604052985000-1604063785000:sleep-session",
+        identifier: "1604052985000-1604063785000:sleep-identifier", // warning: just an example, the string is probably not unique enough
+        description: "some description",
+        granularity: [
+          {
+            startDate: 1604052985000,
+            endDate: 1604056585000,
+            sleepStage: 4,
+          },
+          {
+            startDate: 1604056585000,
+            endDate: 1604060185000,
+            sleepStage: 5,
+          }
+        ]
+      }
+      const result = await GoogleFit.saveSleep(opts);
+      console.log(result); //either be true or error
+    ```
+
 16. Other methods:
 
     ```javascript
