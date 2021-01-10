@@ -12,6 +12,10 @@ A React Native bridge module for interacting with Google Fit
 - [Example app](https://github.com/StasDoskalenko/react-native-google-fit-example)
 - [F.A.Q.](/docs/FAQ.md)
 
+### Requirement
+If you didn't set `fitnessVersion` manually, you can simply skip this part.  
+Note that 0.16.1 require fitness version above 20.0.0  
+Please read https://developers.google.com/fit/improvements why we made the changes.
 
 ### USAGE
 
