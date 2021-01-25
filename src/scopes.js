@@ -39,6 +39,10 @@ const fitnessScopes = {
     'https://www.googleapis.com/auth/fitness.sleep.read',
   FITNESS_SLEEP_WRITE:
     'https://www.googleapis.com/auth/fitness.sleep.write',
+  FITNESS_HEART_RATE_READ:
+    'https://www.googleapis.com/auth/fitness.heart_rate.read',
+  FITNESS_HEART_RATE_WRITE:
+    'https://www.googleapis.com/auth/fitness.heart_rate.write'
 }
 
 export default fitnessScopes
