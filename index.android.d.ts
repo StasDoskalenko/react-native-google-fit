@@ -444,7 +444,9 @@ declare module 'react-native-google-fit' {
     FITNESS_REPRODUCTIVE_HEALTH_READ = 'https://www.googleapis.com/auth/fitness.reproductive_health.read',
     FITNESS_REPRODUCTIVE_HEALTH_WRITE = 'https://www.googleapis.com/auth/fitness.reproductive_health.write',
     FITNESS_SLEEP_READ =  'https://www.googleapis.com/auth/fitness.sleep.read',
-    FITNESS_SLEEP_WRITE = 'https://www.googleapis.com/auth/fitness.sleep.write'
+    FITNESS_SLEEP_WRITE = 'https://www.googleapis.com/auth/fitness.sleep.write',
+    FITNESS_HEART_RATE_READ = 'https://www.googleapis.com/auth/fitness.heart_rate.read',
+    FITNESS_HEART_RATE_WRITE= 'https://www.googleapis.com/auth/fitness.heart_rate.write'
   }
 
   const googleFit: GoogleFit;
