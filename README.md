@@ -641,7 +641,7 @@ Please read https://developers.google.com/fit/improvements why we made the chang
     
     deleteWeight(options, callback); // method to delete weights by options (same as in delete hydration)
  
-    openFit(); //method to open google fit app
+    openFit(callback); //method to open google fit app
     
     saveHeight(options, callback);
  

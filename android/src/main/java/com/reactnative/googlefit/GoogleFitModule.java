@@ -326,13 +326,15 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void openFit() {
+    public void openFit(Callback errorCallback, Callback successCallback) {
         PackageManager pm = mReactContext.getPackageManager();
         try {
             Intent launchIntent = pm.getLaunchIntentForPackage(GOOGLE_FIT_APP_URI);
             mReactContext.startActivity(launchIntent);
+            successCallback.invoke(true);
         } catch (Exception e) {
             Log.i(REACT_MODULE, e.toString());
+            errorCallback.invoke(true);
         }
     }
 
