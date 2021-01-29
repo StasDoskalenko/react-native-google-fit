@@ -443,8 +443,8 @@ class RNGoogleFit {
     )
   }
 
-  openFit() {
-    googleFit.openFit()
+  openFit(callback) {
+    googleFit.openFit((msg) => callback(msg, false), res => callback(false,res))
   }
 
   observeSteps = callback => {
