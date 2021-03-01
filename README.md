@@ -254,6 +254,22 @@ Please read https://developers.google.com/fit/improvements why we made the chang
     ```
     
 7. Blood pressure and Heart rate methods (since version 0.8)
+    ```
+    Heartrate Scopes: 
+        [
+            Scopes.FITNESS_ACTIVITY_READ,
+            Scopes.FITNESS_ACTIVITY_WRITE,
+            Scopes.FITNESS_HEART_RATE_READ,
+            Scopes.FITNESS_HEART_RATE_WRITE,
+        ];
+    Blood pressure: 
+        [
+            FITNESS_BLOOD_PRESSURE_READ,
+            FITNESS_BLOOD_PRESSURE_WRITE,
+            FITNESS_BLOOD_GLUCOSE_READ,
+            FITNESS_BLOOD_GLUCOSE_WRITE,
+        ];
+    ```
     ```javascript
     const options = {
       startDate: "2017-01-01T00:00:17.971Z", // required
