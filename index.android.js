@@ -251,6 +251,19 @@ class RNGoogleFit {
     return result;
   }
 
+  getMoveMinutes = async (options) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+
+    const result = await googleFit.getMoveMinutes(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    );
+
+    return result;
+  }
+
   /**
    * Get the total calories per day over a specified date range.
    * @param {Object} options getDailyCalorieSamples accepts an options object containing:
