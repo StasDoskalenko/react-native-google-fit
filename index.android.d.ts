@@ -66,6 +66,13 @@ declare module 'react-native-google-fit' {
     ) => Promise<ActivitySampleResponse[]>;
 
     /**
+     * Get the Move Minutes over a specified date range.
+     * @param {Object} options getMoveMinutes accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     */
+    getMoveMinutes: (
+      options: StartAndEndDate & Partial<BucketOptions>,
+    ) => Promise<MoveMinutesResponse[]>;
+    /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp. optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
      */
@@ -232,7 +239,7 @@ declare module 'react-native-google-fit' {
   };
 
   type rawSteps = Array<{startDate: string, endDate: string, steps: number}>;
-  
+
   export type StepsResponse = {
     source: string,
     steps: Array<{date: string, value: number }>,
@@ -286,7 +293,7 @@ declare module 'react-native-google-fit' {
     tracked: boolean,
     activityName: string,
     end: number,
-    start: number 
+    start: number,
     calories?: number,
     quantity?: number,
     distance?: number
@@ -296,6 +303,15 @@ declare module 'react-native-google-fit' {
     nutrients: Nutrients
     date: string
   };
+
+  export type MoveMinutesResponse = {
+    dataTypeName: string,
+    dataSourceId: string,
+    originDataSourceId: string,
+    startDate: string,
+    endDate: string,
+    duration: number,
+  }
 
   export type SleepSampleResponse = {
     addedBy: string,
