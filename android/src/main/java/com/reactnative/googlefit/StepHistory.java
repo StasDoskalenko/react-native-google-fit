@@ -232,7 +232,7 @@ public class StepHistory {
                                 for (Bucket bucket : dataReadResponse.getBuckets()) {
                                     List<DataSet> dataSets = bucket.getDataSets();
                                     for (DataSet dataSet : dataSets) {
-                                        processDataSet(dataSet, steps);
+                                        HelperUtil.processDataSet(TAG, dataSet, steps);
                                     }
                                 }
                             }
@@ -241,7 +241,7 @@ public class StepHistory {
                             if (dataReadResponse.getDataSets().size() > 0) {
                                 Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResponse.getDataSets().size());
                                 for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                                    processDataSet(dataSet, steps);
+                                    HelperUtil.processDataSet(TAG, dataSet, steps);
                                 }
                             }
 
@@ -264,41 +264,6 @@ public class StepHistory {
             });
 
         }
-    }
-
-    private void processDataSet(DataSet dataSet, WritableArray map) {
-        //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-
-        WritableMap stepMap = Arguments.createMap();
-
-        for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(TAG, "\tData point:");
-            Log.i(TAG, "\t\tType : " + dp.getDataType().getName());
-            Log.i(TAG, "\t\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            Log.i(TAG, "\t\tEnd  : " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-
-            for(Field field : dp.getDataType().getFields()) {
-                Log.i(TAG, "\t\tField: " + field.getName() +
-                        " Value: " + dp.getValue(field));
-
-                stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("steps", dp.getValue(field).asInt());
-                map.pushMap(stepMap);
-            }
-        }
-    }
-
-
-    private void sendEvent(ReactContext reactContext,
-                           String eventName,
-                           @Nullable WritableArray params) {
-        reactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
     }
 
 }

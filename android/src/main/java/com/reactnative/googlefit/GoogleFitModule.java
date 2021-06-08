@@ -132,7 +132,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void getDailyStepCountSamples(double startDate, 
+    public void getDailyStepCountSamples(double startDate,
                                          double endDate,
                                          int bucketInterval,
                                          String bucketUnit,
@@ -159,6 +159,20 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
         try {
             promise.resolve(mGoogleFitManager.getActivityHistory().getActivitySamples((long)startDate, (long)endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void getMoveMinutes(double startDate,
+                               double endDate,
+                               int bucketInterval,
+                               String bucketUnit,
+                               Promise promise)
+    {
+        try {
+            promise.resolve(mGoogleFitManager.getActivityHistory().getMoveMinutes((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+        } catch (Exception e) {
             promise.reject(e);
         }
     }

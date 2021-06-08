@@ -643,8 +643,51 @@ Please read https://developers.google.com/fit/improvements why we made the chang
       const result = await GoogleFit.saveSleep(opts);
       console.log(result); //either be true or error
     ```
+16. Move Minutes:
 
-16. Other methods:
+    Require `Scopes.FITNESS_ACTIVITY_READ`
+    ```javascript
+    const opt = {
+      startDate: '2020-01-01T12:33:18.873Z', // required, timestamp or ISO8601 string
+      endDate: new Date().toISOString(), // required, timestamp or ISO8601 string
+      //bucket unit...
+    };
+
+    GoogleFit.getSleepSamples(opt).then((res) => {
+      console.log(res)
+    });
+    ```
+    **Response:**
+    
+    ```javascript
+    [
+       {
+          "dataSourceId":"derived:com.google.active_minutes:com.google.android.gms:aggregated",
+          "dataTypeName":"com.google.active_minutes",
+          "duration":73,
+          "endDate":1622594700000,
+          "originDataSourceId":"derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+          "startDate":1622574300000
+       },
+       {
+          "dataSourceId":"derived:com.google.active_minutes:com.google.android.gms:aggregated",
+          "dataTypeName":"com.google.active_minutes",
+          "duration":0,
+          "endDate":1622675040000,
+          "originDataSourceId":"raw:com.google.active_minutes:com.google.android.apps.fitness:user_input",
+          "startDate":1622671440000
+       },
+       {
+          "dataSourceId":"derived:com.google.active_minutes:com.google.android.gms:aggregated",
+          "dataTypeName":"com.google.active_minutes",
+          "duration":17,
+          "endDate":1622854200000,
+          "originDataSourceId":"derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+          "startDate":1622852220000
+       }
+    ]
+    ```
+17. Other methods:
 
     ```javascript
     observeSteps(callback); // On Step Changed Event
