@@ -653,7 +653,7 @@ Please read https://developers.google.com/fit/improvements why we made the chang
       //bucket unit...
     };
 
-    GoogleFit.getSleepSamples(opt).then((res) => {
+    GoogleFit.getMoveMinutes(opt).then((res) => {
       console.log(res)
     });
     ```
