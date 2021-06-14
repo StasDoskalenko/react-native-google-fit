@@ -1,6 +1,10 @@
 ### Changelog:
 
 ```
+0.16.3  + Implement getMoveMinutes
+        ~ Refoctor and remove duplicated processData in stepHistory
+        ~ Update typescript definitions
+
 0.10.0  + Implement hydration
         ~ Fix weight and height deletion
         ~ Update typescript definitions
