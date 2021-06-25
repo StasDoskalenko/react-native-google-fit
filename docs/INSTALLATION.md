@@ -2,6 +2,7 @@
 
 `$ npm install react-native-google-fit --save`
 
+### Note: If your React Native version > 0.60, You can skip the below section and scroll down to Demo Walkthrough Section to check how we config the authentication API with an existing project.
 ### Enable Google Fitness API for your application
 
 In order for your app to communicate properly with the Google Fitness API you need to enable Google Fit API in your Google API Console.
@@ -88,29 +89,29 @@ Copy your `SHA1: XX:XX:XX:XX:XX...` for later use.
 
   Create credentials
   * 1). Credential Type
-   Fitness API, check userdata
+        <br/>Fitness API, check userdata
   * 2). OAuth Consent Screen
-   Add your App name (it can be any but it will show up the name when asking authentication in your app), 
-   Add email
+        </br>Add your App name (it can be any but it will show up the name when asking authentication in your app)
+        </br>Add email
   * 3). Scopes (optional)
-   Skip this part since we can ask permission in App.
+        </br>Skip this part since we can ask permission in App.
   * 4). OAuth Client ID
      * Applicatin type: `Android`, it can be vary depends on your own app.
      * Name: `Android client 1` for demo purpose
-     * Package name
-       You can find your package name in 
+     * Package name: 
+       </br>You can find your package name in `AndroidManifest.xml` under the android folder
        ![image](https://user-images.githubusercontent.com/35160613/123344320-9972b280-d521-11eb-9661-6d5f3dedb481.png)
-       in this demo it's `com.authexamplets`
+       </br>in this demo it's `com.authexamplets`
      * SHA-1: `SHA1: XX:XX:XX:XX:XX...` you obtained previously
   * 5). Your Credentials 
-       Nothing you need to do.
+        </br>Nothing you need to do.
        
 After that, Go to your `OAuth consent screen`, there are two ways you can do 
    * publish your app without verification to let everyone mess around
    * add test user email so your developed app can only be accessed by the test user only.
    ![image](https://user-images.githubusercontent.com/35160613/123345598-6da4fc00-d524-11eb-93b5-887be9613ab5.png)
 
-After basic code into your app. You should be good to go.
+Now add basic code into your app. You should be good to go.
 
    ![image](https://user-images.githubusercontent.com/35160613/123345665-93320580-d524-11eb-8c92-f9d2694e6eb3.png)
 
