@@ -314,6 +314,8 @@ Please read https://developers.google.com/fit/improvements why we made the chang
     ```
 
 8. Get all activities
+    <br/>Require scopes: `Scopes.FITNESS_ACTIVITY_READ` & `Scopes.FITNESS_LOCATION_READ`
+    <br/>Add `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />` to `AndroidManifest.xml` 
     ```javascript
       let opt = {
         startDate: "2017-01-01T00:00:17.971Z", // required
