@@ -238,7 +238,8 @@ class RNGoogleFit {
     return result;
   }
 
-  getActivitySamples = async (options) => {
+  
+   async (options) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
     const result = await googleFit.getActivitySamples(
@@ -248,6 +249,21 @@ class RNGoogleFit {
       bucketUnit
     );
 
+    return result;
+  }
+  
+  saveWorkout = async (options) => {
+    const { name, id, description, startTime, endTime, calories } = prepareInput(options);
+    
+    const result = await googleFit.saveWorkout(
+      name,
+      id,
+      description,
+      startTime,
+      endTime,
+      calories,
+    );
+    
     return result;
   }
 
