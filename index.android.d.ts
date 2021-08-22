@@ -77,8 +77,8 @@ declare module 'react-native-google-fit' {
       name: string,
       id: string,
       description: string,
-      startTime: number,
-      endTime: number,
+      startTime: string,
+      endTime: string,
       calories: number
     ) => Promise<any>;
     
