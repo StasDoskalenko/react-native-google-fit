@@ -239,7 +239,7 @@ class RNGoogleFit {
   }
 
   
-   getActivitySamples = async (options) => {
+  getActivitySamples = async (options) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
 
     const result = await googleFit.getActivitySamples(
