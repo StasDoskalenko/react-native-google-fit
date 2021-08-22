@@ -22,13 +22,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
+import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.request.SessionInsertRequest;
 import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.tasks.Task;
@@ -169,5 +173,40 @@ public class ActivityHistory {
             Log.w(TAG, "Exception: " + e);
         }
         return moveMinutes;
+    }
+
+    public SessionInsertRequest saveWorkout(String name, String id, String description, long startTime, long endTime, float calories) {
+        Session session = new Session.Builder()
+                .setName(name)
+                .setIdentifier(id)
+                .setDescription(description)
+
+                .setActivity(FitnessActivities.STRENGTH_TRAINING)
+                .setStartTime(startTime, TimeUnit.MILLISECONDS)
+                .setEndTime(endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        DataSource sourceKcal = new DataSource.Builder()
+                .setAppPackageName(this.mReactContext.getPackageName())
+                .setDataType(DataType.TYPE_CALORIES_EXPENDED)
+                .setType(DataSource.TYPE_RAW)
+                .build();
+
+
+        DataPoint kcal = DataPoint.builder(sourceKcal)
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+                .setFloatValues(calories)
+                .build();
+
+        DataSet kcalDataset = DataSet.builder(sourceKcal)
+                .add(kcal)
+                .build();
+
+        SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
+                .setSession(session)
+                // Optionally add DataSets for this session.
+                .addDataSet(kcalDataset)
+                .build();
+        return insertRequest;
     }
 }
