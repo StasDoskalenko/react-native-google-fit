@@ -178,6 +178,22 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
+    public void saveWorkout(String name,
+                            String id,
+                            String description,
+                            double startTime,
+                            double endTime,
+                            float calories,
+                            Promise promise)
+    {
+        try {
+            promise.resolve(mGoogleFitManager.getActivityHistory().saveWorkout(name, id, description, (long)startTime, (long)endTime, calories));
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void getUserInputSteps(double startDate,
                                 double endDate,
                                 Callback errorCallback,
