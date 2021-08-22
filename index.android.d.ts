@@ -72,6 +72,17 @@ declare module 'react-native-google-fit' {
     getMoveMinutes: (
       options: StartAndEndDate & Partial<BucketOptions>,
     ) => Promise<MoveMinutesResponse[]>;
+    
+    saveWorkout: (
+      name: string,
+      id: string,
+      description: string,
+      startTime: number,
+      endTime: number,
+      calories: number
+    ) => Promise<any>;
+    
+    
     /**
      * Get the total calories per day over a specified date range.
      * @param {Object} options getDailyCalorieSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp. optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
