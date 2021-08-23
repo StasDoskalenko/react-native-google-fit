@@ -187,7 +187,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                             Promise promise)
     {
         try {
-            promise.resolve(mGoogleFitManager.getActivityHistory().saveWorkout(name, id, description, (long)startTime, (long)endTime, calories));
+            mGoogleFitManager.getActivityHistory().saveWorkout(name, id, description, (long)startTime, (long)endTime, calories, promise);
         } catch (Exception e) {
             promise.reject(e);
         }
