@@ -252,15 +252,14 @@ class RNGoogleFit {
     return result;
   }
   
-  saveWorkout = async (options) => {
-    const { name, id, description, startTime, endTime, calories } = prepareInput(options);
+  saveWorkout = async (name, id, description, startTime, endTime, calories) => {
     
     const result = await googleFit.saveWorkout(
       name,
       id,
       description,
-      startTime,
-      endTime,
+      Date.parse(startTime),
+      Date.parse(endTime),
       calories,
     );
     
