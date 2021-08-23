@@ -14,6 +14,7 @@ package com.reactnative.googlefit;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
@@ -175,7 +176,7 @@ public class ActivityHistory {
         return moveMinutes;
     }
 
-    public SessionInsertRequest saveWorkout(String name, String id, String description, long startTime, long endTime, float calories) {
+    public void saveWorkout(String name, String id, String description, long startTime, long endTime, float calories, Promise promise) {
         Session session = new Session.Builder()
                 .setName(name)
                 .setIdentifier(id)
@@ -207,6 +208,20 @@ public class ActivityHistory {
                 // Optionally add DataSets for this session.
                 .addDataSet(kcalDataset)
                 .build();
-        return insertRequest;
+        GoogleSignInOptionsExtension fitnessOptions =
+                FitnessOptions.builder()
+                        .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_WRITE)
+                        .build();
+
+        Fitness.getSessionsClient(this.mReactContext, GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions))
+                .insertSession(insertRequest)
+                .addOnSuccessListener (unused -> {
+                    Log.i(TAG, "Session insert was successful!");
+                    promise.resolve(true);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "There was a problem inserting the session: ", e);
+                    promise.reject(e);
+                });
     }
 }
