@@ -64,7 +64,7 @@ public class GoogleFitManager implements ActivityEventListener {
     private SleepHistory sleepHistory;
 
     private static final String TAG = "RNGoogleFit";
-//    reserve to place deprecated Api in the future
+//    reserve to replace deprecated Api in the future
     private GoogleSignInClient mSignInClient;
 
     public GoogleFitManager(ReactContext reactContext, Activity activity) {
@@ -135,7 +135,7 @@ public class GoogleFitManager implements ActivityEventListener {
     public void authorize(ArrayList<String> userScopes) {
         final ReactContext mReactContext = this.mReactContext;
 
-//    reserve to place deprecated Api in the future
+//    reserve to replace deprecated Api in the future
 //        GoogleSignInOptions.Builder optionsBuilder =
 //                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
 //                        .requestEmail()
@@ -250,7 +250,7 @@ public class GoogleFitManager implements ActivityEventListener {
                 .emit(eventName, params);
     }
 
-//    reserve to place deprecated Api in the future
+//    reserve to replace deprecated Api in the future
 //    @Override
 //    public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
 //        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
