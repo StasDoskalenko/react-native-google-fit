@@ -267,6 +267,7 @@ public class ActivityHistory {
                         map.putString("activity", session.getActivity());
                         map.putDouble("startDate", session.getStartTime(TimeUnit.MILLISECONDS));
                         map.putDouble("endDate", session.getEndTime(TimeUnit.MILLISECONDS));
+                        map.putString("sessionName", session.getName());
                         map.putString("description", session.getDescription());
                         map.putString("identifier", session.getIdentifier());
                         results.pushMap(map);
