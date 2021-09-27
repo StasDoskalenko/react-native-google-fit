@@ -534,7 +534,7 @@ class RNGoogleFit {
       bucketUnit,
     );
     if (result.length > 0) {
-      return prepareResponse(result).map((i) => ({...i, value: i.value.toFixed(3)}));
+      return prepareResponse(result);
     }
     return result;
   }

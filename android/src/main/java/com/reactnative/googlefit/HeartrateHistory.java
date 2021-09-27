@@ -113,6 +113,13 @@ public class HeartrateHistory {
         return true;
     }
 
+    public boolean delete(ReadableMap sample) {
+        long endTime = (long) sample.getDouble("endTime");
+        long startTime = (long) sample.getDouble("startTime");
+        new DeleteDataHelper(startTime, endTime, this.dataType, googleFitManager).execute();
+        return true;
+    }
+
     //Async fit data insert
     private class InsertAndVerifyDataTask extends AsyncTask<Void, Void, Void> {
 
@@ -169,7 +176,7 @@ public class HeartrateHistory {
         DataPoint dataPoint = dataSet.createDataPoint();
 
         dataPoint.setTimestamp(date, timeUnit);
-        dataPoint.getValue(FIELD_BLOOD_GLUCOSE_LEVEL).setFloat(Float.valueOf(value.toString()));
+        dataPoint.getValue(FIELD_BLOOD_GLUCOSE_LEVEL).setFloat((float) value);
 
         dataSet.add(dataPoint);
 
