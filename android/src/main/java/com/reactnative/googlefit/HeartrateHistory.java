@@ -164,7 +164,7 @@ public class HeartrateHistory {
      * @param timeUnit TimeUnit Time unit in which period is expressed
      * @return
      */
-    private DataSet createDataForRequest(DataType dataType, int dataSourceType, Double value,
+    private DataSet createDataForRequest(DataType dataType, int dataSourceType, double value,
                                          long date, TimeUnit timeUnit) {
         DataSource dataSource = new DataSource.Builder()
                 .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
