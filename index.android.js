@@ -525,6 +525,26 @@ class RNGoogleFit {
     return result;
   }
 
+  getBloodGlucoseSamples = async (options, callback) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getBloodGlucoseSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit,
+    );
+    if (result.length > 0) {
+      return prepareResponse(result);
+    }
+    return result;
+  }
+
+  saveBloodGlucose = async (options) => {
+    options.date = Date.parse(options.date)
+    const result = await googleFit.saveBloodGlucose(options);
+    return result;
+  }
+
   getHydrationSamples = async (options) => {
     const { startDate, endDate } = prepareInput(options);
     const result = await googleFit.getHydrationSamples(

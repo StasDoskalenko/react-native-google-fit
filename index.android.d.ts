@@ -115,6 +115,14 @@ declare module 'react-native-google-fit' {
       options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<BloodPressureResponse[]>;
 
+    getBloodGlucoseSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<BloodGlucoseResponse[]>;
+
+    saveBloodGlucose: (
+      options: { date: string, value: number },
+    ) => Promise<Boolean | undefined>
+
     saveWeight: (
       options: WeightData,
       callback: (isError: boolean, result: true) => void
@@ -272,6 +280,13 @@ declare module 'react-native-google-fit' {
     endDate: string,
     diastolic: number,
     systolic: number,
+    day: Day
+  }
+
+  export type BloodGlucoseResponse = {
+    startDate: string,
+    endDate: string,
+    value: number,
     day: Day
   }
 
