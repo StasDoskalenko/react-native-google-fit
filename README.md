@@ -17,6 +17,15 @@ If you didn't set `fitnessVersion` manually, you can simply skip this part.
 Note that 0.16.1 require fitness version above 20.0.0  
 Please read https://developers.google.com/fit/improvements why we made the changes.
 
+#### Android 11
+For Android 11, If you want to interact with `Google Fit` App.</br>
+For example, use `openFit()`,`isAvailable(callback)`. Otherwise ignore it.</br>
+Add the following queries into your `AndroidManifest.xml`
+```xml
+<queries>
+    <package android:name="com.google.android.apps.fitness" />
+</queries>
+```
 ### USAGE
 
 1. `import GoogleFit, { Scopes } from 'react-native-google-fit'`
