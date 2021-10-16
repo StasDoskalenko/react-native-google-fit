@@ -307,6 +307,48 @@ class RNGoogleFit {
     return result;
   }
 
+  getWorkoutSession = async (options) => {
+    try {
+      const { startDate, endDate, ...config } = options;
+      const result = await googleFit.getWorkoutSession(
+        Date.parse(startDate),
+        Date.parse(endDate),
+        config
+      );
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
+
+  saveWorkout = async (options) => {
+    try {
+      const { startDate, endDate, ...config } = options;
+      const result = await googleFit.saveWorkout(
+        Date.parse(startDate),
+        Date.parse(endDate),
+        config
+      );
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
+
+  deleteAllWorkout = async (options) => {
+    try {
+      const { startDate, endDate, ...config } = options;
+      const result = await googleFit.deleteAllWorkout(
+        Date.parse(startDate),
+        Date.parse(endDate),
+        config
+      );
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
+
   saveFood(options, callback) {
     options.date = Date.parse(options.date)
     googleFit.saveFood(
@@ -609,6 +651,16 @@ export default new RNGoogleFit()
 // Possible Scopes
 export const Scopes = Object.freeze(PossibleScopes)
 
+export const BucketUnit = Object.freeze({
+  NANOSECOND: "NANOSECOND",
+  MICROSECOND: "MICROSECOND",
+  MILLISECOND: "MILLISECOND",
+  SECOND: "SECOND",
+  MINUTE: "MINUTE",
+  HOUR: "HOUR",
+  DAY: "DAY"
+});
+
 //Data types for food addition
 export const MealType = Object.freeze({
   UNKNOWN: 0,
@@ -718,4 +770,242 @@ export const Nutrient = Object.freeze({
    * @type {string}
    */
   IRON: 'iron',
+})
+
+export const ActivityType = Object.freeze({
+  Aerobics: "aerobics",
+  Archery: "archery",
+  Badminton: "badminton",
+  Baseball: "baseball",
+  Basketball: "basketball",
+  Biathlon: "biathlon",
+  Biking: "biking",
+  Handbiking: "biking.hand",
+  Mountain_biking: "biking.mountain",
+  Road_biking: "biking.road",
+  Spinning: "biking.spinning",
+  Stationary_biking: "biking.stationary",
+  Utility_biking: "biking.utility",
+  Boxing: "boxing",
+  Calisthenics: "calisthenics",
+  Circuit_training: "circuit_training",
+  Cricket: "cricket",
+  Crossfit: "crossfit",
+  Curling: "curling",
+  Dancing: "dancing",
+  Diving: "diving",
+  Elevator: "elevator",
+  Elliptical: "elliptical",
+  Ergometer: "ergometer",
+  Escalator: "escalator",
+  Fencing: "fencing",
+  Football_American: "football.american",
+  Football_Australian: "football.australian",
+  Football_Soccer: "football.soccer",
+  Frisbee_Disc: "frisbee_disc",
+  Gardening: "gardening",
+  Golf: "golf",
+  Guided_Breathing: "guided_breathing",
+  Gymnastics: "gymnastics",
+  Handball: "handball",
+  HIIT: "interval_training.high_intensity",
+  Hiking: "hiking",
+  Hockey: "hockey",
+  Horseback_riding: "horseback_riding",
+  Housework: "housework",
+  Ice_skating: "ice_skating",
+  In_vehicle: "in_vehicle",
+  Interval_Training: "interval_training",
+  Jumping_rope: "jump_rope",
+  Kayaking: "kayaking",
+  Kettlebell_training: "kettlebell_training",
+  Kickboxing: "kickboxing",
+  Kick_Scooter: "kick_scooter",
+  Kitesurfing: "kitesurfing",
+  Martial_arts: "martial_arts",
+  Meditation: "meditation",
+  Mime_Type_Prefix: "vnd.google.fitness.activity/",
+  Mixed_martial_arts: "martial_arts.mixed",
+  Other_unclassified_fitness_activity: "other",
+  P90X_exercises: "p90x",
+  Paragliding: "paragliding",
+  Pilates: "pilates",
+  Polo: "polo",
+  Racquetball: "racquetball",
+  Rock_climbing: "rock_climbing",
+  Rowing: "rowing",
+  Rowing_machine: "rowing.machine",
+  Rugby: "rugby",
+  Running: "running",
+  Jogging: "running.jogging",
+  Running_on_sand: "running.sand",
+  Running_treadmill: "running.treadmill",
+  Sailing: "sailing",
+  Scuba_diving: "scuba_diving",
+  Skateboarding: "skateboarding",
+  Skating: "skating",
+  Skating_Cross: "skating.cross",
+  Skating_Indoor: "skating.indoor",
+  Skating_Inline_rollerblading: "skating.inline",
+  Skiing: "skiing",
+  Skiing_Back_Country: "skiing.back_country",
+  Skiing_Cross_Country: "skiing.cross_country",
+  Skiing_Downhill: "skiing.downhill",
+  Skiing_Kite: "skiing.kite",
+  Skiing_Roller: "skiing.roller",
+  Sledding: "sledding",
+  Snowboarding: "snowboarding",
+  Snowmobile: "snowmobile",
+  Snowshoeing: "snowshoeing",
+  Softball: "softball",
+  Squash: "squash",
+  Stair_climbing: "stair_climbing",
+  Stair_climbing_machine: "stair_climbing.machine",
+  Stand_up_paddleboarding: "standup_paddleboarding",
+  Status_Active: "ActiveActionStatus",
+  Status_Completed: "CompletedActionStatus",
+  Still_not_moving: "still",
+  Strength_training: "strength_training",
+  Surfing: "surfing",
+  Swimming: "swimming",
+  Swimming_open_water: "swimming.open_water",
+  Swimming_swimming_pool: "swimming.pool",
+  Table_tennis_ping_pong: "table_tennis",
+  Team_sports: "team_sports",
+  Tennis: "tennis",
+  Tilting_sudden_device_gravity_change: "tilting",
+  Treadmill_walking_or_running: "treadmill",
+  Unknown_unable_to_detect_activity: "unknown",
+  Volleyball: "volleyball",
+  Volleyball_beach: "volleyball.beach",
+  Volleyball_indoor: "volleyball.indoor",
+  Wakeboarding: "wakeboarding",
+  Walking: "walking",
+  Walking_fitness: "walking.fitness",
+  Walking_nording: "walking.nordic",
+  Walking_treadmill: "walking.treadmill",
+  Walking_stroller: "walking.stroller",
+  Waterpolo: "water_polo",
+  Weightlifting: "weightlifting",
+  Wheelchair: "wheelchair",
+  Windsurfing: "windsurfing",
+  Yoga: "yoga",
+  Zumba: "zumba"
+})
+
+export const ActivityTypeCode = Object.freeze({
+  Aerobics: 9,
+  Archery: 119,
+  Badminton: 10,
+  Baseball: 11,
+  Basketball: 12,
+  Biathlon: 13,
+  Biking: 1,
+  Handbiking: 14,
+  Mountain_biking: 15,
+  Road_biking: 16,
+  Spinning: 17,
+  Stationary_biking: 18,
+  Utility_biking: 19,
+  Boxing: 20,
+  Calisthenics: 21,
+  Circuit_training: 22,
+  Cricket: 23,
+  Crossfit: 113,
+  Curling: 106,
+  Dancing: 24,
+  Diving: 102,
+  Elevator: 117,
+  Elliptical: 25,
+  Ergometer: 103,
+  Escalator: 118,
+  Fencing: 26,
+  Football_American: 27,
+  Football_Australian: 28,
+  Football_Soccer: 29,
+  Frisbee: 30,
+  Gardening: 31,
+  Golf: 32,
+  Guided_Breathing: 122,
+  Gymnastics: 33,
+  Handball: 34,
+  HIIT: 114,
+  Hiking: 35,
+  Hockey: 36,
+  Horseback_riding: 37,
+  Housework: 38,
+  Ice_skating: 104,
+  In_vehicle: 0,
+  Interval_Training: 115,
+  Jumping_rope: 39,
+  Kayaking: 40,
+  Kettlebell_training: 41,
+  Kickboxing: 42,
+  Kitesurfing: 43,
+  Martial_arts: 44,
+  Meditation: 45,
+  Mixed_martial_arts: 46,
+  Other_unclassified_fitness_activity: 108,
+  P90X_exercises: 47,
+  Paragliding: 48,
+  Pilates: 49,
+  Polo: 50,
+  Racquetball: 51,
+  Rock_climbing: 52,
+  Rowing: 53,
+  Rowing_machine: 54,
+  Rugby: 55,
+  Running: 8,
+  Jogging: 56,
+  Running_on_sand: 57,
+  Running_treadmill: 58,
+  Sailing: 59,
+  Scuba_diving: 60,
+  Skateboarding: 61,
+  Skating: 62,
+  Cross_skating: 63,
+  Indoor_skating: 105,
+  Inline_skating_rollerblading: 64,
+  Skiing: 65,
+  Back_country_skiing: 66,
+  Cross_country_skiing: 67,
+  Downhill_skiing: 68,
+  Kite_skiing: 69,
+  Roller_skiing: 70,
+  Sledding: 71,
+  Snowboarding: 73,
+  Snowmobile: 74,
+  Snowshoeing: 75,
+  Softball: 120,
+  Squash: 76,
+  Stair_climbing: 77,
+  Stair_climbing_machine: 78,
+  Stand_up_paddleboarding: 79,
+  Still_not_moving: 3,
+  Strength_training: 80,
+  Surfing: 81,
+  Swimming: 82,
+  Swimming_open_water: 84,
+  Swimming_swimming_pool: 83,
+  Table_tennis_ping_pong: 85,
+  Team_sports: 86,
+  Tennis: 87,
+  Tilting_sudden_device_gravity_change: 5,
+  Treadmill_walking_or_running: 88,
+  Unknown_unable_to_detect_activity: 4,
+  Volleyball: 89,
+  Volleyball_beach: 90,
+  Volleyball_indoor: 91,
+  Wakeboarding: 92,
+  Walking: 7,
+  Walking_fitness: 93,
+  Nording_walking: 94,
+  Walking_treadmill: 95,
+  Walking_stroller: 116,
+  Waterpolo: 96,
+  Weightlifting: 97,
+  Wheelchair: 98,
+  Windsurfing: 99,
+  Yoga: 100,
+  Zumba: 101
 })

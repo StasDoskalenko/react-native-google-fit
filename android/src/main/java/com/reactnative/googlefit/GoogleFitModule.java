@@ -475,4 +475,31 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             promise.reject(e);
         }
     }
+
+    @ReactMethod
+    public void getWorkoutSession(double startDate, double endDate, ReadableMap options, Promise promise) {
+        try{
+            mGoogleFitManager.getActivityHistory().getWorkoutSession((long)startDate, (long)endDate, options, promise);
+        } catch (Error e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void saveWorkout(double startDate, double endDate, ReadableMap options, Promise promise) {
+        try {
+            mGoogleFitManager.getActivityHistory().saveWorkout((long)startDate, (long)endDate, options, promise);
+        } catch (Error e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void deleteAllWorkout(double startDate, double endDate, ReadableMap options, Promise promise) {
+        try {
+            mGoogleFitManager.getActivityHistory().deleteAllWorkout((long)startDate, (long)endDate, options, promise);
+        } catch (Error e) {
+            promise.reject(e);
+        }
+    }
 }
