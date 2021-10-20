@@ -711,7 +711,7 @@ Add the following queries into your `AndroidManifest.xml`
     
     deleteWeight(options, callback); // method to delete weights by options (same as in delete hydration)
  
-    openFit(); //method to open google fit app
+    openFit(callback); //method to open google fit app
     
     saveHeight(options, callback);
  

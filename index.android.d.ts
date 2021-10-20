@@ -185,7 +185,7 @@ declare module 'react-native-google-fit' {
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
 
-    openFit(): void
+    openFit(callback: (isError: boolean, result: boolean) => void): void
 
     observeSteps: (callback: (isError: boolean, result: any) => void) => void
 
