@@ -93,7 +93,7 @@ Alternatively you can use event listeners (deprecated)
 const opt = {
   startDate: "2017-01-01T00:00:17.971Z", // required ISO8601Timestamp
   endDate: new Date().toISOString(), // required ISO8601Timestamp
-  bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+  bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
   bucketInterval: 1, // optional - default 1. 
 };
 
@@ -146,7 +146,7 @@ GoogleFit.getWeeklySteps(date, adjustment).then().catch()
    
 **Response:**
 ```javascript
-// {bucketInterval: 15, bucketUnit: 'MINUTE'}
+// {bucketInterval: 15, bucketUnit: BucketUnit.MINUTE}
 [
   { source: "com.google.android.gms:estimated_steps", 
     steps: [
@@ -164,7 +164,7 @@ GoogleFit.getWeeklySteps(date, adjustment).then().catch()
   },
 ]
 
-// {bucketInterval: 1, bucketUnit: 'DAY'}
+// {bucketInterval: 1, bucketUnit: BucketUnit.DAY}
 [
     { source: "com.google.android.gms:estimated_steps",
         ...
@@ -182,7 +182,7 @@ const opt = {
   unit: "pound", // required; default 'kg'
   startDate: "2017-01-01T00:00:17.971Z", // required
   endDate: new Date().toISOString(), // required
-  bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+  bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
   bucketInterval: 1, // optional - default 1. 
   ascending: false // optional; default false
 };
@@ -280,7 +280,7 @@ Blood pressure:
 const options = {
   startDate: "2017-01-01T00:00:17.971Z", // required
   endDate: new Date().toISOString(), // required
-  bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+  bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
   bucketInterval: 1, // optional - default 1. 
 }
 
@@ -321,12 +321,13 @@ async function fetchData() {
 
 #### 8. Get all activities
 <br/>Require scopes: `Scopes.FITNESS_ACTIVITY_READ` & `Scopes.FITNESS_LOCATION_READ`
-<br/>Add `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />` to `AndroidManifest.xml` 
+<br/>Add `<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />` to `AndroidManifest.xml`
+
 ```javascript
   let opt = {
     startDate: "2017-01-01T00:00:17.971Z", // required
     endDate: new Date().toISOString(), // required
-    bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+    bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
     bucketInterval: 1, // optional - default 1. 
   };
 
@@ -384,7 +385,7 @@ Like no distance for still activity.
     startDate: "2017-01-01T00:00:17.971Z", // required
     endDate: new Date().toISOString(), // required
     basalCalculation: true, // optional, to calculate or not basalAVG over the week
-    bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+    bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
     bucketInterval: 1, // optional - default 1. 
   };
 
@@ -417,7 +418,7 @@ Like no distance for still activity.
   const opt = {
     startDate: "2017-01-01T00:00:17.971Z", // required
     endDate: new Date().toISOString(), // required
-    bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+    bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
     bucketInterval: 1, // optional - default 1. 
   };
 
@@ -457,7 +458,7 @@ You need to add `FITNESS_NUTRITION_READ` scope to your authorization to work wit
   const opt = {
     startDate: "2017-01-01T00:00:17.971Z", // required
     endDate: new Date().toISOString(), // required
-    bucketUnit: "DAY", // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
+    bucketUnit: BucketUnit.DAY, // optional - default "DAY". Valid values: "NANOSECOND" | "MICROSECOND" | "MILLISECOND" | "SECOND" | "MINUTE" | "HOUR" | "DAY"
     bucketInterval: 1, // optional - default 1. 
   };
 
