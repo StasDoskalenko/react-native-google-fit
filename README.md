@@ -695,7 +695,80 @@ GoogleFit.getMoveMinutes(opt).then((res) => {
    }
 ]
 ```
-#### 17. Other methods:
+#### 17. Workout [Experimental]:
+Fields may be **inconsistent** and **overwrite** by Google Fit App, it could be `bugs` or some internal processes that we are not aware of.
+<br/>**That's why it's experimental. Use at your own risk.**
+<br/>[List of ActivityType](https://github.com/StasDoskalenko/react-native-google-fit/blob/db0d2f8cf090e5f62e8115cfba2fc0cc454fb922/index.android.d.ts#L509)
+<br/>[List of Session Activities from official Doc](https://developers.google.com/android/reference/com/google/android/gms/fitness/FitnessActivities#ERGOMETER)
+
+**Add:**
+```javascript
+GoogleFit.saveWorkout({
+    startDate: startDate,
+    endDate: endDate,
+    sessionName: `session name`,
+    // below example is probably not unique enough, must be **UUID**
+    identifier: `session:${Date.now()}-${dataType}:${startDate}-${endDate}`,
+    activityType: ActivityType.Meditation, //dataType
+    description: `some description`,
+    // options field
+    calories: 233, // most consistent field across all activities
+    steps: 600, // may not working, for example: ActivityType.Meditation doesn't have step by default
+    // experimental field
+    // this may not work or overwrite by GoogleFit App, it works in ActivityType.Other_unclassified_fitness_activity
+    intensity: 1 // display as heart points in Google Fit app
+});
+```
+**Deletion:**
+<br />Warning: Deletion is an async actions, Oftentimes the deletion would not happen immediately.
+```javascript
+await GoogleFit.deleteAllWorkout({
+   startDate: startDate,
+   endDate: endDate,
+})
+```
+**Get Workout:**
+<br/>This is **complemental** method to `getActivitySamples()`, For some unknown reasons, both were missing some data or have incorrect data.
+<br/>Try to use both to create a full picture if neccessary
+```javascript
+await GoogleFit.getWorkoutSession(actOptions)({
+   startDate: startDate,
+   endDate: endDate,
+})
+```
+
+func | session Id | session name |  session identifier | description | duration | intensity | calories, steps. etc. 
+------- | ------------- | ------------ | ------------- | ------------ | ------------- | ------------ | ------------- |
+getActivitySamples()  | ❌ | ❌ | ❌ | ❌ | ✔️ | ✔️ | ✔️ 
+getWorkoutSession() | ✔️ | ✔️ | ✔️ | ✔️ | ❌ | ❌ | ✔️ 
+
+---
+
+There is not such a update workout method if the workout exists in a session based on current investigation.
+<br/>So if you want to do an update, you can try to do delete then create based on the old session timestamp
+
+```javascript
+// startDate & endDate are from the existing session you want to modify
+const options = {
+    startDate: startDate,
+    endDate: endDate,
+    sessionName: `new session name`,
+    identifier: `session:${Date.now()}-${dataType}:${startDate}-${endDate}`, // UUID
+    activityType: ActivityType.Meditation, //dataType
+    description: `new description`,
+    .....
+    newData
+};
+
+const del = await GoogleFit.deleteAllWorkout(options);
+
+if(del) {
+    const result = await GoogleFit.saveWorkout(options);
+    console.log(result)
+}
+```
+
+#### Other methods:
 
 ```javascript
 observeSteps(callback); // On Step Changed Event
