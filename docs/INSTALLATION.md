@@ -63,7 +63,7 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
  
  
  
-## Demo Walkthrough
+## Demo Walkthrough (Development Setup)
  
 1. `npx react-native init AuthExampleTS --template react-native-template-typescript` to create a fresh RN project then go into the project folder
 2. `npm install react-native-google-fit --save` install the library
@@ -71,6 +71,7 @@ _**Note**: Do not change BuildConfig.APPLICATION_ID - it's a constant value._
    there is a `debug.keystore` file
    
    if you don't have one, then run **(You need to enable keytool command in your machine)**
+   <br/>Sometimes you might want to delete the existing one from template becuase it's outdated, so it's recommanded to create your own fresh one.
 ```
    keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000
 ```
@@ -107,7 +108,6 @@ Copy your `SHA1: XX:XX:XX:XX:XX...` for later use.
         </br>Nothing you need to do.
        
 After that, Go to your `OAuth consent screen`, there are two ways you can do 
-   * publish your app without verification to let everyone mess around
    * add test user email so your developed app can only be accessed by the test user only.
    ![image](https://user-images.githubusercontent.com/35160613/123345598-6da4fc00-d524-11eb-93b5-887be9613ab5.png)
 
