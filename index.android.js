@@ -581,6 +581,34 @@ class RNGoogleFit {
     return result;
   }
 
+  getBodyTemperatureSamples = async (options, callback) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getBodyTemperatureSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit,
+    );
+    if (result.length > 0) {
+      return prepareResponse(result);
+    }
+    return result;
+  }
+
+  getOxygenSaturationSamples = async (options, callback) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getOxygenSaturationSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit,
+    );
+    if (result.length > 0) {
+      return prepareResponse(result);
+    }
+    return result;
+  }
+
   saveBloodGlucose = async (options) => {
     options.date = Date.parse(options.date)
     const result = await googleFit.saveBloodGlucose(options);

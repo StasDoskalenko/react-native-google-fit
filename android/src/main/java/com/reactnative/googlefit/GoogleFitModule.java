@@ -375,9 +375,39 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                         String bucketUnit,
                                         Promise promise) {
         try {
-            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
-            heartrateHistory.setDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE);
-            promise.resolve(heartrateHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(HealthDataTypes.TYPE_BLOOD_PRESSURE);
+            promise.resolve(healthHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+        } catch (IllegalViewOperationException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void getBodyTemperatureSamples(double startDate,
+                                       double endDate,
+                                       int bucketInterval,
+                                       String bucketUnit,
+                                       Promise promise) {
+        try {
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(HealthDataTypes.TYPE_BODY_TEMPERATURE);
+            promise.resolve(healthHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+        } catch (IllegalViewOperationException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void getOxygenSaturationSamples(double startDate,
+                                       double endDate,
+                                       int bucketInterval,
+                                       String bucketUnit,
+                                       Promise promise) {
+        try {
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(HealthDataTypes.TYPE_OXYGEN_SATURATION);
+            promise.resolve(healthHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
             promise.reject(e);
         }
@@ -390,9 +420,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                         String bucketUnit,
                                         Promise promise) {
         try {
-            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
-            heartrateHistory.setDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE);
-            promise.resolve(heartrateHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE);
+            promise.resolve(healthHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
             promise.reject(e);
         }
@@ -401,9 +431,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void saveBloodGlucose(ReadableMap bloodGlucoseSample, Promise promise) {
         try {
-            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
-            heartrateHistory.setDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE);
-            heartrateHistory.saveBloodGlucose(bloodGlucoseSample);
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(HealthDataTypes.TYPE_BLOOD_GLUCOSE);
+            healthHistory.saveBloodGlucose(bloodGlucoseSample);
         } catch (Error e) {
             promise.reject(e);
         }
@@ -417,9 +447,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                     Promise promise) {
 
         try {
-            HeartrateHistory heartrateHistory = mGoogleFitManager.getHeartrateHistory();
-            heartrateHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
-            promise.resolve(heartrateHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
+            promise.resolve(healthHistory.getHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
             promise.reject(e);
         }
