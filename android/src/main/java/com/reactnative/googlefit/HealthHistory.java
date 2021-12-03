@@ -45,22 +45,22 @@ import static com.google.android.gms.fitness.data.HealthFields.FIELD_TEMPORAL_RE
 import static com.google.android.gms.fitness.data.HealthFields.FIELD_TEMPORAL_RELATION_TO_SLEEP;
 
 
-public class HeartrateHistory {
+public class HealthHistory {
 
     private ReactContext mReactContext;
     private GoogleFitManager googleFitManager;
     private DataSet Dataset;
     private DataType dataType;
 
-    private static final String TAG = "Heart Rate History";
+    private static final String TAG = "Health History";
 
-    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
+    public HealthHistory(ReactContext reactContext, GoogleFitManager googleFitManager, DataType dataType){
         this.mReactContext = reactContext;
         this.googleFitManager = googleFitManager;
         this.dataType = dataType;
     }
 
-    public HeartrateHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
+    public HealthHistory(ReactContext reactContext, GoogleFitManager googleFitManager){
         this(reactContext, googleFitManager, DataType.TYPE_HEART_RATE_BPM);
     }
 
@@ -184,10 +184,7 @@ public class HeartrateHistory {
     }
 
     private void processDataSet(DataSet dataSet, WritableArray map) {
-
-        //Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         Format formatter = new SimpleDateFormat("EEE");
-//        WritableMap stepMap = Arguments.createMap();
 
         for (DataPoint dp : dataSet.getDataPoints()) {
             WritableMap stepMap = Arguments.createMap();
