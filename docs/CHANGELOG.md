@@ -1,6 +1,9 @@
 ### Changelog:
 
 ```
+0.18.1  + Implement `getBodyTemperatureSamples()` and `getOxygenSaturationSamples()` (#266, kudos to @mluksha)
+        ~ Update typescript definitions
+        
 0.18.0  + Implement Workout Support[Experimental] (#251)
         ~ typescript: add `BucketUnitType` and `BucketUnit` helper
         
