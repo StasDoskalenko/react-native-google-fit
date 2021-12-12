@@ -1,6 +1,8 @@
 ### Changelog:
 
 ```
+0.18.2  ~ temporary hotfix (#268, kudos to @nikhil-kumar-160)
+
 0.18.1  + Implement `getBodyTemperatureSamples()` and `getOxygenSaturationSamples()` (#266, kudos to @mluksha)
         ~ Update typescript definitions
         
