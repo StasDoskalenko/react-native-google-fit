@@ -276,7 +276,18 @@ declare module 'react-native-google-fit' {
     bucketUnit: BucketUnit
   };
 
-  type rawSteps = Array<{startDate: string, endDate: string, steps: number}>;
+  type rawSteps = Array<{
+    dataTypeName: string,
+    dataSourceId: string,
+    originDataSourceId: string,
+    deviceUid?: string,
+    deviceManufacturer?: string,
+    deviceModel?: string,
+    deviceType?: string,
+    startDate: string,
+    endDate: number,
+    steps: number
+  }>;
 
   export type StepsResponse = {
     source: string,

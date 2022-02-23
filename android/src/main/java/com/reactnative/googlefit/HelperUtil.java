@@ -10,6 +10,7 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Device;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
@@ -69,6 +70,40 @@ final class HelperUtil {
                 innerMap.putString("dataTypeName", dp.getDataType().getName());
                 innerMap.putString("dataSourceId", dp.getDataSource().getStreamIdentifier());
                 innerMap.putString("originDataSourceId", dp.getOriginalDataSource().getStreamIdentifier());
+
+                Device device = dp.getOriginalDataSource().getDevice();
+                if (device != null) {
+                    innerMap.putString("deviceUid", device.getUid());
+                    innerMap.putString("deviceManufacturer", device.getManufacturer());
+                    innerMap.putString("deviceModel", device.getModel());
+                    switch (device.getType()) {
+                        case Device.TYPE_PHONE:  
+                            innerMap.putString("deviceType", "phone");
+                        break;
+                        case Device.TYPE_WATCH: 
+                            innerMap.putString("deviceType", "watch");
+                        break;
+                        case Device.TYPE_TABLET: 
+                            innerMap.putString("deviceType", "tablet");
+                        break;
+                        case Device.TYPE_CHEST_STRAP:
+                            innerMap.putString("deviceType", "chest-strap");
+                        break;
+                        case Device.TYPE_HEAD_MOUNTED:
+                            innerMap.putString("deviceType", "head-mounted");
+                        break;
+                        case Device.TYPE_SCALE:
+                            innerMap.putString("deviceType", "scale");
+                        break;
+                        case Device.TYPE_UNKNOWN:
+                            innerMap.putString("deviceType", "unknown");
+                        break;
+                        default: 
+                            innerMap.putString("deviceType", "unknown");
+                        break;
+                    };
+                }
+
                 innerMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 innerMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
                 innerMap.putDouble(field.getName(), dp.getValue(field).asInt());
