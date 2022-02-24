@@ -51,6 +51,19 @@ final class HelperUtil {
         return signInOptionsExtension.build();
     }
 
+    public static String getDeviceType(Device device) {
+        switch (device.getType()) {
+            case Device.TYPE_PHONE: return "phone";
+            case Device.TYPE_WATCH: return "watch";
+            case Device.TYPE_TABLET: return "tablet";
+            case Device.TYPE_CHEST_STRAP: return "chest-strap";
+            case Device.TYPE_HEAD_MOUNTED: return "head-mounted";
+            case Device.TYPE_SCALE: return "scale";
+            case Device.TYPE_UNKNOWN: return "unknown";
+        }; 
+        return "unknown";
+    }
+
     public static void processDataSet(String TAG, DataSet dataSet, WritableArray wtArray) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
@@ -76,32 +89,7 @@ final class HelperUtil {
                     innerMap.putString("deviceUid", device.getUid());
                     innerMap.putString("deviceManufacturer", device.getManufacturer());
                     innerMap.putString("deviceModel", device.getModel());
-                    switch (device.getType()) {
-                        case Device.TYPE_PHONE:  
-                            innerMap.putString("deviceType", "phone");
-                        break;
-                        case Device.TYPE_WATCH: 
-                            innerMap.putString("deviceType", "watch");
-                        break;
-                        case Device.TYPE_TABLET: 
-                            innerMap.putString("deviceType", "tablet");
-                        break;
-                        case Device.TYPE_CHEST_STRAP:
-                            innerMap.putString("deviceType", "chest-strap");
-                        break;
-                        case Device.TYPE_HEAD_MOUNTED:
-                            innerMap.putString("deviceType", "head-mounted");
-                        break;
-                        case Device.TYPE_SCALE:
-                            innerMap.putString("deviceType", "scale");
-                        break;
-                        case Device.TYPE_UNKNOWN:
-                            innerMap.putString("deviceType", "unknown");
-                        break;
-                        default: 
-                            innerMap.putString("deviceType", "unknown");
-                        break;
-                    };
+                    innerMap.putString("deviceType", getDeviceType(device));
                 }
 
                 innerMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
