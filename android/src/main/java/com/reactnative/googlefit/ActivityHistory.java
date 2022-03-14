@@ -201,7 +201,7 @@ public class ActivityHistory {
             if (response.getStatus().isSuccess()) {
                 for (Bucket bucket : response.getBuckets()) {
                     for (DataSet dataSet : bucket.getDataSets()) {
-                        HelperUtil.processDataSet(TAG, dataSet, moveMinutes);
+                        HelperUtil.processDataSet(this.mReactContext, TAG, dataSet, moveMinutes);
                     }
                 }
                 return moveMinutes;

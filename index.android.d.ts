@@ -277,6 +277,8 @@ declare module 'react-native-google-fit' {
   };
 
   export type DeviceInfo = {
+    appName?: string,
+    appPackageName?: string,
     dataTypeName: string,
     dataSourceId: string,
     originDataSourceId: string,

@@ -226,7 +226,7 @@ public class StepHistory {
                                 for (Bucket bucket : dataReadResponse.getBuckets()) {
                                     List<DataSet> dataSets = bucket.getDataSets();
                                     for (DataSet dataSet : dataSets) {
-                                        HelperUtil.processDataSet(TAG, dataSet, steps);
+                                        HelperUtil.processDataSet(mReactContext, TAG, dataSet, steps);
                                     }
                                 }
                             }
@@ -235,7 +235,7 @@ public class StepHistory {
                             if (dataReadResponse.getDataSets().size() > 0) {
                                 Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResponse.getDataSets().size());
                                 for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                                    HelperUtil.processDataSet(TAG, dataSet, steps);
+                                    HelperUtil.processDataSet(mReactContext, TAG, dataSet, steps);
                                 }
                             }
 
