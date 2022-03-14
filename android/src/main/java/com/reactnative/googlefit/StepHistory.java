@@ -172,16 +172,10 @@ public class StepHistory {
 
             Log.i(TAG, "  + Device    : " + device);
             if (device != null) {
+                source.putString("deviceUid", device.getUid());
                 source.putString("deviceManufacturer", device.getManufacturer());
                 source.putString("deviceModel", device.getModel());
-                switch(device.getType()) {
-                    case Device.TYPE_CHEST_STRAP:
-                        source.putString("deviceType", "chestStrap"); break;
-                }
-            } else {
-                source.putNull("deviceManufacturer");
-                source.putNull("deviceModel");
-                source.putNull("deviceType");
+                source.putString("deviceType", HelperUtil.getDeviceType(device));
             }
 
             //if (!DataType.TYPE_STEP_COUNT_DELTA.equals(type)) continue;

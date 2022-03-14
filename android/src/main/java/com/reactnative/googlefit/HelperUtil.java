@@ -10,6 +10,7 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Device;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
@@ -50,6 +51,19 @@ final class HelperUtil {
         return signInOptionsExtension.build();
     }
 
+    public static String getDeviceType(Device device) {
+        switch (device.getType()) {
+            case Device.TYPE_PHONE: return "phone";
+            case Device.TYPE_WATCH: return "watch";
+            case Device.TYPE_TABLET: return "tablet";
+            case Device.TYPE_CHEST_STRAP: return "chest-strap";
+            case Device.TYPE_HEAD_MOUNTED: return "head-mounted";
+            case Device.TYPE_SCALE: return "scale";
+            case Device.TYPE_UNKNOWN: return "unknown";
+        }; 
+        return "unknown";
+    }
+
     public static void processDataSet(String TAG, DataSet dataSet, WritableArray wtArray) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
@@ -69,6 +83,15 @@ final class HelperUtil {
                 innerMap.putString("dataTypeName", dp.getDataType().getName());
                 innerMap.putString("dataSourceId", dp.getDataSource().getStreamIdentifier());
                 innerMap.putString("originDataSourceId", dp.getOriginalDataSource().getStreamIdentifier());
+
+                Device device = dp.getOriginalDataSource().getDevice();
+                if (device != null) {
+                    innerMap.putString("deviceUid", device.getUid());
+                    innerMap.putString("deviceManufacturer", device.getManufacturer());
+                    innerMap.putString("deviceModel", device.getModel());
+                    innerMap.putString("deviceType", getDeviceType(device));
+                }
+
                 innerMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
                 innerMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
                 innerMap.putDouble(field.getName(), dp.getValue(field).asInt());
