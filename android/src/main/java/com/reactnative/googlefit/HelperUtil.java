@@ -1,8 +1,12 @@
 package com.reactnative.googlefit;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
@@ -51,6 +55,16 @@ final class HelperUtil {
         return signInOptionsExtension.build();
     }
 
+    public static String getAppName(PackageManager pm, String packageName) {
+        ApplicationInfo ai = null;
+        try {
+            ai = pm.getApplicationInfo(packageName, 0);
+        } catch (final NameNotFoundException e) {
+            return null;
+        }
+        return (String) pm.getApplicationLabel(ai);
+    }
+
     public static String getDeviceType(Device device) {
         switch (device.getType()) {
             case Device.TYPE_PHONE: return "phone";
@@ -64,7 +78,7 @@ final class HelperUtil {
         return "unknown";
     }
 
-    public static void processDataSet(String TAG, DataSet dataSet, WritableArray wtArray) {
+    public static void processDataSet(ReactContext reactContext, String TAG, DataSet dataSet, WritableArray wtArray) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         dateFormat.setTimeZone(TimeZone.getDefault());
 
@@ -83,6 +97,16 @@ final class HelperUtil {
                 innerMap.putString("dataTypeName", dp.getDataType().getName());
                 innerMap.putString("dataSourceId", dp.getDataSource().getStreamIdentifier());
                 innerMap.putString("originDataSourceId", dp.getOriginalDataSource().getStreamIdentifier());
+
+                String appPackageName = dp.getOriginalDataSource().getAppPackageName();
+                if (appPackageName != null) {
+                    innerMap.putString("appPackageName", appPackageName);
+                    PackageManager pm = reactContext.getPackageManager();
+                    String appName = getAppName(pm, appPackageName);
+                    if (appName != null) {
+                        innerMap.putString("appName", appName);
+                    }
+                }
 
                 Device device = dp.getOriginalDataSource().getDevice();
                 if (device != null) {
