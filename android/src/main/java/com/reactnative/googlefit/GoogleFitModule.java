@@ -250,13 +250,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void getDailyCalorieSamples(double startDate,
                                        double endDate,
-                                       boolean basalCalculation,
+                                       boolean includeBmrAvg,
                                        int bucketInterval,
                                        String bucketUnit,
                                        Promise promise) {
 
         try {
-            promise.resolve(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate, basalCalculation, bucketInterval, bucketUnit));
+            promise.resolve(mGoogleFitManager.getCalorieHistory().aggregateDataByDate((long) startDate, (long) endDate, includeBmrAvg, bucketInterval, bucketUnit));
         } catch (IllegalViewOperationException e) {
             promise.reject(e);
         }
