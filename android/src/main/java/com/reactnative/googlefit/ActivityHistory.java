@@ -406,6 +406,23 @@ public class ActivityHistory {
                 .addOnFailureListener(e -> promise.reject(e));
     }
 
+    public void deleteAllSleep(long startTime, long endTime, ReadableMap options,  final Promise promise) {
+        DataDeleteRequest.Builder requestBuilder = new DataDeleteRequest.Builder()
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+
+        DataDeleteRequest request = requestBuilder
+                .addDataType(DataType.TYPE_SLEEP_SEGMENT)
+                .deleteAllSessions()
+                .build();
+
+        FitnessOptions fitnessOptions = createWorkoutFitnessOptions(FitnessOptions.ACCESS_WRITE);
+
+        Fitness.getHistoryClient(this.mReactContext, GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions))
+                .deleteData(request)
+                .addOnSuccessListener(unused -> promise.resolve(true))
+                .addOnFailureListener(e -> promise.reject(e));
+    }
+
     //private helper functions
     private FitnessOptions createWorkoutFitnessOptions(int fitnessOptionsAccess) {
         FitnessOptions.Builder fitnessOptionsBuilder = FitnessOptions.builder();
