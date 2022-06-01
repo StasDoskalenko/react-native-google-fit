@@ -532,4 +532,13 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             promise.reject(e);
         }
     }
+
+    @ReactMethod
+    public void deleteAllSleep(double startDate, double endDate, ReadableMap options, Promise promise) {
+        try {
+            mGoogleFitManager.getActivityHistory().deleteAllSleep((long)startDate, (long)endDate, options, promise);
+        } catch (Error e) {
+            promise.reject(e);
+        }
+    }
 }

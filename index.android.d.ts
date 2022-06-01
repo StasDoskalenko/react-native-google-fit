@@ -189,6 +189,10 @@ declare module 'react-native-google-fit' {
       options: DeleteOptions
     ) => Promise<Boolean | undefined>
 
+    deleteAllSleep: (
+      options: DeleteOptions
+    ) => Promise<Boolean | undefined>
+
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
