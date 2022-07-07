@@ -131,6 +131,10 @@ declare module 'react-native-google-fit' {
       options: { date: string, value: number },
     ) => Promise<Boolean | undefined>
 
+    saveBloodPressure: (
+      options: { date: string, systolic: number, diastolic: number },
+    ) => Promise<Boolean | undefined>
+
     saveWeight: (
       options: WeightData,
       callback: (isError: boolean, result: true) => void
