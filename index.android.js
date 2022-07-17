@@ -629,6 +629,12 @@ class RNGoogleFit {
     return result;
   }
 
+  saveBloodPressure = async (options) => {
+    options.date = Date.parse(options.date)
+    const result = await googleFit.saveBloodPressure(options);
+    return result;
+  }
+
   getHydrationSamples = async (options) => {
     const { startDate, endDate } = prepareInput(options);
     const result = await googleFit.getHydrationSamples(
