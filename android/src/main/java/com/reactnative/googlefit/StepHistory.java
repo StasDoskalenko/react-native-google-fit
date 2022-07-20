@@ -172,16 +172,10 @@ public class StepHistory {
 
             Log.i(TAG, "  + Device    : " + device);
             if (device != null) {
+                source.putString("deviceUid", device.getUid());
                 source.putString("deviceManufacturer", device.getManufacturer());
                 source.putString("deviceModel", device.getModel());
-                switch(device.getType()) {
-                    case Device.TYPE_CHEST_STRAP:
-                        source.putString("deviceType", "chestStrap"); break;
-                }
-            } else {
-                source.putNull("deviceManufacturer");
-                source.putNull("deviceModel");
-                source.putNull("deviceType");
+                source.putString("deviceType", HelperUtil.getDeviceType(device));
             }
 
             //if (!DataType.TYPE_STEP_COUNT_DELTA.equals(type)) continue;
@@ -232,7 +226,7 @@ public class StepHistory {
                                 for (Bucket bucket : dataReadResponse.getBuckets()) {
                                     List<DataSet> dataSets = bucket.getDataSets();
                                     for (DataSet dataSet : dataSets) {
-                                        HelperUtil.processDataSet(TAG, dataSet, steps);
+                                        HelperUtil.processDataSet(mReactContext, TAG, dataSet, steps);
                                     }
                                 }
                             }
@@ -241,7 +235,7 @@ public class StepHistory {
                             if (dataReadResponse.getDataSets().size() > 0) {
                                 Log.i(TAG, "  +++ Number of returned DataSets: " + dataReadResponse.getDataSets().size());
                                 for (DataSet dataSet : dataReadResponse.getDataSets()) {
-                                    HelperUtil.processDataSet(TAG, dataSet, steps);
+                                    HelperUtil.processDataSet(mReactContext, TAG, dataSet, steps);
                                 }
                             }
 
