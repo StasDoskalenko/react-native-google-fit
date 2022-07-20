@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 import static com.google.android.gms.fitness.data.Field.FIELD_MEAL_TYPE;
 import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_GLUCOSE_LEVEL;
 import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_GLUCOSE_SPECIMEN_SOURCE;
+import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC;
+import static com.google.android.gms.fitness.data.HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC;
 import static com.google.android.gms.fitness.data.HealthFields.FIELD_TEMPORAL_RELATION_TO_MEAL;
 import static com.google.android.gms.fitness.data.HealthFields.FIELD_TEMPORAL_RELATION_TO_SLEEP;
 
@@ -113,6 +115,20 @@ public class HealthHistory {
         return true;
     }
 
+    public boolean saveBloodPressure(ReadableMap sample) {
+        this.Dataset = createDataForBloodPressRequest(
+                this.dataType,
+                DataSource.TYPE_RAW,
+                sample.getDouble("systolic"),
+                sample.getDouble("diastolic"),
+                (long)sample.getDouble("date"),
+                TimeUnit.MILLISECONDS
+        );
+        new InsertAndVerifyDataTask(this.Dataset).execute();
+
+        return true;
+    }
+
     public boolean delete(ReadableMap sample) {
         long endTime = (long) sample.getDouble("endTime");
         long startTime = (long) sample.getDouble("startTime");
@@ -177,6 +193,36 @@ public class HealthHistory {
 
         dataPoint.setTimestamp(date, timeUnit);
         dataPoint.getValue(FIELD_BLOOD_GLUCOSE_LEVEL).setFloat((float) value);
+
+        dataSet.add(dataPoint);
+
+        return dataSet;
+    }
+
+    /**
+     * This method creates a dataset object to be able to insert data in google fit
+     * @param dataType DataType Fitness Data Type object
+     * @param dataSourceType int Data Source Id. For example, DataSource.TYPE_RAW
+     * @param systolic Object Systolic for the fitness data. They must be int or float
+     * @param diastolic Object Diastolic for the fitness data. They must be int or float
+     * @param date long Time when the activity started
+     * @param timeUnit TimeUnit Time unit in which period is expressed
+     * @return
+     */
+    private DataSet createDataForBloodPressRequest(DataType dataType, int dataSourceType, double systolic,
+                                         double diastolic, long date, TimeUnit timeUnit) {
+        DataSource dataSource = new DataSource.Builder()
+                .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
+                .setDataType(dataType)
+                .setType(dataSourceType)
+                .build();
+
+        DataSet dataSet = DataSet.create(dataSource);
+        DataPoint dataPoint = dataSet.createDataPoint();
+
+        dataPoint.setTimestamp(date, timeUnit);
+        dataPoint.getValue(FIELD_BLOOD_PRESSURE_SYSTOLIC).setFloat((float) systolic);
+        dataPoint.getValue(FIELD_BLOOD_PRESSURE_DIASTOLIC).setFloat((float) diastolic);
 
         dataSet.add(dataPoint);
 

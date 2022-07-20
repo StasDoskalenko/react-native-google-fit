@@ -349,6 +349,20 @@ class RNGoogleFit {
     }
   }
 
+  deleteAllSleep = async (options) => {
+    try {
+      const { startDate, endDate, ...config } = options;
+      const result = await googleFit.deleteAllSleep(
+        Date.parse(startDate),
+        Date.parse(endDate),
+        config
+      );
+      return result;
+    } catch (err) {
+      return err;
+    }
+  }
+
   saveFood(options, callback) {
     options.date = Date.parse(options.date)
     googleFit.saveFood(
@@ -612,6 +626,12 @@ class RNGoogleFit {
   saveBloodGlucose = async (options) => {
     options.date = Date.parse(options.date)
     const result = await googleFit.saveBloodGlucose(options);
+    return result;
+  }
+
+  saveBloodPressure = async (options) => {
+    options.date = Date.parse(options.date)
+    const result = await googleFit.saveBloodPressure(options);
     return result;
   }
 

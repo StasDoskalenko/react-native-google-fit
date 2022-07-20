@@ -201,7 +201,7 @@ public class ActivityHistory {
             if (response.getStatus().isSuccess()) {
                 for (Bucket bucket : response.getBuckets()) {
                     for (DataSet dataSet : bucket.getDataSets()) {
-                        HelperUtil.processDataSet(TAG, dataSet, moveMinutes);
+                        HelperUtil.processDataSet(this.mReactContext, TAG, dataSet, moveMinutes);
                     }
                 }
                 return moveMinutes;
@@ -395,6 +395,23 @@ public class ActivityHistory {
                 .addDataType(DataType.TYPE_CALORIES_EXPENDED)
                 .addDataType(DataType.TYPE_STEP_COUNT_DELTA)
                 .addDataType(DataType.TYPE_MOVE_MINUTES)
+                .deleteAllSessions()
+                .build();
+
+        FitnessOptions fitnessOptions = createWorkoutFitnessOptions(FitnessOptions.ACCESS_WRITE);
+
+        Fitness.getHistoryClient(this.mReactContext, GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions))
+                .deleteData(request)
+                .addOnSuccessListener(unused -> promise.resolve(true))
+                .addOnFailureListener(e -> promise.reject(e));
+    }
+
+    public void deleteAllSleep(long startTime, long endTime, ReadableMap options,  final Promise promise) {
+        DataDeleteRequest.Builder requestBuilder = new DataDeleteRequest.Builder()
+                .setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+
+        DataDeleteRequest request = requestBuilder
+                .addDataType(DataType.TYPE_SLEEP_SEGMENT)
                 .deleteAllSessions()
                 .build();
 

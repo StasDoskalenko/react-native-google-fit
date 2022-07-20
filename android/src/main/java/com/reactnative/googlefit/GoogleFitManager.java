@@ -29,7 +29,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -213,8 +212,11 @@ public class GoogleFitManager implements ActivityEventListener {
                 .requestEmail()
                 .build();
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(context, options);
-
-        GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(mReactContext, new Scope("https://www.googleapis.com/auth/fitness.activity.read"));
+        // this is a temporary scope as a hotfix
+        // Ref to https://developers.google.com/android/guides/releases?hl=en
+        // will be removed in the future release
+        String tempScope = "www.googleapis.com/auth/fitness.activity.read";
+        GoogleSignInAccount gsa = GoogleSignIn.getAccountForScopes(mReactContext, new Scope(tempScope));
         Fitness.getConfigClient(mReactContext, gsa).disableFit();
         mApiClient.disconnect();
 
