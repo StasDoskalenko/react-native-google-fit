@@ -29,20 +29,23 @@
     "url": "git+https://github.com/StasDoskalenko/react-native-google-fit.git"
   },
   "dependencies": {
-    "moment": "2.29.2"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
-    "babel-eslint": "10.0.1",
-    "eslint": "7.28.0",
-    "eslint-config-standard": "16.0.3",
-    "eslint-config-standard-react": "11.0.1",
-    "eslint-plugin-babel": "5.3.1",
-    "eslint-plugin-import": "2.23.4",
-    "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "5.1.0",
-    "eslint-plugin-react": "7.24.0",
-    "eslint-plugin-standard": "4.1.0",
-    "react-native": "0.64.2"
+    "babel-eslint": "^10.0.1",
+    "eslint": "^7.28.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-config-standard-react": "^11.0.1",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-standard": "^4.1.0",
+    "react-native": "^0.64.2"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.60.0"
   }
 }
