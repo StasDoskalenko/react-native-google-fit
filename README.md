@@ -732,7 +732,7 @@ await GoogleFit.deleteAllWorkout({
 <br/>This is **complemental** method to `getActivitySamples()`, For some unknown reasons, both were missing some data or have incorrect data.
 <br/>Try to use both to create a full picture if neccessary
 ```javascript
-await GoogleFit.getWorkoutSession(actOptions)({
+await GoogleFit.getWorkoutSession({
    startDate: startDate,
    endDate: endDate,
 })
