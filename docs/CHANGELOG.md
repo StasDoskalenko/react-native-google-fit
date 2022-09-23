@@ -1,6 +1,8 @@
 ### Changelog:
 
 ```
+0.19.0 ~ Relax dependency version (#313, kudos to @matiaskorhonen)
+
 0.18.3  + Add device Info to step history data (#279, kudos to @kristerkari)
         ~ Update typescript definitions
 
