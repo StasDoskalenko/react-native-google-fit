@@ -43,7 +43,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-standard": "^4.1.0",
-    "react-native": "^0.64.2"
+    "react-native": "^0.70.1"
   },
   "peerDependencies": {
     "react-native": ">=0.60.0"
