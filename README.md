@@ -288,6 +288,9 @@ async function fetchData() {
   const heartrate = await GoogleFit.getHeartRateSamples(opt)；
   console.log(heartrate);
 
+  const restingheartrate = await GoogleFit.getRestingHeartRateSamples(opt)；
+  console.log(restingheartrate);
+
   const bloodpressure = await GoogleFit.getBloodPressureSamples(opt)；
   console.log(bloodpressure);
 }

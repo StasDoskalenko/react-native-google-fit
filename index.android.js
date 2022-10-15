@@ -567,6 +567,20 @@ class RNGoogleFit {
     return result;
   }
 
+  getRestingHeartRateSamples = async (options) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getRestingHeartRateSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    );
+    if (result.length > 0) {
+      return prepareResponse(result, 'value');
+    }
+    return result;
+  }
+
   getBloodPressureSamples = async (options, callback) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getBloodPressureSamples(

@@ -102,6 +102,43 @@ public class HealthHistory {
         return map;
     }
 
+    public ReadableArray getRestingHeartRateHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
+        DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
+                .aggregate(new DataSource.Builder()
+                .setType(DataSource.TYPE_DERIVED)
+                .setDataType(DataType.TYPE_HEART_RATE_BPM)
+                .setAppPackageName("com.google.android.gms")
+                .setStreamName("resting_heart_rate<-merge_heart_rate_bpm")
+                .build())
+                .read(this.dataType)
+                .bucketByTime(1, TimeUnit.DAYS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
+                
+
+        DataReadRequest readRequest = readRequestBuilder.build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        WritableArray map = Arguments.createArray();
+
+        //Used for aggregated data
+        if (dataReadResult.getBuckets().size() > 0) {
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    processDataSet(dataSet, map);
+                }
+            }
+        }
+        //Used for non-aggregated data
+        else if (dataReadResult.getDataSets().size() > 0) {
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                processDataSet(dataSet, map);
+            }
+        }
+        return map;
+    }
+
     public boolean saveBloodGlucose(ReadableMap sample) {
         this.Dataset = createDataForRequest(
                 this.dataType,
