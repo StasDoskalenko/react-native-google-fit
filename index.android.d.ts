@@ -111,6 +111,15 @@ declare module 'react-native-google-fit' {
       options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<HeartRateResponse[]>;
 
+    /**
+     * Query for getting resting heart rate samples. the options object is used to setup a query to retrieve relevant samples.
+     * @param {Object} options  getRestingHeartRateSamples accepts an options object startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     *                          
+     */
+    getRestingHeartRateSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>
+    ) => Promise<HeartRateResponse[]>;
+
     getBloodPressureSamples: (
       options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<BloodPressureResponse[]>;
