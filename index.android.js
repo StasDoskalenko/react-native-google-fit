@@ -268,17 +268,15 @@ class RNGoogleFit {
    * Get the total calories per day over a specified date range.
    * @param {Object} options getDailyCalorieSamples accepts an options object containing:
    * required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp
-   * optional basalCalculation - {true || false} should we substract the basal metabolic rate averaged over a week
+   * optional includeBmrAvg- {true || false} should we include the basal metabolic rate averaged over a week
    */
 
-  getDailyCalorieSamples = async (options) => {
-    const basalCalculation = options.basalCalculation !== false
-    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
-
+  getDailyCalorieSamples = async ({ includeBmrAvg = true, ...restOptions }) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(restOptions);
     const result = await googleFit.getDailyCalorieSamples(
       startDate,
       endDate,
-      basalCalculation,
+      includeBmrAvg,
       bucketInterval,
       bucketUnit,
     );

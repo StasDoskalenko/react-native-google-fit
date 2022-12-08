@@ -19,8 +19,10 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -28,9 +30,10 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.fitness.result.DataReadResult;
-
-import org.json.JSONObject;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.text.DateFormat;
 import java.text.Format;
@@ -54,7 +57,7 @@ public class CalorieHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime, boolean basalCalculation, int bucketInterval, String bucketUnit) {
+    public ReadableArray aggregateDataByDate(long startTime, long endTime, boolean includeBmrAvg, int bucketInterval, String bucketUnit) {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -78,7 +81,7 @@ public class CalorieHistory {
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 List<DataSet> dataSets = bucket.getDataSets();
                 for (DataSet dataSet : dataSets) {
-                    processDataSet(dataSet, map, basalCalculation);
+                    processDataSet(dataSet, map, includeBmrAvg);
                 }
             }
         }
@@ -86,7 +89,7 @@ public class CalorieHistory {
         else if (dataReadResult.getDataSets().size() > 0) {
             Log.i(TAG, "Number of returned DataSets: " + dataReadResult.getDataSets().size());
             for (DataSet dataSet : dataReadResult.getDataSets()) {
-                processDataSet(dataSet, map, basalCalculation);
+                processDataSet(dataSet, map, includeBmrAvg);
             }
         }
 
@@ -95,24 +98,23 @@ public class CalorieHistory {
 
 
     // utility function that gets the basal metabolic rate averaged over a week
-    private float getBasalAVG(long _et) throws Exception {
+    private float getBasalAVG(long endTime) throws Exception {
         float basalAVG = 0;
-        Calendar cal = java.util.Calendar.getInstance();
-        cal.setTime(new Date(_et));
+        Calendar calendar = java.util.Calendar.getInstance();
+        calendar.setTime(new Date(endTime));
         //set start time to a week before end time
-        cal.add(Calendar.WEEK_OF_YEAR, -1);
-        long nst = cal.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        long startTime = calendar.getTimeInMillis();
 
         DataReadRequest.Builder builder = new DataReadRequest.Builder();
         builder.aggregate(DataType.TYPE_BASAL_METABOLIC_RATE, DataType.AGGREGATE_BASAL_METABOLIC_RATE_SUMMARY);
-        builder.bucketByTime(1, TimeUnit.DAYS);
-        builder.setTimeRange(nst, _et, TimeUnit.MILLISECONDS);
+        builder.bucketByTime(1, TimeUnit.HOURS);
+        builder.setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
         DataReadRequest readRequest = builder.build();
 
         DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await();
 
-        if (dataReadResult.getStatus().isSuccess()) {
-            JSONObject obj = new JSONObject();
+        if (dataReadResult.getStatus().isSuccess()) { ;
             int avgsN = 0;
             for (Bucket bucket : dataReadResult.getBuckets()) {
                 // in the com.google.bmr.summary data type, each data point represents
@@ -130,40 +132,88 @@ public class CalorieHistory {
         } else throw new Exception(dataReadResult.getStatus().getStatusMessage());
     }
 
+    private float getActivityCal(long startTime, long endTime) throws Exception {
+        float activityCal = 0.0f;
 
-    private void processDataSet(DataSet dataSet, WritableArray map, boolean basalCalculation) {
+        DataReadRequest readRequest = new DataReadRequest.Builder()
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED)
+                .bucketByActivitySegment(1, TimeUnit.SECONDS)
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .build();
+
+        FitnessOptions fitnessOptions = FitnessOptions.builder()
+                .addDataType(DataType.TYPE_ACTIVITY_SEGMENT, FitnessOptions.ACCESS_READ)
+                .addDataType(DataType.TYPE_CALORIES_EXPENDED, FitnessOptions.ACCESS_READ)
+                .build();
+
+        GoogleSignInAccount googleSignInAccount =
+                GoogleSignIn.getAccountForExtension(this.mReactContext, fitnessOptions);
+
+        try {
+            Task<DataReadResponse> task = Fitness.getHistoryClient(this.mReactContext, googleSignInAccount)
+                    .readData(readRequest);
+
+            DataReadResponse response = Tasks.await(task, 30, TimeUnit.SECONDS);
+
+            if (response.getStatus().isSuccess()) {
+                for (Bucket bucket : response.getBuckets()) {
+                    String activityName = bucket.getActivity();
+                    if (bucket.getDataSets().isEmpty() || activityName.equals("unknown")) continue;
+                    for (DataSet dataSet : bucket.getDataSets()) {
+                        for (DataPoint dataPoint : dataSet.getDataPoints()) {
+                            for (Field field : dataPoint.getDataType().getFields()) {
+                                String fieldName = field.getName();
+                                if (!fieldName.equals("calories")) continue;
+                                activityCal += dataPoint.getValue(field).asFloat();
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log.w(TAG, "There was an error reading data from Google Fit" + response.getStatus().toString());
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Exception: " + e);
+        }
+        return activityCal;
+    }
+
+    private void processDataSet(DataSet dataSet, WritableArray map, boolean includeBmrAvg) {
         Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         DateFormat dateFormat = DateFormat.getDateInstance();
         DateFormat timeFormat = DateFormat.getTimeInstance();
         Format formatter = new SimpleDateFormat("EEE");
         WritableMap stepMap = Arguments.createMap();
 
-
         for (DataPoint dp : dataSet.getDataPoints()) {
+            long startTime = dp.getStartTime(TimeUnit.MILLISECONDS);
+            long endTime = dp.getEndTime(TimeUnit.MILLISECONDS);
             Log.i(TAG, "Data point:");
             Log.i(TAG, "\tType: " + dp.getDataType().getName());
-            Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)) + " " + timeFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)) + " " + timeFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            Log.i(TAG, "\tStart: " + dateFormat.format(startTime) + " " + timeFormat.format(startTime));
+            Log.i(TAG, "\tEnd: " + dateFormat.format(endTime) + " " + timeFormat.format(endTime));
 
-            String day = formatter.format(new Date(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            String day = formatter.format(new Date(startTime));
             Log.i(TAG, "Day: " + day);
-
             for (Field field : dp.getDataType().getFields()) {
                 Log.i("History", "\tField: " + field.getName() +
                         " Value: " + dp.getValue(field));
 
                 stepMap.putString("day", day);
-                stepMap.putDouble("startDate", dp.getStartTime(TimeUnit.MILLISECONDS));
-                stepMap.putDouble("endDate", dp.getEndTime(TimeUnit.MILLISECONDS));
-                float basal = 0;
-                if (basalCalculation) {
+                stepMap.putDouble("startDate", startTime);
+                stepMap.putDouble("endDate", endTime);
+                float calorie = 0.0f;
+                if (!includeBmrAvg) {
                     try {
-                        basal = getBasalAVG(dp.getEndTime(TimeUnit.MILLISECONDS));
+                        calorie = getActivityCal(startTime, endTime);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else {
+                    calorie = dp.getValue(field).asFloat();
                 }
-                stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
+                stepMap.putDouble("calorie", calorie);
                 map.pushMap(stepMap);
             }
         }
