@@ -345,28 +345,32 @@ declare module 'react-native-google-fit' {
     endDate: string,
     diastolic: number,
     systolic: number,
-    day: Day
+    day: Day,
+    wasManuallyEntered: boolean
   }
 
   export type BloodGlucoseResponse = {
     startDate: string,
     endDate: string,
     value: number,
-    day: Day
+    day: Day,
+    wasManuallyEntered: boolean
   }
 
   export type BodyTemperatureResponse = {
     startDate: string,
     endDate: string,
     value: number,
-    day: Day
+    day: Day,
+    wasManuallyEntered: boolean
   }
 
   export type OxygenSaturationResponse = {
     startDate: string,
     endDate: string,
     value: number,
-    day: Day
+    day: Day,
+    wasManuallyEntered: boolean
   }
   
   export type WeightData = { date: string } & ({ unit: 'pound', value: number } | {});
