@@ -165,7 +165,7 @@ public class CalorieHistory {
                 }
                 stepMap.putDouble("calorie", dp.getValue(field).asFloat() - basal);
 
-                /** Checks is data point was added manually by user */
+                /** Checks if data point was added manually by user */
                 DataSource ds = dp.getOriginalDataSource();
                 String streamId = ds.getStreamIdentifier();
                 if (streamId.toLowerCase().indexOf("user_input") != -1) {
