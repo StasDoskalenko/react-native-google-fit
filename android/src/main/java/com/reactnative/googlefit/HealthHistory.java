@@ -287,6 +287,14 @@ public class HealthHistory {
                   stepMap.putDouble("value", dp.getValue(field).asFloat());
                 }
 
+                /** Checks is data point was added manually by user */
+                DataSource ds = dp.getOriginalDataSource();
+                String streamId = ds.getStreamIdentifier();
+                if (streamId.toLowerCase().indexOf("user_input") != -1) {
+                    stepMap.putBoolean("wasManuallyEntered", true);
+                } else {
+                    stepMap.putBoolean("wasManuallyEntered", false);
+                }
 
                 map.pushMap(stepMap);
             }
