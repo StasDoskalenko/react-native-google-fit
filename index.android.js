@@ -105,10 +105,38 @@ class RNGoogleFit {
           return dataTypes.filter(data => data !== 'distance');
         }
       } catch (err) {
-        console.warn(err);
-      };
+        console.warn(err)
+      }
     }
-    return dataTypes;
+    const activityRecognitionPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION
+    )
+    if (dataTypes.includes('step') && !activityRecognitionPermission) {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACTIVITY_RECOGNITION,
+          {
+            title: 'Access Physical Activity Permission',
+            message:
+              'Enable physical activity access for Google Fit Api. ' +
+              'Cancel may cause inaccuracy result',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        )
+
+        // this need to be changed in the future if we want to use RecordingAPI for more sensitive permissions
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          // we don't do anything here since the permission are granted
+        } else {
+          // remove step from array to avoid crash,
+          return dataTypes.filter((data) => data !== 'step')
+        }
+      } catch (err) {
+        console.warn(err)
+      }
+    }
+    return dataTypes
   }
 
   /**
