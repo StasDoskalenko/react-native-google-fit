@@ -29,6 +29,10 @@ https://developers.google.com/fit/android/get-api-key
    https://developers.google.com/fit/android/get-api-key
 ```
 
+After that, when you have the client_secrets.json file from OAuth 2.0 Client IDs, you must rename and copy this file to path:
+**app/android/app/src/main/resources/client_secrets.json**
+
+
 ### Mostly Automatic installation
 
 `$ react-native link react-native-google-fit`
