@@ -187,7 +187,7 @@ public class GoogleFitManager implements ActivityEventListener {
                                     try {
                                         mAuthInProgress = true;
                                         connectionResult.startResolutionForResult(mActivity, REQUEST_OAUTH);
-                                    } catch (IntentSender.SendIntentException e) {
+                                    } catch (IntentSender.SendIntentException | NullPointerException e) {
                                         Log.i(TAG, "Authorization - Failed again: " + e);
                                         mApiClient.connect();
                                     }
