@@ -554,7 +554,6 @@ class RNGoogleFit {
   }
 
   getHeartRateSamples = async (options) => {
-    console.log(`👾👾👾👾 📺📺📺`) // TODO: GLE remove
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getHeartRateSamples(
       startDate,
@@ -564,6 +563,23 @@ class RNGoogleFit {
     );
     if (result.length > 0) {
       return prepareResponse(result, 'value');
+    }
+    return result;
+  }
+
+  getAggregatedHeartRateSamples = async (options) => {
+    console.log(`👾👾👾👾 📺📺📺`) // TODO: GLE remove
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getAggregatedHeartRateSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    );
+    if (result.length > 0) {
+      const retval = prepareResponse(result, 'average');
+      console.log(`👾👾👾👾 Going to return: ${JSON.stringify(retval)}`) // TODO: GLE remove
+      return retval;
     }
     return result;
   }
