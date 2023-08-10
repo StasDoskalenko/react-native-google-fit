@@ -474,7 +474,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                                               Promise promise) {
 
         try {
-            Log.d("GLE", "In getAggregatedHeartRateSamples")
             HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
             healthHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
             promise.resolve(healthHistory.getAggregatedHeartRateHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));

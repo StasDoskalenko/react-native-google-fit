@@ -109,16 +109,13 @@ public class HealthHistory {
      */
     public ReadableArray getAggregatedHeartRateHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
-                .read(this.dataType)
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
 
         if (this.dataType == DataType.TYPE_HEART_RATE_BPM) {
-            Log.d("GLE", "Getting heart rate, going to use aggregate");
             readRequestBuilder
                     .aggregate(this.dataType, DataType.AGGREGATE_HEART_RATE_SUMMARY)
                     .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit));
         } else {
-            Log.d("GLE", "Not heart rate, going to read as usual");
             readRequestBuilder.read(this.dataType);
         }
 
@@ -327,7 +324,7 @@ public class HealthHistory {
                 if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
                     stepMap.putDouble("diastolic", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
                     stepMap.putDouble("systolic", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
-                } else if (this.dataType == DataType.TYPE_HEART_RATE_BPM && field == Field.FIELD_AVERAGE) {
+                } else if (this.dataType == DataType.TYPE_HEART_RATE_BPM && field.toString().startsWith("average")) {
                     stepMap.putDouble("average", dp.getValue(Field.FIELD_AVERAGE).asFloat());
                     stepMap.putDouble("average", dp.getValue(Field.FIELD_MIN).asFloat());
                     stepMap.putDouble("average", dp.getValue(Field.FIELD_MAX).asFloat());
