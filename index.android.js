@@ -568,10 +568,7 @@ class RNGoogleFit {
   }
 
   getAggregatedHeartRateSamples = async (options) => {
-    console.log(`👾👾👾👾 📺📺📺`) // TODO: GLE remove
-    console.log(`👾👾👾👾 Going to prepare input`) // TODO: GLE remove
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
-    console.log(`👾👾👾👾 Going to get aggregated values`) // TODO: GLE remove
     const result = await googleFit.getAggregatedHeartRateSamples(
       startDate,
       endDate,
@@ -579,9 +576,7 @@ class RNGoogleFit {
       bucketUnit
     );
     if (result.length > 0) {
-      const retval = prepareResponse(result, 'average');
-      console.log(`👾👾👾👾 Going to return: ${JSON.stringify(retval)}`) // TODO: GLE remove
-      return retval;
+      return prepareResponse(result, 'average');
     }
     return result;
   }
