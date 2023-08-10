@@ -567,7 +567,7 @@ class RNGoogleFit {
     return result;
   }
 
-  getAggregatedHeartRateSamples = async (options) => {
+  getAggregatedHeartRateSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getAggregatedHeartRateSamples(
       startDate,
@@ -576,7 +576,7 @@ class RNGoogleFit {
       bucketUnit
     );
     if (result.length > 0) {
-      return prepareResponse(result, 'average');
+      return prepareResponse(result, 'average', inLocalTimeZone);
     }
     return result;
   }
