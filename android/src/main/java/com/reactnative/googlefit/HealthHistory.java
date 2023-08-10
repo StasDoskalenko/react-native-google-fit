@@ -326,8 +326,8 @@ public class HealthHistory {
                     stepMap.putDouble("systolic", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
                 } else if (this.dataType == DataType.TYPE_HEART_RATE_BPM && field.toString().startsWith("average")) {
                     stepMap.putDouble("average", dp.getValue(Field.FIELD_AVERAGE).asFloat());
-                    stepMap.putDouble("average", dp.getValue(Field.FIELD_MIN).asFloat());
-                    stepMap.putDouble("average", dp.getValue(Field.FIELD_MAX).asFloat());
+                    stepMap.putDouble("min", dp.getValue(Field.FIELD_MIN).asFloat());
+                    stepMap.putDouble("max", dp.getValue(Field.FIELD_MAX).asFloat());
                 } else {
                   stepMap.putDouble("value", dp.getValue(field).asFloat());
                 }
