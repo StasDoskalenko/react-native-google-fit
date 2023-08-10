@@ -589,8 +589,12 @@ class RNGoogleFit {
   }
 
   getAggregatedHeartRateSamples = async (options, inLocalTimeZone = false) => {
+<<<<<<< HEAD
     const { startDate, endDate, bucketInterval, bucketUnit } =
       prepareInput(options)
+=======
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+>>>>>>> 263da91 (Added the 'in local timezone' option to aggregated heart rates)
     const result = await googleFit.getAggregatedHeartRateSamples(
       startDate,
       endDate,
@@ -598,7 +602,11 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
+<<<<<<< HEAD
       return prepareResponse(result, 'average', inLocalTimeZone)
+=======
+      return prepareResponse(result, 'average', inLocalTimeZone);
+>>>>>>> 263da91 (Added the 'in local timezone' option to aggregated heart rates)
     }
     return result
   }
