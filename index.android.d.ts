@@ -121,10 +121,6 @@ declare module 'react-native-google-fit' {
       options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<HeartRateResponse[]>
 
-    getAggregatedHeartRateSamples: (
-      options: StartAndEndDate & Partial<BucketOptions>
-    ) => Promise<AggregatedHearRateResponse[]>
-
     /**
      * Query for getting aggregated heart rate samples.
      * @param options
