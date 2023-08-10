@@ -554,6 +554,7 @@ class RNGoogleFit {
   }
 
   getHeartRateSamples = async (options) => {
+    console.log(`👾👾👾👾 📺📺📺`) // TODO: GLE remove
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getHeartRateSamples(
       startDate,
