@@ -102,6 +102,47 @@ public class HealthHistory {
         return map;
     }
 
+    /**
+     * GLE added to allow us to aggregate heart rate data.
+     * It does the same as health history, but adds the aggregation.
+     * Note there are also some changes to the processDataSet method to allow for the aggregation.
+     */
+    public ReadableArray getAggregatedHeartRateHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
+        DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS);
+
+        if (this.dataType == DataType.TYPE_HEART_RATE_BPM) {
+            readRequestBuilder
+                    .aggregate(this.dataType, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                    .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit));
+        } else {
+            readRequestBuilder.read(this.dataType);
+        }
+
+        DataReadRequest readRequest = readRequestBuilder.build();
+
+        DataReadResult dataReadResult = Fitness.HistoryApi.readData(googleFitManager.getGoogleApiClient(), readRequest).await(1, TimeUnit.MINUTES);
+
+        WritableArray map = Arguments.createArray();
+
+        //Used for aggregated data
+        if (dataReadResult.getBuckets().size() > 0) {
+            for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    processDataSet(dataSet, map);
+                }
+            }
+        }
+        //Used for non-aggregated data
+        else if (dataReadResult.getDataSets().size() > 0) {
+            for (DataSet dataSet : dataReadResult.getDataSets()) {
+                processDataSet(dataSet, map);
+            }
+        }
+        return map;
+    }
+
     public ReadableArray getRestingHeartRateHistory(long startTime, long endTime, int bucketInterval, String bucketUnit) {
         DataReadRequest.Builder readRequestBuilder = new DataReadRequest.Builder()
                 .aggregate(new DataSource.Builder()
@@ -283,6 +324,10 @@ public class HealthHistory {
                 if (this.dataType == HealthDataTypes.TYPE_BLOOD_PRESSURE) {
                     stepMap.putDouble("diastolic", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_DIASTOLIC).asFloat());
                     stepMap.putDouble("systolic", dp.getValue(HealthFields.FIELD_BLOOD_PRESSURE_SYSTOLIC).asFloat());
+                } else if (this.dataType == DataType.TYPE_HEART_RATE_BPM && field.toString().startsWith("average")) {
+                    stepMap.putDouble("average", dp.getValue(Field.FIELD_AVERAGE).asFloat());
+                    stepMap.putDouble("min", dp.getValue(Field.FIELD_MIN).asFloat());
+                    stepMap.putDouble("max", dp.getValue(Field.FIELD_MAX).asFloat());
                 } else {
                   stepMap.putDouble("value", dp.getValue(field).asFloat());
                 }
