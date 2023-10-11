@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:8.0.2'
     }
 }
 
@@ -17,8 +17,30 @@ def safeExtGet(prop, fallback) {
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
+def supportsNamespace() {
+    def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+    def major = parsed[0].toInteger()
+    def minor = parsed[1].toInteger()
+
+    // Namespace support was added in 7.3.0
+    if (major == 7 && minor >= 3) {
+        return true
+    }
+
+    return major >= 8
+}
+
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 27)
+    if (supportsNamespace()) {
+        namespace "com.reactnative.googlefit"
+    } else {
+        sourceSets {
+            main {
+                manifest.srcFile "src/main/AndroidManifest.xml"
+            }
+        }
+    }
+    compileSdkVersion safeExtGet('compileSdkVersion', 28)
     // buildToolsVersion safeExtGet('buildToolsVersion', '27.0.3')
 
     compileOptions {
@@ -28,7 +50,7 @@ android {
 
     defaultConfig {
         minSdkVersion safeExtGet('minSdkVersion', 16)
-        targetSdkVersion safeExtGet('targetSdkVersion', 27)
+        targetSdkVersion safeExtGet('targetSdkVersion', 28)
         versionCode 1
         versionName "1.0"
     }
@@ -48,11 +70,19 @@ repositories {
 }
 
 dependencies {
+    def supportLibVersion = safeExtGet('supportLibVersion', null)
+    def androidXVersion = safeExtGet('androidXVersion', null)
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation('com.facebook.react:react-native:+') {
         exclude group: 'com.android.support'
     }
-    implementation "com.android.support:appcompat-v7:${safeExtGet('supportLibVersion', '27.0.0')}"
+    if (supportLibVersion && androidXVersion == null) {
+        implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    } else {
+        def defaultAndroidXVersion = "1.+"
+        implementation "androidx.appcompat:appcompat:${safeExtGet(androidXVersion, defaultAndroidXVersion)}"
+    }
     implementation "com.google.android.gms:play-services-auth:${safeExtGet('authVersion', '+')}"
     implementation "com.google.android.gms:play-services-fitness:${safeExtGet('fitnessVersion', '+')}"
 }
