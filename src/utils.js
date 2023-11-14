@@ -48,7 +48,7 @@ export function prepareInput(options) {
   return { startDate, endDate, bucketInterval, bucketUnit };
 }
 
-export function prepareResponse(response, byKey = 'value') {
+export function prepareResponse(response, byKey = 'value', inLocalTimeZone = false) {
   return response
     .map(el => {
       if (!isNil(el[byKey])) {
@@ -57,8 +57,13 @@ export function prepareResponse(response, byKey = 'value') {
         // the Chrome V8 debugger, but not on device. Using momentJS here to get around this issue.
         // el.startDate = new Date(el.startDate).toISOString()
         // el.endDate = new Date(el.endDate).toISOString()
-        el.startDate = moment(el.startDate).toISOString()
-        el.endDate = moment(el.endDate).toISOString()
+        if (inLocalTimeZone) {
+          el.startDate = moment.parseZone(el.startDate).toISOString(true)
+          el.endDate = moment.parseZone(el.endDate).toISOString(true)
+        } else {
+          el.startDate = moment(el.startDate).toISOString()
+          el.endDate = moment(el.endDate).toISOString()
+        }
         return el
       }
     })

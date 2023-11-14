@@ -467,6 +467,22 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
+    public void getAggregatedHeartRateSamples(double startDate,
+                                              double endDate,
+                                              int bucketInterval,
+                                              String bucketUnit,
+                                              Promise promise) {
+
+        try {
+            HealthHistory healthHistory = mGoogleFitManager.getHealthHistory();
+            healthHistory.setDataType(DataType.TYPE_HEART_RATE_BPM);
+            promise.resolve(healthHistory.getAggregatedHeartRateHistory((long)startDate, (long)endDate, bucketInterval, bucketUnit));
+        } catch (IllegalViewOperationException e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void getRestingHeartRateSamples(double startDate,
                                     double endDate,
                                     int bucketInterval,

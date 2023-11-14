@@ -567,6 +567,20 @@ class RNGoogleFit {
     return result;
   }
 
+  getAggregatedHeartRateSamples = async (options, inLocalTimeZone = false) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
+    const result = await googleFit.getAggregatedHeartRateSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    );
+    if (result.length > 0) {
+      return prepareResponse(result, 'average', inLocalTimeZone);
+    }
+    return result;
+  }
+
   getRestingHeartRateSamples = async (options) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getRestingHeartRateSamples(
@@ -689,9 +703,10 @@ class RNGoogleFit {
   /**
    * Get the sleep sessions over a specified date range.
    * @param {Object} options getSleepData accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+   * @param inLocalTimeZone return start and end dates in local time zone rather than converting to UTC
    */
 
-  getSleepSamples = async (options) => {
+  getSleepSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate } = prepareInput(options);
 
     const result = await googleFit.getSleepSamples(
@@ -699,7 +714,7 @@ class RNGoogleFit {
       endDate
     );
 
-    return prepareResponse(result, "addedBy");
+    return prepareResponse(result, "addedBy", inLocalTimeZone);
   }
 
   saveSleep = async (options) => {
