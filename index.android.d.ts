@@ -111,6 +111,11 @@ declare module 'react-native-google-fit' {
       options: StartAndEndDate & Partial<BucketOptions>
     ) => Promise<HeartRateResponse[]>;
 
+    /**
+     * Query for getting aggregated heart rate samples.
+     * @param options
+     * @param inLocalTimeZone
+     */
     getAggregatedHeartRateSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
       inLocalTimeZone: boolean
