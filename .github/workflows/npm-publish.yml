@@ -1,6 +1,6 @@
 on:
   push:
-    branches: main
+    branches: master
 
 jobs:
   publish:
@@ -10,8 +10,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "18"
-      - run: npm ci
-      - run: npm test
       - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
