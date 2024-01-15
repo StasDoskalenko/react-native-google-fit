@@ -581,7 +581,7 @@ class RNGoogleFit {
     return result;
   }
 
-  getRestingHeartRateSamples = async (options) => {
+  getRestingHeartRateSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getRestingHeartRateSamples(
       startDate,
@@ -590,12 +590,12 @@ class RNGoogleFit {
       bucketUnit
     );
     if (result.length > 0) {
-      return prepareResponse(result, 'value');
+      return prepareResponse(result, 'value', inLocalTimeZone);
     }
     return result;
   }
 
-  getBloodPressureSamples = async (options, callback) => {
+  getBloodPressureSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getBloodPressureSamples(
       startDate,
@@ -604,7 +604,7 @@ class RNGoogleFit {
       bucketUnit,
     );
     if (result.length > 0) {
-      return prepareResponse(result, 'systolic');
+      return prepareResponse(result, 'systolic', inLocalTimeZone);
     }
     return result;
   }
@@ -623,7 +623,7 @@ class RNGoogleFit {
     return result;
   }
 
-  getBodyTemperatureSamples = async (options, callback) => {
+  getBodyTemperatureSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
     const result = await googleFit.getBodyTemperatureSamples(
       startDate,
@@ -632,7 +632,7 @@ class RNGoogleFit {
       bucketUnit,
     );
     if (result.length > 0) {
-      return prepareResponse(result);
+      return prepareResponse(result, inLocalTimeZone);
     }
     return result;
   }
