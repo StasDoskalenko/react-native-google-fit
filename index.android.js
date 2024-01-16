@@ -589,12 +589,8 @@ class RNGoogleFit {
   }
 
   getAggregatedHeartRateSamples = async (options, inLocalTimeZone = false) => {
-<<<<<<< HEAD
     const { startDate, endDate, bucketInterval, bucketUnit } =
       prepareInput(options)
-=======
-    const { startDate, endDate, bucketInterval, bucketUnit } = prepareInput(options);
->>>>>>> 263da91 (Added the 'in local timezone' option to aggregated heart rates)
     const result = await googleFit.getAggregatedHeartRateSamples(
       startDate,
       endDate,
@@ -602,16 +598,27 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
-<<<<<<< HEAD
       return prepareResponse(result, 'average', inLocalTimeZone)
-=======
-      return prepareResponse(result, 'average', inLocalTimeZone);
->>>>>>> 263da91 (Added the 'in local timezone' option to aggregated heart rates)
     }
     return result
   }
 
-  getRestingHeartRateSamples = async (options) => {
+  getAggregatedHeartRateSamples = async (options, inLocalTimeZone = false) => {
+    const { startDate, endDate, bucketInterval, bucketUnit } =
+      prepareInput(options)
+    const result = await googleFit.getAggregatedHeartRateSamples(
+      startDate,
+      endDate,
+      bucketInterval,
+      bucketUnit
+    )
+    if (result.length > 0) {
+      return prepareResponse(result, 'average', inLocalTimeZone)
+    }
+    return result
+  }
+
+  getRestingHeartRateSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } =
       prepareInput(options)
     const result = await googleFit.getRestingHeartRateSamples(
@@ -621,12 +628,12 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
-      return prepareResponse(result, 'value')
+      return prepareResponse(result, 'value', inLocalTimeZone)
     }
     return result
   }
 
-  getBloodPressureSamples = async (options, callback) => {
+  getBloodPressureSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } =
       prepareInput(options)
     const result = await googleFit.getBloodPressureSamples(
@@ -636,7 +643,7 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
-      return prepareResponse(result, 'systolic')
+      return prepareResponse(result, 'systolic', inLocalTimeZone)
     }
     return result
   }
@@ -656,7 +663,7 @@ class RNGoogleFit {
     return result
   }
 
-  getBodyTemperatureSamples = async (options, callback) => {
+  getBodyTemperatureSamples = async (options, inLocalTimeZone = false) => {
     const { startDate, endDate, bucketInterval, bucketUnit } =
       prepareInput(options)
     const result = await googleFit.getBodyTemperatureSamples(
@@ -666,7 +673,7 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
-      return prepareResponse(result)
+      return prepareResponse(result, inLocalTimeZone)
     }
     return result
   }

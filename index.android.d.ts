@@ -131,6 +131,11 @@ declare module 'react-native-google-fit' {
       inLocalTimeZone: boolean
     ) => Promise<AggregatedHeartRateResponse[]>
 
+    getAggregatedHeartRateSamples: (
+      options: StartAndEndDate & Partial<BucketOptions>,
+      inLocalTimeZone: boolean
+    ) => Promise<AggregatedHeartRateResponse[]>;
+
     /**
      * Query for getting resting heart rate samples. the options object is used to setup a query to retrieve relevant samples.
      * @param {Object} options  getRestingHeartRateSamples accepts an options object startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
@@ -369,6 +374,15 @@ declare module 'react-native-google-fit' {
     average: number
     max: number
     day: Day
+  }
+
+  export type AggregatedHeartRateResponse = {
+    startDate: string,
+    endDate: string,
+    min: number,
+    average: number,
+    max: number,
+    day: Day,
   }
 
   export type BloodPressureResponse = {
