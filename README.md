@@ -321,6 +321,30 @@ async function fetchData() {
   }
 ]
 ```
+Getting aggregated heart rate samples:
+
+```typescript
+/**
+ * Query for getting aggregated heart rate samples.
+ * @param options
+ * @param inLocalTimeZone
+ */
+getAggregatedHeartRateSamples: (
+  options: StartAndEndDate & Partial<BucketOptions>,
+  inLocalTimeZone: boolean
+) => Promise<AggregatedHeartRateResponse[]>;
+```
+Response:
+```typescript
+[{
+  startDate: string,
+  endDate: string,
+  min: number,
+  average: number,
+  max: number,
+  day: Day,
+}]
+```
 
 #### 8. Get all activities
 <br/>Require scopes: `Scopes.FITNESS_ACTIVITY_READ` & `Scopes.FITNESS_LOCATION_READ`
