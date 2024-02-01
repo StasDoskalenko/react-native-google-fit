@@ -368,7 +368,7 @@ declare module 'react-native-google-fit' {
   export type RestingHeartRateResponse = {
     startDate: string
     endDate: string
-    value: number
+    average: number
     day: Day
     wasManuallyEntered: boolean
   }
