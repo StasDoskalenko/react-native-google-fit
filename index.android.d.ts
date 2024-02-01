@@ -139,7 +139,7 @@ declare module 'react-native-google-fit' {
     getRestingHeartRateSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
       inLocalTimeZone: boolean
-    ) => Promise<HeartRateResponse[]>
+    ) => Promise<RestingHeartRateResponse[]>
 
     getBloodPressureSamples: (
       options: StartAndEndDate & Partial<BucketOptions>,
@@ -358,6 +358,14 @@ declare module 'react-native-google-fit' {
   }
 
   export type HeartRateResponse = {
+    startDate: string
+    endDate: string
+    value: number
+    day: Day
+    wasManuallyEntered: boolean
+  }
+
+  export type RestingHeartRateResponse = {
     startDate: string
     endDate: string
     value: number

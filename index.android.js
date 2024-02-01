@@ -628,7 +628,7 @@ class RNGoogleFit {
       bucketUnit
     )
     if (result.length > 0) {
-      return prepareResponse(result, 'value', inLocalTimeZone)
+      return prepareResponse(result, 'average', inLocalTimeZone)
     }
     return result
   }
