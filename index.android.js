@@ -420,8 +420,8 @@ class RNGoogleFit {
             if (options.unit === 'pound') {
               el.value = KgToLbs(el.value) //convert back to pounds
             }
-            el.startDate = new Date(el.startDate).toISOString()
-            el.endDate = new Date(el.endDate).toISOString()
+            el.startDate = moment.parseZone(el.startDate).toISOString(true)
+            el.endDate = moment.parseZone(el.startDate).toISOString(true)
             return el
           }
         })
