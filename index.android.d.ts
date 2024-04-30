@@ -475,6 +475,7 @@ declare module 'react-native-google-fit' {
     calories?: number,
     steps?: number,
     intensity?: number,
+    distance?: number,
   }
 
   export type Granularity = {
