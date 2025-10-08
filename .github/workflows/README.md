@@ -4,111 +4,117 @@ This directory contains automated workflows for managing releases of `react-nati
 
 ## Workflows
 
-### 1. `prepare-release.yml` - Prepare a Release
+### 1. `create-release-branch.yml` - Create Release Branch
 
 **Trigger:** Manual (workflow_dispatch)
 
-**Purpose:** Creates a pre-release and PR for review before publishing
+**Purpose:** Creates a release branch and git tag
 
 **Steps:**
-1. Bumps version (patch/minor/major)
-2. Creates and pushes git tag
-3. Creates GitHub pre-release with auto-generated notes
-4. Updates CHANGELOG.md with release notes
-5. Creates `release/vX.Y.Z` branch
-6. Opens PR to master with release notes
+1. Calculates new version (patch/minor/major)
+2. Creates `release/vX.Y.Z` branch
+3. Creates and pushes git tag `vX.Y.Z`
+4. Provides instructions for next steps
 
 **How to use:**
-1. Go to Actions → "Prepare Release"
+1. Go to Actions → "Create Release Branch"
 2. Click "Run workflow"
 3. Select version bump type (patch/minor/major)
 4. Click "Run workflow"
-5. Review the created PR and pre-release
+5. Go to GitHub Releases and manually publish the release
 
-### 2. `promote-release.yml` - Promote Pre-release to Release
+### 2. `release-published.yml` - Release Published Handler
 
-**Trigger:** Automatic (when PR from `release/*` branch is merged)
+**Trigger:** Automatic (when you publish a release on GitHub)
 
-**Purpose:** Marks the pre-release as a full release
+**Purpose:** Creates PR to update package.json and CHANGELOG.md
 
 **Steps:**
-1. Marks the pre-release as a full release (removes pre-release flag)
-2. Comments on PR with success message
+1. Gets version and release notes from the published release
+2. Updates package.json with new version
+3. Updates CHANGELOG.md with release notes
+4. Creates `release-pr/vX.Y.Z` branch
+5. Opens PR to master
 
 **How it works:**
-- Automatically runs when a release PR is merged
-- Promotes the existing pre-release to a full release
-- This triggers the npm publish workflow
+- Automatically runs when you publish a release on GitHub
+- Uses the release notes you generated/edited on GitHub
+- Creates a clean PR with version bump and changelog update
 
-### 3. `publish-release.yml` - Publish to npm
+### 3. `publish-npm.yml` - Publish to npm
 
-**Trigger:** Automatic (when a release is published)
+**Trigger:** Automatic (when release PR is merged)
 
 **Purpose:** Publishes the package to npm
 
 **Steps:**
-1. Checks out code at the release tag
-2. Installs dependencies
-3. Publishes package to npm
-4. Comments on release with npm link
+1. Validates the PR came from a `release-pr/*` branch
+2. Checks out master (now has updated package.json)
+3. Installs dependencies
+4. Publishes to npm
+5. Comments on PR with success links
 
 **How it works:**
-- Automatically runs when a release is published (not pre-release)
-- Uses the exact code from the git tag
-- Posts npm installation instructions as a comment
+- Automatically runs when a release PR is merged
+- Publishes from master ensuring version is correct
+- Posts npm links as a comment
 
 ## Release Process
 
 ```
 ┌─────────────────────────────────────────┐
-│  1. Prepare Release (Manual)            │
-│     • Actions → "Prepare Release"       │
-│     • Select version bump type          │
-│     • Creates tag + pre-release         │
-│     • Creates PR with GitHub notes      │
+│  1. Create Branch & Tag (Manual)        │
+│     • Actions → "Create Release Branch" │
+│     • Select patch/minor/major          │
+│     • Creates release/vX.Y.Z branch     │
+│     • Creates vX.Y.Z tag                │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│  2. Review Release                      │
-│     • Check pre-release on GitHub       │
-│     • Review auto-generated notes       │
-│     • Check version bump in PR          │
-│     • Run any final tests               │
-│     • Approve the PR                    │
+│  2. Publish Release (Manual)            │
+│     • Go to GitHub Releases             │
+│     • Click "Draft a new release"       │
+│     • Select tag vX.Y.Z                 │
+│     • Click "Generate release notes"    │
+│     • Edit if needed                    │
+│     • Click "Publish release"           │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│  3. Merge PR (Manual)                   │
-│     • Click "Merge pull request"        │
+│  3. Auto PR Created (Automatic)         │
+│     • Triggered by release published    │
+│     • Updates package.json version      │
+│     • Updates CHANGELOG.md              │
+│     • Opens PR to master                │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
-│  4. Promote Release (Automatic)         │
-│     • Marks pre-release as release      │
-│     • Comments on PR                    │
+│  4. Review & Merge PR (Manual)          │
+│     • Review the version bump           │
+│     • Approve and merge PR              │
 └─────────────────┬───────────────────────┘
                   │
                   ▼
 ┌─────────────────────────────────────────┐
 │  5. Publish to npm (Automatic)          │
-│     • Triggered by release published    │
-│     • Publishes package to npm          │
-│     • Comments on release with link     │
+│     • Triggered by PR merge             │
+│     • Publishes from master             │
+│     • Comments on PR with links         │
 └─────────────────────────────────────────┘
 ```
 
 ## Benefits
 
-✅ **Safe** - Review changes before publishing to npm  
+✅ **Simple** - Clear, straightforward process  
 ✅ **Native GitHub Features** - Uses GitHub's auto-generated release notes  
-✅ **Pre-release Testing** - Create pre-release first for validation  
-✅ **Automated** - Minimal manual steps required  
+✅ **Manual Control** - You publish the release when ready  
+✅ **Automated** - PR and npm publish happen automatically  
 ✅ **Auditable** - Full PR history + GitHub releases  
-✅ **Flexible** - Can edit release notes before promoting  
-✅ **Reversible** - Close PR or delete pre-release to abort  
+✅ **Flexible** - Edit release notes on GitHub before publishing  
+✅ **Safe** - Version bump reviewed in PR before npm publish  
 
 ## Testing
 
@@ -116,25 +122,25 @@ See [docs/development/testing-github-actions-workflow.md](/docs/development/test
 
 ## Troubleshooting
 
-### Pre-release not created
+### Branch/tag not created
 - Check workflow run logs in Actions tab
 - Ensure you have proper permissions
 - Verify tag doesn't already exist
 
-### Release not promoted
-- Verify PR was from a `release/*` branch
-- Check that PR was merged (not just closed)
-- Review promote workflow logs in Actions tab
+### PR not created after publishing release
+- Verify you published the release (not saved as draft)
+- Check "Release Published" workflow logs in Actions tab
+- Ensure the tag exists and matches the release
 
 ### npm publish didn't run
-- Verify release was promoted (not pre-release)
-- Check that release was published (not just created)
-- Review publish workflow logs in Actions tab
+- Verify PR was from a `release-pr/*` branch
+- Check that PR was merged (not just closed)
+- Review "Publish to npm" workflow logs in Actions tab
 
 ### npm publish failed
 - Verify `NPM_TOKEN` secret is set
 - Check that version doesn't already exist on npm
-- Ensure the code at the tag builds successfully
+- Ensure master has the updated package.json
 - Review npm publish logs in workflow output
 
 ## Required Secrets

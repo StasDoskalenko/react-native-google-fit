@@ -1,0 +1,85 @@
+name: Publish to npm
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  publish:
+    # Only run if PR was merged and came from a release-pr/* branch
+    if: |
+      github.event.pull_request.merged == true && 
+      startsWith(github.event.pull_request.head.ref, 'release-pr/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Validate release PR branch
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          if [[ ! "$BRANCH" =~ ^release-pr/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Branch name '$BRANCH' doesn't match release-pr/vX.Y.Z pattern"
+            exit 1
+          fi
+          echo "✅ Valid release PR branch: $BRANCH"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install
+      
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "📦 Version: $VERSION"
+      
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish
+          echo "✅ Published to npm"
+      
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body \
+            "🎉 **Package published to npm successfully!**
+            
+            📦 **npm:** [react-native-google-fit@${{ env.NEW_VERSION }}](https://www.npmjs.com/package/react-native-google-fit/v/${{ env.NEW_VERSION }})
+            🔖 **Release:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})
+            
+            Install with:
+            \`\`\`bash
+            npm install react-native-google-fit@${{ env.NEW_VERSION }}
+            # or
+            yarn add react-native-google-fit@${{ env.NEW_VERSION }}
+            \`\`\`"
+          
+          echo "✅ PR comment posted"
+      
+      - name: Summary
+        run: |
+          echo "🎉 Release v${{ env.NEW_VERSION }} complete!"
+          echo ""
+          echo "✅ npm: https://www.npmjs.com/package/react-native-google-fit/v/${{ env.NEW_VERSION }}"
+          echo "✅ Release: https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }}"
+

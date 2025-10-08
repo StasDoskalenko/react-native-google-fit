@@ -1,0 +1,87 @@
+name: Create Release Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'patch'
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Calculate new version
+        id: version
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Parse version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          # Bump version based on input
+          case "${{ inputs.version_bump }}" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+          
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "✅ New version: $NEW_VERSION"
+      
+      - name: Create release branch
+        run: |
+          BRANCH_NAME="release/v${{ env.NEW_VERSION }}"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+          echo "✅ Branch created: $BRANCH_NAME"
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Release v${{ env.NEW_VERSION }}"
+          git push origin "v${{ env.NEW_VERSION }}"
+          echo "✅ Tag created: v${{ env.NEW_VERSION }}"
+      
+      - name: Summary
+        run: |
+          echo "🎉 Release branch and tag created!"
+          echo ""
+          echo "📋 Next steps:"
+          echo "  1. Go to: https://github.com/${{ github.repository }}/releases/new"
+          echo "  2. Select tag: v${{ env.NEW_VERSION }}"
+          echo "  3. Click 'Generate release notes'"
+          echo "  4. Review and publish the release"
+          echo ""
+          echo "The publish workflow will automatically create a PR to update package.json and CHANGELOG.md"
+
