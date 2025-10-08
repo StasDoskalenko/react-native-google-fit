@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+### [0.21.1] - 2025-10-08
+
+#### Changes
+- Initial release
+
+
+
 ### [0.21.0] - 2024-05-17
 
 #### Added
