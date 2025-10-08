@@ -2,14 +2,21 @@ const {
   AndroidConfig,
   withAndroidManifest,
   createRunOncePlugin,
-} = require('@expo/config-plugins')
+} = require('expo/config-plugins')
+
+let pkg = { name: 'react-native-google-fit' }
+try {
+  pkg = require('./package.json')
+} catch {
+  // empty catch block
+}
 
 /**
  * Expo config plugin for react-native-google-fit
  * Adds necessary Android configurations for Google Fit API
  */
 const withGoogleFit = (config) => {
-  return withAndroidManifest(config, async (config) => {
+  return withAndroidManifest(config, (config) => {
     const androidManifest = config.modResults
 
     // Ensure queries element exists
@@ -44,8 +51,4 @@ const withGoogleFit = (config) => {
   })
 }
 
-module.exports = createRunOncePlugin(
-  withGoogleFit,
-  'react-native-google-fit',
-  '1.0.0'
-)
+module.exports = createRunOncePlugin(withGoogleFit, pkg.name, pkg.version)
