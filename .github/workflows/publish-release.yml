@@ -1,0 +1,122 @@
+name: Publish Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  publish:
+    # Only run if PR was merged (not just closed) and came from a release branch
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master  # Ensure we're on master after merge
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install
+      
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "📦 Version: $VERSION"
+      
+      - name: Get previous version tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          if [ -n "$PREV_TAG" ]; then
+            echo "📌 Previous tag: $PREV_TAG"
+          fi
+      
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Release v${{ env.NEW_VERSION }}"
+          git push origin "v${{ env.NEW_VERSION }}"
+          echo "✅ Tag v${{ env.NEW_VERSION }} created and pushed"
+      
+      - name: Generate release notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ steps.prev_tag.outputs.tag }}" ]; then
+            gh api repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="v${{ env.NEW_VERSION }}" \
+              -f target_commitish="master" \
+              -f previous_tag_name="${{ steps.prev_tag.outputs.tag }}" \
+              --jq '.body' > /tmp/release_notes.md
+          else
+            echo "## Initial Release" > /tmp/release_notes.md
+            echo "" >> /tmp/release_notes.md
+            echo "First release of react-native-google-fit v${{ env.NEW_VERSION }}" >> /tmp/release_notes.md
+          fi
+          
+          echo "✅ Release notes generated"
+      
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ env.NEW_VERSION }}" \
+            --title "v${{ env.NEW_VERSION }}" \
+            --notes-file /tmp/release_notes.md
+          
+          echo "✅ GitHub Release created"
+      
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm publish
+          echo "✅ Published to npm"
+      
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body \
+            "🎉 **Release v${{ env.NEW_VERSION }} published successfully!**
+            
+            ✅ **Tag created:** [\`v${{ env.NEW_VERSION }}\`](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})
+            ✅ **GitHub Release:** [View Release](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})
+            ✅ **npm package:** [react-native-google-fit@${{ env.NEW_VERSION }}](https://www.npmjs.com/package/react-native-google-fit/v/${{ env.NEW_VERSION }})
+            
+            The package should be available on npm within a few minutes."
+          
+          echo "✅ PR comment posted"
+      
+      - name: Summary
+        run: |
+          echo "🎉 Release v${{ env.NEW_VERSION }} complete!"
+          echo ""
+          echo "📋 Summary:"
+          echo "  ✅ Tag: v${{ env.NEW_VERSION }}"
+          echo "  ✅ GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }}"
+          echo "  ✅ npm: https://www.npmjs.com/package/react-native-google-fit/v/${{ env.NEW_VERSION }}"
+

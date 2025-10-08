@@ -6,9 +6,11 @@
 
 A React Native bridge module for interacting with Google Fit
 
+> **⚠️ Important Notice**: Google has deprecated the Google Fit API and is transitioning to Health Connect. While the Google Fit API remains available, we are committed to maintaining this library and bringing it up to the latest standards. We will continue to support this library as long as the API is accessible and will provide migration guidance when Health Connect integration becomes necessary.
+
 # Quick Links
 - [Installation](/docs/INSTALLATION.md)
-- [Changelog](/docs/CHANGELOG.md)
+- [Changelog](CHANGELOG.md)
 - [Example app](https://github.com/StasDoskalenko/react-native-google-fit-example)
 - [F.A.Q.](/docs/FAQ.md)
 
