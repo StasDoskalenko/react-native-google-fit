@@ -33,7 +33,9 @@ jobs:
       - name: Get release notes
         id: release_notes
         run: |
-          echo '${{ github.event.release.body }}' > /tmp/release_notes.md
+          cat > /tmp/release_notes.md << 'RELEASE_NOTES_EOF'
+          ${{ github.event.release.body }}
+          RELEASE_NOTES_EOF
           echo "✅ Release notes retrieved"
 
       - name: Update package.json

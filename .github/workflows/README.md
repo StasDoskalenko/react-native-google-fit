@@ -104,6 +104,33 @@ This directory contains automated workflows for managing releases of `react-nati
 │     • Publishes from master             │
 │     • Comments on PR with links         │
 └─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start([Start Release]) --> Manual1[/"👤 Step 1: Create Release Branch<br/>(Manual - GitHub Actions)"/]
+    
+    Manual1 --> Action1["🔧 Workflow: create-release-branch.yml<br/>• Calculate new version<br/>• Create release/vX.Y.Z branch<br/>• Push git tag vX.Y.Z"]
+    
+    Action1 --> Manual2[/"👤 Step 2: Publish Release<br/>(Manual - GitHub UI)"/]
+    
+    Manual2 --> Action2["📝 On GitHub Releases:<br/>• Draft new release<br/>• Select tag vX.Y.Z<br/>• Generate release notes<br/>• Edit if needed<br/>• Publish release"]
+    
+    Action2 --> Auto1["⚡ Workflow: release-published.yml<br/>(Automatic)<br/>• Get release notes<br/>• Update package.json<br/>• Update CHANGELOG.md<br/>• Create release-pr/vX.Y.Z branch<br/>• Open PR to master"]
+    
+    Auto1 --> Manual3[/"👤 Step 3: Review & Merge PR<br/>(Manual)"/]
+    
+    Manual3 --> Action3["✅ Review PR:<br/>• Verify version bump<br/>• Check CHANGELOG<br/>• Approve & merge"]
+    
+    Action3 --> Auto2["⚡ Workflow: publish-npm.yml<br/>(Automatic)<br/>• Validate PR branch<br/>• Install dependencies<br/>• Publish to npm<br/>• Comment on PR with links"]
+    
+    Auto2 --> Done([✨ Release Complete!])
+    
+    classDef manualStep fill:#e1f5ff,stroke:#0366d6,stroke-width:2px
+    classDef autoStep fill:#f0fff4,stroke:#22863a,stroke-width:2px
+    classDef actionStep fill:#fff5b1,stroke:#f9c513,stroke-width:1px
+    
+    class Manual1,Manual2,Manual3 manualStep
+    class Auto1,Auto2 autoStep
+    class Action1,Action2,Action3 actionStep
 ```
 
 ## Benefits
