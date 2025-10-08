@@ -78,8 +78,19 @@ npx expo run:android
 ```
 
 The plugin automatically configures:
-- Android 11+ `<queries>` for Google Fit app interaction
+- Android 11+ `<queries>` for Google Fit app interaction (see manual setup below)
 - Auto-linking (React Native 0.60+)
+
+**What the plugin does:**
+
+The plugin adds the following to your `AndroidManifest.xml`:
+```xml
+<queries>
+    <package android:name="com.google.android.apps.fitness" />
+</queries>
+```
+
+This allows your app to interact with the Google Fit app on Android 11+.
 
 ---
 
