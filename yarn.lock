@@ -6092,7 +6092,11 @@ __metadata:
     moment: "npm:^2.29.4"
     react-native: "npm:^0.72.6"
   peerDependencies:
+    expo: "*"
     react-native: ">=0.60.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
   languageName: unknown
   linkType: soft
 

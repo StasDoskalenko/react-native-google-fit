@@ -51,8 +51,8 @@
     "react-native": "^0.72.6"
   },
   "peerDependencies": {
-    "react-native": ">=0.60.0",
-    "expo": "*"
+    "expo": "*",
+    "react-native": ">=0.60.0"
   },
   "peerDependenciesMeta": {
     "expo": {
