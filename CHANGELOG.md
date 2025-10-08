@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+### [0.22.1] - 2025-10-08
+
+## What's Changed
+* Chore: Fix expo import by @StasDoskalenko in https://github.com/StasDoskalenko/react-native-google-fit/pull/380
+
+
+**Full Changelog**: https://github.com/StasDoskalenko/react-native-google-fit/compare/v0.22.0...v0.22.1
+
+
+
 ### [0.22.0] - 2025-10-08
 
 ## What's Changed
