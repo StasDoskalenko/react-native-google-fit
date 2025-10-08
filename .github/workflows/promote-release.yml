@@ -1,0 +1,62 @@
+name: Promote Release
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  promote:
+    # Only run if PR was merged and came from a release/v* branch
+    if: |
+      github.event.pull_request.merged == true && 
+      startsWith(github.event.pull_request.head.ref, 'release/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Validate release branch
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          if [[ ! "$BRANCH" =~ ^release/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Branch name '$BRANCH' doesn't match release/vX.Y.Z pattern"
+            exit 1
+          fi
+          echo "✅ Valid release branch: $BRANCH"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+      
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "📦 Version: $VERSION"
+      
+      - name: Mark release as non-prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "v${{ env.NEW_VERSION }}" --prerelease=false
+          echo "✅ Release v${{ env.NEW_VERSION }} marked as full release"
+      
+      - name: Comment on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body \
+            "✅ **Release v${{ env.NEW_VERSION }} promoted to full release!**
+            
+            🔖 **Release:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})
+            
+            The npm package will be published automatically when the release is finalized."
+          
+          echo "✅ PR comment posted"
+
