@@ -14,4 +14,12 @@ android/gradle/**
 android/gradlew*
 android/local.properties
 *.iml
-yarn.lock
+
+# Yarn Berry
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
