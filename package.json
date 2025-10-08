@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "expo": {
+    "plugin": "./app.plugin.js"
+  },
   "bugs": {
     "url": "https://github.com/StasDoskalenko/react-native-google-fit/issues"
   },
@@ -21,7 +24,9 @@
     "android",
     "fitness",
     "native",
-    "ReactNative"
+    "ReactNative",
+    "expo",
+    "expo-plugin"
   ],
   "license": "MIT",
   "repository": {
@@ -46,7 +51,13 @@
     "react-native": "^0.72.6"
   },
   "peerDependencies": {
-    "react-native": ">=0.60.0"
+    "react-native": ">=0.60.0",
+    "expo": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
   },
   "packageManager": "yarn@4.10.3"
 }
