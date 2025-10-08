@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+### [0.21.4] - 2025-10-08
+
+## What's Changed
+* Chore: Fix release-published.yml by @StasDoskalenko in https://github.com/StasDoskalenko/react-native-google-fit/pull/376
+
+
+**Full Changelog**: https://github.com/StasDoskalenko/react-native-google-fit/compare/v0.21.3...v0.21.4
+
+
+
 ### [0.21.2] - 2025-10-08
 
 #### Changes
