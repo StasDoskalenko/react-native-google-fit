@@ -25,23 +25,23 @@ jobs:
             exit 1
           fi
           echo "✅ Valid release PR branch: $BRANCH"
-      
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: master
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: "24"
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      
+
       - name: Install dependencies
         run: |
           corepack enable
           yarn install
-      
+
       - name: Get version from package.json
         id: version
         run: |
@@ -49,14 +49,14 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
           echo "📦 Version: $VERSION"
-      
+
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm publish
           echo "✅ Published to npm"
-      
+
       - name: Comment on PR
         env:
           GH_TOKEN: ${{ github.token }}
@@ -73,13 +73,12 @@ jobs:
             # or
             yarn add react-native-google-fit@${{ env.NEW_VERSION }}
             \`\`\`"
-          
+
           echo "✅ PR comment posted"
-      
+
       - name: Summary
         run: |
           echo "🎉 Release v${{ env.NEW_VERSION }} complete!"
           echo ""
           echo "✅ npm: https://www.npmjs.com/package/react-native-google-fit/v/${{ env.NEW_VERSION }}"
           echo "✅ Release: https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }}"
-

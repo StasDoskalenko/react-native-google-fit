@@ -15,12 +15,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
+
       - name: Get version from release
         id: version
         run: |
@@ -29,13 +29,13 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
           echo "📦 Version: $VERSION"
-      
+
       - name: Get release notes
         id: release_notes
         run: |
           echo '${{ github.event.release.body }}' > /tmp/release_notes.md
           echo "✅ Release notes retrieved"
-      
+
       - name: Update package.json
         run: |
           # Update version in package.json
@@ -46,7 +46,7 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
           "
           echo "✅ package.json updated to v${{ env.NEW_VERSION }}"
-      
+
       - name: Generate changelog entry
         run: |
           echo "### [${{ env.NEW_VERSION }}] - $(date +%Y-%m-%d)" > /tmp/changelog_entry.md
@@ -54,9 +54,9 @@ jobs:
           cat /tmp/release_notes.md >> /tmp/changelog_entry.md
           echo "" >> /tmp/changelog_entry.md
           echo "" >> /tmp/changelog_entry.md
-          
+
           echo "✅ Changelog entry generated"
-      
+
       - name: Update CHANGELOG.md
         run: |
           # Insert new entry after the header (line 5)
@@ -65,9 +65,9 @@ jobs:
           cat /tmp/changelog_entry.md >> /tmp/changelog_new.md
           tail -n +6 CHANGELOG.md >> /tmp/changelog_new.md
           mv /tmp/changelog_new.md CHANGELOG.md
-          
+
           echo "✅ CHANGELOG.md updated"
-      
+
       - name: Create PR branch
         run: |
           BRANCH_NAME="release-pr/v${{ env.NEW_VERSION }}"
@@ -75,35 +75,37 @@ jobs:
           git add package.json CHANGELOG.md
           git commit -m "chore: release v${{ env.NEW_VERSION }}"
           git push origin $BRANCH_NAME
-          
+
           echo "PR_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
           echo "✅ PR branch created: $BRANCH_NAME"
-      
+
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Create PR body
+          echo "## Release v${{ env.NEW_VERSION }}" > /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "This PR updates the version to **v${{ env.NEW_VERSION }}** and updates the changelog." >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "**Release:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})" >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "### Changes in this release:" >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          cat /tmp/release_notes.md >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "---" >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "### What this PR does:" >> /tmp/pr_body.md
+          echo "- Bumps version in package.json to ${{ env.NEW_VERSION }}" >> /tmp/pr_body.md
+          echo "- Updates CHANGELOG.md with release notes" >> /tmp/pr_body.md
+          echo "" >> /tmp/pr_body.md
+          echo "**Note:** Once this PR is merged, the npm package will be automatically published." >> /tmp/pr_body.md
+
           gh pr create \
             --base master \
             --head ${{ env.PR_BRANCH }} \
             --title "Release v${{ env.NEW_VERSION }}" \
-            --body "## Release v${{ env.NEW_VERSION }}
+            --body-file /tmp/pr_body.md
 
-This PR updates the version to **v${{ env.NEW_VERSION }}** and updates the changelog.
-
-🔖 **Release:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})
-
-### Changes in this release:
-
-$(cat /tmp/release_notes.md)
-
----
-
-### What this PR does:
-- ✅ Bumps version in package.json to ${{ env.NEW_VERSION }}
-- ✅ Updates CHANGELOG.md with release notes
-
-**Note:** Once this PR is merged, the npm package will be automatically published."
-          
-          echo "✅ Pull request created"
-
+          echo "Pull request created"
