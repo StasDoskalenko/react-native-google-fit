@@ -49,10 +49,17 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "✅ Version bumped to $NEW_VERSION"
       
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ env.NEW_VERSION }}" -m "Release v${{ env.NEW_VERSION }}"
+          git push origin "v${{ env.NEW_VERSION }}"
+          echo "✅ Tag v${{ env.NEW_VERSION }} created and pushed"
+      
       - name: Get previous version tag
         id: prev_tag
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          # Get second-to-last tag (since we just created the new one)
+          PREV_TAG=$(git tag -l --sort=-v:refname | grep -v "v${{ env.NEW_VERSION }}" | head -n 1)
           echo "tag=$PREV_TAG" >> $GITHUB_OUTPUT
           if [ -n "$PREV_TAG" ]; then
             echo "📌 Previous tag: $PREV_TAG"
@@ -60,19 +67,43 @@ jobs:
             echo "📌 No previous tag found"
           fi
       
+      - name: Create pre-release on GitHub
+        id: create_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ steps.prev_tag.outputs.tag }}" ]; then
+            gh release create "v${{ env.NEW_VERSION }}" \
+              --title "v${{ env.NEW_VERSION }}" \
+              --generate-notes \
+              --notes-start-tag "${{ steps.prev_tag.outputs.tag }}" \
+              --prerelease
+          else
+            gh release create "v${{ env.NEW_VERSION }}" \
+              --title "v${{ env.NEW_VERSION }}" \
+              --notes "Initial release of react-native-google-fit" \
+              --prerelease
+          fi
+          
+          echo "✅ Pre-release created"
+      
+      - name: Get release notes from GitHub
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "v${{ env.NEW_VERSION }}" --json body --jq '.body' > /tmp/release_notes.md
+          echo "✅ Release notes retrieved"
+      
       - name: Generate changelog entry
         id: changelog
         run: |
           echo "### [${{ env.NEW_VERSION }}] - $(date +%Y-%m-%d)" > /tmp/changelog_entry.md
           echo "" >> /tmp/changelog_entry.md
+          echo "#### Changes" >> /tmp/changelog_entry.md
           
-          if [ -n "${{ steps.prev_tag.outputs.tag }}" ]; then
-            echo "#### Changes" >> /tmp/changelog_entry.md
-            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s (%h)" --no-merges >> /tmp/changelog_entry.md
-          else
-            echo "#### Changes" >> /tmp/changelog_entry.md
-            echo "- Initial release" >> /tmp/changelog_entry.md
-          fi
+          # Extract just the commits from the release notes (skip the header)
+          tail -n +3 /tmp/release_notes.md >> /tmp/changelog_entry.md
           
           echo "" >> /tmp/changelog_entry.md
           echo "" >> /tmp/changelog_entry.md
@@ -98,22 +129,24 @@ jobs:
             echo ""
             echo "This PR prepares the release for version **v${{ env.NEW_VERSION }}**."
             echo ""
+            echo "🔖 **Pre-release created:** [v${{ env.NEW_VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.NEW_VERSION }})"
+            echo ""
             echo "### Changes in this release:"
             echo ""
-            cat /tmp/changelog_entry.md
+            cat /tmp/release_notes.md
             echo ""
             echo "---"
             echo ""
             echo "### Checklist before merging:"
             echo "- [ ] Version bump is correct"
             echo "- [ ] CHANGELOG.md is properly updated"
+            echo "- [ ] Release notes look good"
             echo "- [ ] All tests pass"
             echo "- [ ] Ready to publish to npm"
             echo ""
-            echo "**Note:** Once this PR is merged, the package will be automatically:"
-            echo "- Tagged as \`v${{ env.NEW_VERSION }}\`"
-            echo "- Published to npm"
-            echo "- Released on GitHub"
+            echo "**Note:** Once this PR is merged, the pre-release will be automatically:"
+            echo "- ✅ Marked as a full release"
+            echo "- 📦 Published to npm"
             echo "EOF"
           } >> $GITHUB_OUTPUT
       
@@ -136,8 +169,7 @@ jobs:
             --base master \
             --head ${{ env.RELEASE_BRANCH }} \
             --title "Release v${{ env.NEW_VERSION }}" \
-            --body "${{ steps.pr_body.outputs.body }}" \
-            --label "release"
+            --body "${{ steps.pr_body.outputs.body }}"
           
           echo "✅ Pull request created"
           echo ""
