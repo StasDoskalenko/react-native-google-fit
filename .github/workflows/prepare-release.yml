@@ -1,0 +1,146 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'patch'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install
+      
+      - name: Bump version
+        id: version
+        run: |
+          npm version ${{ inputs.version_bump }} --no-git-tag-version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "✅ Version bumped to $NEW_VERSION"
+      
+      - name: Get previous version tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          if [ -n "$PREV_TAG" ]; then
+            echo "📌 Previous tag: $PREV_TAG"
+          else
+            echo "📌 No previous tag found"
+          fi
+      
+      - name: Generate changelog entry
+        id: changelog
+        run: |
+          echo "### [${{ env.NEW_VERSION }}] - $(date +%Y-%m-%d)" > /tmp/changelog_entry.md
+          echo "" >> /tmp/changelog_entry.md
+          
+          if [ -n "${{ steps.prev_tag.outputs.tag }}" ]; then
+            echo "#### Changes" >> /tmp/changelog_entry.md
+            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s (%h)" --no-merges >> /tmp/changelog_entry.md
+          else
+            echo "#### Changes" >> /tmp/changelog_entry.md
+            echo "- Initial release" >> /tmp/changelog_entry.md
+          fi
+          
+          echo "" >> /tmp/changelog_entry.md
+          echo "" >> /tmp/changelog_entry.md
+          
+          echo "✅ Changelog entry generated"
+      
+      - name: Update CHANGELOG.md
+        run: |
+          head -n 5 CHANGELOG.md > /tmp/changelog_new.md
+          echo "" >> /tmp/changelog_new.md
+          cat /tmp/changelog_entry.md >> /tmp/changelog_new.md
+          tail -n +6 CHANGELOG.md >> /tmp/changelog_new.md
+          mv /tmp/changelog_new.md CHANGELOG.md
+          
+          echo "✅ CHANGELOG.md updated"
+      
+      - name: Generate PR body
+        id: pr_body
+        run: |
+          {
+            echo "body<<EOF"
+            echo "## Release v${{ env.NEW_VERSION }}"
+            echo ""
+            echo "This PR prepares the release for version **v${{ env.NEW_VERSION }}**."
+            echo ""
+            echo "### Changes in this release:"
+            echo ""
+            cat /tmp/changelog_entry.md
+            echo ""
+            echo "---"
+            echo ""
+            echo "### Checklist before merging:"
+            echo "- [ ] Version bump is correct"
+            echo "- [ ] CHANGELOG.md is properly updated"
+            echo "- [ ] All tests pass"
+            echo "- [ ] Ready to publish to npm"
+            echo ""
+            echo "**Note:** Once this PR is merged, the package will be automatically:"
+            echo "- Tagged as \`v${{ env.NEW_VERSION }}\`"
+            echo "- Published to npm"
+            echo "- Released on GitHub"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+      
+      - name: Create release branch
+        run: |
+          BRANCH_NAME="release/v${{ env.NEW_VERSION }}"
+          git checkout -b $BRANCH_NAME
+          git add package.json CHANGELOG.md
+          git commit -m "chore: prepare release v${{ env.NEW_VERSION }}"
+          git push origin $BRANCH_NAME
+          
+          echo "RELEASE_BRANCH=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "✅ Release branch created: $BRANCH_NAME"
+      
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base master \
+            --head ${{ env.RELEASE_BRANCH }} \
+            --title "Release v${{ env.NEW_VERSION }}" \
+            --body "${{ steps.pr_body.outputs.body }}" \
+            --label "release"
+          
+          echo "✅ Pull request created"
+          echo ""
+          echo "🎉 Release preparation complete!"
+          echo "📝 Review the PR and merge when ready to publish"
+

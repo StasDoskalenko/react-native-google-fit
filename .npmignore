@@ -7,3 +7,24 @@ react-native-system-notification.iml
 .idea/
 android/.idea/
 *.iml
+
+# Example app
+googleFitExample/
+
+# Yarn files (not needed in npm package)
+.yarn/
+.yarnrc.yml
+
+# Testing files
+.actrc
+.secrets
+.secrets.example
+.github/workflows/.secrets.example
+docs/development/
+
+# Development config files
+.eslintrc
+.eslintignore
+.prettierrc
+.prettierignore
+.github/
