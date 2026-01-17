@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+### [0.22.2] - 2026-01-17
+
+## What's Changed
+* Release v0.22.1 by @github-actions[bot] in https://github.com/StasDoskalenko/react-native-google-fit/pull/381
+* Bump tar from 7.5.1 to 7.5.3 by @dependabot[bot] in https://github.com/StasDoskalenko/react-native-google-fit/pull/383
+* Bump js-yaml from 3.14.1 to 3.14.2 by @dependabot[bot] in https://github.com/StasDoskalenko/react-native-google-fit/pull/384
+
+
+**Full Changelog**: https://github.com/StasDoskalenko/react-native-google-fit/compare/v0.22.1...v0.22.2
+
+
+
 ### [0.22.1] - 2025-10-08
 
 ## What's Changed
